@@ -2,15 +2,16 @@
 #include <vector>
 #include <chrono>
 #include <random>
-#include "hashFunctionH.hpp"
+#include "hashFunctionG.hpp"
+#include "randGen.hpp"
 
 int main(){
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-	std::vector<double> p = {1, 1, 1, 1, 1};
-	HashFunctionH* h1 = new HashFunctionH(4, 5, seed);
-	h1->printVec();
-	std::cout << h1->computeH(p);
-	
-	delete h1;
+	setRandomSeed(seed);
+	std::vector<double> p = {1, 1, 1};
+	HashFunctionG* g1 = new HashFunctionG(4, 2, 3);
+	std::cout << g1->computeG(p);
+
+	delete g1;
 	return 0;
 }

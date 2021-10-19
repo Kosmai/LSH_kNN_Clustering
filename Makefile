@@ -1,8 +1,8 @@
 CC=g++
 CFLAGS=-Wall
 BUILDNAME=lsh
-DEPS=hashFunctionH.hpp
-OBJ=main.o hashFunctionH.o
+DEPS=hashFunctionH.hpp hashFunctionG.hpp randGen.hpp
+OBJ=main.o hashFunctionH.o hashFunctionG.o randGen.o
 
 all: clean $(BUILDNAME)
 
