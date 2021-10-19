@@ -1,13 +1,16 @@
 CC=g++
+CFLAGS=-Wall
 BUILDNAME=lsh
-DEPS= 
-OBJ=main.o
+DEPS=hashFunctionH.hpp
+OBJ=main.o hashFunctionH.o
+
+all: clean $(BUILDNAME)
 
 %.o: %.c ${DEPS}
-	$(CC) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $^
 
 $(BUILDNAME): $(OBJ)
-	$(CC) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^
 
 .PHONY: clean
 clean:
