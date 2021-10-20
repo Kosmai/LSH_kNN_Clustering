@@ -1,16 +1,16 @@
 #include "hashTable.hpp"
 
-Hashtable::Hashtable(){
+HashTable::HashTable(){
     std::cout << "Default created" << std::endl;
 }
 
-Hashtable::Hashtable(unsigned int numBuckets) {
+HashTable::HashTable(unsigned int numBuckets) {
     this->numBuckets = numBuckets;
     this->hashArray = new std::list<Item *>[numBuckets];
-    std::cout << "Hashtable Created" << std::endl;
+    std::cout << "HashTable Created" << std::endl;
 }
 
-Hashtable::~Hashtable() {
+HashTable::~HashTable() {
     std::list<Item *>::iterator it;
     for (unsigned int bucket = 0; bucket < this->numBuckets; bucket++) {
         for (it = this->hashArray[bucket].begin(); it != this->hashArray[bucket].end(); ++it) {
@@ -18,23 +18,23 @@ Hashtable::~Hashtable() {
         }
     }
     delete[] (this->hashArray);
-    std::cout << "Hashtable Deleted" << std::endl;
+    std::cout << "HashTable Deleted" << std::endl;
 }
 
-Hashtable::Hashtable(const Hashtable &copy){
+HashTable::HashTable(const HashTable &copy){
     this->numBuckets = copy.numBuckets;
     this->hashArray = new std::list<Item *>[numBuckets];
-    std::cout << "Hashtable Copy Created" << std::endl;
+    std::cout << "HashTable Copy Created" << std::endl;
 }
 
-Hashtable& Hashtable::operator=(const Hashtable &copy){
-    std::cout << "Hashtable Copy Opp Created" << std::endl;
+HashTable& HashTable::operator=(const HashTable &copy){
+    std::cout << "HashTable Copy Opp Created" << std::endl;
     this->numBuckets = copy.numBuckets;
     this->hashArray = new std::list<Item *>[this->numBuckets];
     return *this;
 }
 
-int Hashtable::search(unsigned int bucket, int key) const {
+int HashTable::search(unsigned int bucket, int key) const {
 
     if (bucket >= this->numBuckets) {
         return -1;
@@ -50,7 +50,7 @@ int Hashtable::search(unsigned int bucket, int key) const {
     return 0;
 }
 
-int Hashtable::count(unsigned int bucket, int key) const {
+int HashTable::count(unsigned int bucket, int key) const {
 
     if (bucket >= this->numBuckets) {
         return -1;
@@ -68,7 +68,7 @@ int Hashtable::count(unsigned int bucket, int key) const {
     return count;
 }
 
-int Hashtable::insert(unsigned int bucket, int key, ITEM_TYPE *data) {
+int HashTable::insert(unsigned int bucket, int key, ITEM_TYPE *data) {
 
     if (bucket >= this->numBuckets) {
         return -1;
@@ -83,7 +83,7 @@ int Hashtable::insert(unsigned int bucket, int key, ITEM_TYPE *data) {
     return 0;
 }
 
-int Hashtable::remove(unsigned int bucket, int key) {
+int HashTable::remove(unsigned int bucket, int key) {
 
     if (bucket >= this->numBuckets) {
         return -1;
@@ -102,7 +102,7 @@ int Hashtable::remove(unsigned int bucket, int key) {
     return 0;
 }
 
-void Hashtable::print() const {
+void HashTable::print() const {
 
     std::cout << "------------------------------------------" << std::endl;
 

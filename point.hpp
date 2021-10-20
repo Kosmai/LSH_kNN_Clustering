@@ -22,7 +22,7 @@ public:
 
     std::string getId();
 
-    std::vector<double> getVector();
+    std::vector<double>& getVector();
 
     int getDimension();
 

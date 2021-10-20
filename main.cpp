@@ -6,13 +6,14 @@
 #include "randGen.hpp"
 #include "hashTable.hpp"
 #include "point.hpp"
+#include "LSH.hpp"
 
 #define MAX_ELEMENTS 100
-#define BUCKETS 100
+#define BUCKETS 10
 #define DIMS 2
 #define W 2
-#define K 8
-#define L 1
+#define K 4
+#define L 8
 
 
 int main() {
@@ -50,18 +51,22 @@ int main() {
 //	delete[] ht;
 
 //Point demo
-    std::vector<double> tempVec = {1, 2, 3, 4};
+    std::vector<double> tempVec = {1, 2};
     std::string tempId = "point1";
 
-    std::vector<double> tempVec2 = {4, 6, 3, 4};
-    std::string tempId2 = "point2";
+    // std::vector<double> tempVec2 = {4, 6, 3, 4};
+    // std::string tempId2 = "point2";
 
     Point a(tempVec, tempId);
-    Point b(tempVec2, tempId2);
-    a.print();
-    std::cout << "Size: " << a.getDimension() << std::endl;
-    std::cout << "Distance: " << a.l2Distance(&b) << std::endl;
-    std::cout << "Distance: " << a.l2Distance({4, 6, 3, 4}) << std::endl;
-    std::cout << "Distance: " << a.l2Distance(b.getVector()) << std::endl;
+    // Point b(tempVec2, tempId2);
+    // a.print();
+    // std::cout << "Size: " << a.getDimension() << std::endl;
+    // std::cout << "Distance: " << a.l2Distance(&b) << std::endl;
+    // std::cout << "Distance: " << a.l2Distance({4, 6, 3, 4}) << std::endl;
+    // std::cout << "Distance: " << a.l2Distance(b.getVector()) << std::endl;
+
+    LSH lsh = LSH(DIMS, BUCKETS, L, K, W);
+    lsh.addPoint(a);
+    lsh.printAllHT();
     return 0;
 }

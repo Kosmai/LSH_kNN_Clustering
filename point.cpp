@@ -37,7 +37,7 @@ std::string Point::getId() {
     return this->id;
 }
 
-std::vector<double> Point::getVector() {
+std::vector<double>& Point::getVector() {
     return this->vec;
 }
 

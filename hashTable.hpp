@@ -4,28 +4,30 @@
 #include <string>
 #include <iostream>
 
-#define ITEM_TYPE int
+class Point;
+
+#define ITEM_TYPE Point
 
 struct Item {
     int key;
     ITEM_TYPE *data;
 };
 
-class Hashtable {
+class HashTable {
 private:
     unsigned int numBuckets;
     std::list<Item *> *hashArray;
 
 public:
-    Hashtable();
+    HashTable();
 
-    Hashtable(const Hashtable &copy);
+    HashTable(const HashTable &copy);
 
-    Hashtable& operator=(const Hashtable &copy);
+    HashTable& operator=(const HashTable &copy);
 
-    explicit Hashtable(unsigned int);
+    explicit HashTable(unsigned int);
 
-    ~Hashtable();
+    ~HashTable();
 
     int search(unsigned int, int) const;
 
