@@ -20,7 +20,7 @@ Hashtable::~Hashtable() {
 
 int Hashtable::search(unsigned int bucket, int key) const {
 
-    if (bucket > this->numBuckets) {
+    if (bucket >= this->numBuckets) {
         return -1;
     }
 
@@ -39,7 +39,7 @@ int Hashtable::search(unsigned int bucket, int key) const {
 
 int Hashtable::insert(unsigned int bucket, int key, ITEM_TYPE *data) {
 
-    if (bucket > this->numBuckets) {
+    if (bucket >= this->numBuckets) {
         return -1;
     }
 
@@ -54,7 +54,7 @@ int Hashtable::insert(unsigned int bucket, int key, ITEM_TYPE *data) {
 
 int Hashtable::remove(unsigned int bucket, int key) {
 
-    if (bucket > this->numBuckets) {
+    if (bucket >= this->numBuckets) {
         return -1;
     }
 
