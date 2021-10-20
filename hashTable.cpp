@@ -19,6 +19,11 @@ Hashtable::~Hashtable() {
 }
 
 int Hashtable::search(unsigned int bucket, int key) const {
+
+    if (bucket > this->numBuckets) {
+        return -1;
+    }
+
     std::list<Item *>::iterator it;
 
     for (it = this->hashArray[bucket].begin(); it != this->hashArray[bucket].end(); ++it) {
@@ -33,6 +38,11 @@ int Hashtable::search(unsigned int bucket, int key) const {
 }
 
 int Hashtable::insert(unsigned int bucket, int key, ITEM_TYPE *data) {
+
+    if (bucket > this->numBuckets) {
+        return -1;
+    }
+
     Item *newItem = new Item;
     newItem->key = key;
     newItem->data = data;
@@ -43,11 +53,16 @@ int Hashtable::insert(unsigned int bucket, int key, ITEM_TYPE *data) {
 }
 
 int Hashtable::remove(unsigned int bucket, int key) {
+
+    if (bucket > this->numBuckets) {
+        return -1;
+    }
+
     std::list<Item *>::iterator it;
 
     for (it = this->hashArray[bucket].begin(); it != this->hashArray[bucket].end(); ++it) {
         if ((*it)->key == key) {
-            delete(*it);
+            delete (*it);
             this->hashArray[bucket].remove(*it);
             return 1;
         }
