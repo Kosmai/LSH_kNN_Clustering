@@ -1,13 +1,11 @@
+#include <iostream>
+#include <string>
 #include "../inc/hashTable.hpp"
 
-HashTable::HashTable(){
-    std::cout << "Default created" << std::endl;
-}
 
 HashTable::HashTable(unsigned int numBuckets) {
     this->numBuckets = numBuckets;
     this->hashArray = new std::list<Item *>[numBuckets];
-    std::cout << "HashTable Created" << std::endl;
 }
 
 HashTable::~HashTable() {
@@ -18,22 +16,23 @@ HashTable::~HashTable() {
         }
     }
     delete[] (this->hashArray);
-    std::cout << "HashTable Deleted" << std::endl;
 }
 
 HashTable::HashTable(const HashTable &copy){
     this->numBuckets = copy.numBuckets;
     this->hashArray = new std::list<Item *>[numBuckets];
-    std::cout << "HashTable Copy Created" << std::endl;
 }
 
 HashTable& HashTable::operator=(const HashTable &copy){
-    std::cout << "HashTable Copy Opp Created" << std::endl;
     this->numBuckets = copy.numBuckets;
     this->hashArray = new std::list<Item *>[this->numBuckets];
     return *this;
 }
 
+
+
+
+//Looks in bucket for ID==key, if found returns 1, otherwise 0
 int HashTable::search(unsigned int bucket, int key) const {
 
     if (bucket >= this->numBuckets) {
@@ -50,6 +49,7 @@ int HashTable::search(unsigned int bucket, int key) const {
     return 0;
 }
 
+//Counts the amount of instances in bucket with ID==key
 int HashTable::count(unsigned int bucket, int key) const {
 
     if (bucket >= this->numBuckets) {
@@ -68,6 +68,7 @@ int HashTable::count(unsigned int bucket, int key) const {
     return count;
 }
 
+//Creates a new entry in bucket with ID=key and a ptr to the data
 int HashTable::insert(unsigned int bucket, int key, ITEM_TYPE *data) {
 
     if (bucket >= this->numBuckets) {
@@ -83,6 +84,7 @@ int HashTable::insert(unsigned int bucket, int key, ITEM_TYPE *data) {
     return 0;
 }
 
+//Removes only the first instance of key in bucket
 int HashTable::remove(unsigned int bucket, int key) {
 
     if (bucket >= this->numBuckets) {

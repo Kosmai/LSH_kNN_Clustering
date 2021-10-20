@@ -1,4 +1,14 @@
-void setRandomSeed(unsigned seed);
+
+//Only call this once with any seed
+void setRandomSeed(unsigned int seed);
+
+
+
+//Returns a normal distribution random double in [0,1]
 double getNormalRandom();
-int getUniformRandom();
+
+//Returns a uniform distribution random float in [0,1]
 float getUniformRandomFloat();
+
+//Returns a uniform random int in [-2^31 , 2^31-1]
+int getUniformRandom();

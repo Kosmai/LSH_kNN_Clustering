@@ -3,20 +3,15 @@
 #include "../inc/hashFunctionH.hpp"
 #include "../inc/randGen.hpp"
 
-HashFunctionH::HashFunctionH(){}
-
 //Fill v with random doubles
 HashFunctionH::HashFunctionH(int w, int dims) : w(w){
-	t = getUniformRandomFloat()*w;
+	t = getUniformRandomFloat()*w; //Generate t = random double in [0,w]
 	for(int i = 0; i < dims; i++){
-		this->v.push_back(getNormalRandom());
+		this->v.push_back(getNormalRandom()); //Append normal dist. double to the vector
 	}
 }
 
-HashFunctionH::~HashFunctionH(){
-
-}
-
+//Prints the vector that represent this H function
 void HashFunctionH::printVec(){
 	std::cout << "Vector v" << std::endl << "=================" << std::endl;
 	for(auto i : this->v){
@@ -25,7 +20,7 @@ void HashFunctionH::printVec(){
 	std::cout << "=================" << std::endl;
 }
 
-//Return h(p) used in LSH
+//Return   h(p) = (p dot v + t) / w   used in LSH 
 int HashFunctionH::computeH(std::vector<double>& p){
 	return (std::inner_product(std::begin(this->v), std::end(this->v), std::begin(p), 0.0) + t)/w;
 }

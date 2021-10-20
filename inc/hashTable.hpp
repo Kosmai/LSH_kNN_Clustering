@@ -1,8 +1,4 @@
-#pragma once
-
 #include <list>
-#include <string>
-#include <iostream>
 
 class Point;
 
@@ -19,7 +15,7 @@ private:
     std::list<Item *> *hashArray;
 
 public:
-    HashTable();
+    HashTable() = default;
 
     HashTable(const HashTable &copy);
 
@@ -29,13 +25,18 @@ public:
 
     ~HashTable();
 
-    int search(unsigned int, int) const;
 
-    int count (unsigned int, int) const;
+    //returns 1 if item found, 0 otherwise
+    int search(unsigned int bucket, int key) const;
 
-    int insert(unsigned int, int, ITEM_TYPE *);
+    //returns the amount of times "key" exists in bucket
+    int count (unsigned int bucket, int key) const;
 
-    int remove(unsigned int, int);
+    //adds in bucket item with ID key and pointer to it
+    int insert(unsigned int bucket, int key, ITEM_TYPE *);
+
+    //deletes the first item with key found in bucket, returns 1/0
+    int remove(unsigned int bucket, int key);
 
     void print() const;
 };

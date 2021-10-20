@@ -17,6 +17,9 @@
 
 
 int main() {
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    setRandomSeed(seed);
+
     std::vector<Point> points;
 	std::vector<double> p[MAX_ELEMENTS];
 	for(int i = 0; i < MAX_ELEMENTS; i++){

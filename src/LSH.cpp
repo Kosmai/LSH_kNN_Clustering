@@ -1,25 +1,34 @@
 #include <chrono>
 #include "../inc/hashFunctionG.hpp"
 #include "../inc/hashTable.hpp"
-#include "../inc/randGen.hpp"
 #include "../inc/point.hpp"
 #include "../inc/LSH.hpp"
 
+LSH::LSH(){
+	std::cout << "Default LSH ctr implicitly called" << std::endl;
+}
 
 LSH::LSH(int dims, int buckets, int L, int k, int w) 
 : dims(dims),buckets(buckets), L(L), k(k), w(w){
-	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-	setRandomSeed(seed);
 
 	hashTables = new HashTable[L];
 	gFunctions = new HashFunctionG[L];
 	for(int i = 0; i < L; i++){
 		hashTables[i] = HashTable(buckets);
-		gFunctions[i]  = HashFunctionG(k, w, dims);
+		gFunctions[i] = HashFunctionG(k, w, dims);
 	}
 }
 
+LSH::LSH(const LSH& copy) 
+: dims(copy.dims),buckets(copy.buckets), L(copy.L), k(copy.k), w(copy.w){
+
+	std::cout << "LSH was copied - Undefined behavior" << std::endl;
+	hashTables = copy.hashTables;
+	gFunctions = copy.gFunctions;
+}
+
 LSH::~LSH(){
+
 	delete[] hashTables;
 	delete[] gFunctions;
 }
@@ -41,10 +50,15 @@ void LSH::printAllHT(){
 
 int LSH::addPoint(Point& p){
 
+	//make sure the point is valid
+	if(p.getDimension() != this->dims){
+		return -1;
+	}
+
 	//append p in list of points
 	points.push_back(p);
 
-	//add it's address in each hashtable 
+	//add it's address in each hashtable
 	for(int i = 0; i < L; i++){
 		unsigned int ID = gFunctions[i].computeID(p.getVector());
 		unsigned int bucketID = ID % buckets;

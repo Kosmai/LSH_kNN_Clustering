@@ -1,34 +1,30 @@
-#include "../inc/point.hpp"
 #include <cmath>
+#include "../inc/point.hpp"
 
 Point::Point() {
     this->id = "Uninitialized";
 }
 
-Point::Point(std::vector<double> vec, std::string id) {
-    this->vec = vec;
+Point::Point(std::vector<double>& vec, const std::string& id) {
+    this->vec = vec; //copy construct
     this->id = id;
 }
 
-Point::~Point() {
-
-}
-
 Point &Point::operator=(const Point &copy) {
-    this->vec = copy.vec;
+    this->vec = copy.vec; //copy construct
     this->id = copy.id;
 
     return *this;
 }
 
-int Point::setId(std::string id) {
+int Point::setId(std::string& id) {
     this->id = id;
 
     return 0;
 }
 
-int Point::setVector(std::vector<double> vec) {
-    this->vec = vec;
+int Point::setVector(std::vector<double>& vec) {
+    this->vec = vec; //copy construct
 
     return 0;
 }
@@ -57,7 +53,7 @@ double Point::l2Distance(Point *otherPoint) {
     return sqrt(sum);
 }
 
-double Point::l2Distance(std::vector<double> otherVector) {
+double Point::l2Distance(std::vector<double>& otherVector) {
     if ((int)otherVector.size() != this->getDimension()) {
         return -1;
     }

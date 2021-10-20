@@ -1,5 +1,3 @@
-#pragma once
-
 #include <vector>
 #include <iostream>
 
@@ -10,15 +8,19 @@ private:
 public:
     Point();
 
-    Point(std::vector<double>, std::string);
+    Point(std::vector<double>& vec, const std::string& id);
 
-    ~Point();
+    ~Point() = default;
+
+    Point(const Point& copy) = default;
 
     Point& operator=(const Point &copy);
 
-    int setId(std::string);
 
-    int setVector(std::vector<double>);
+
+    int setId(std::string& id);
+
+    int setVector(std::vector<double>&);
 
     std::string getId();
 
@@ -28,7 +30,7 @@ public:
 
     double l2Distance(Point*);
 
-    double l2Distance(std::vector<double>);
+    double l2Distance(std::vector<double>&);
 
     void print();
 

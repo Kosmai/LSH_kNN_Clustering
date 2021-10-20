@@ -15,10 +15,25 @@ private:
 	std::list<Point> points;
 
 public:
-	LSH(int dims, int buckets, int L, int k, int w);
+
+	LSH();
+
+	explicit LSH(int dims, int buckets, int L, int k, int w);
+
 	~LSH();
+
+	LSH(const LSH& copy);
+
+	LSH& operator=(const LSH& copy) = delete;
+
+
+	//print specified HashTable
 	void printHT(int id);
+
+	//print all HashTables
 	void printAllHT();
+
+	//Add a point p to the LSH class
 	int addPoint(Point& p);
 
 
