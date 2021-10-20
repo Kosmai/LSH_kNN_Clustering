@@ -1,9 +1,9 @@
 #include <chrono>
-#include "hashFunctionG.hpp"
-#include "hashTable.hpp"
-#include "randGen.hpp"
-#include "point.hpp"
-#include "LSH.hpp"
+#include "../inc/hashFunctionG.hpp"
+#include "../inc/hashTable.hpp"
+#include "../inc/randGen.hpp"
+#include "../inc/point.hpp"
+#include "../inc/LSH.hpp"
 
 
 LSH::LSH(int dims, int buckets, int L, int k, int w) 

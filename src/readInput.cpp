@@ -1,4 +1,4 @@
-#include "readInput.hpp"
+#include "../inc/readInput.hpp"
 
 void printVec(std::vector<double> v) {
     std::cout << "Vector v" << std::endl << "=================" << std::endl;

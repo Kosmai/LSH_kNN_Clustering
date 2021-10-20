@@ -1,7 +1,7 @@
 #include <iostream>
 #include <random>
-#include "hashFunctionH.hpp"
-#include "randGen.hpp"
+#include "../inc/hashFunctionH.hpp"
+#include "../inc/randGen.hpp"
 
 HashFunctionH::HashFunctionH(){}
 

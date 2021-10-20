@@ -5,11 +5,11 @@ class Point;
 
 class LSH{
 private:
-	int k;       //amount of diffrent H functions in each G function
-	int w;       //determines the size of the gap used in H funtions
-	int L;       //amount of diffrent hashtables
 	int dims;    //amount of dimensions used
 	int buckets; //amount of buckets per hashtable
+	int L;       //amount of diffrent hashtables
+	int k;       //amount of diffrent H functions in each G function
+	int w;       //determines the size of the gap used in H funtions
 	HashTable*     hashTables;
 	HashFunctionG* gFunctions;
 	std::list<Point> points;

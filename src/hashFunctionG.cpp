@@ -1,7 +1,7 @@
 #include <iostream>
-#include "hashFunctionG.hpp"
-#include "hashFunctionH.hpp"
-#include "randGen.hpp"
+#include "../inc/hashFunctionG.hpp"
+#include "../inc/hashFunctionH.hpp"
+#include "../inc/randGen.hpp"
 
 HashFunctionG::HashFunctionG(){
 	std::cout << "Dummy G created" << std::endl;

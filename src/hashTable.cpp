@@ -1,4 +1,4 @@
-#include "hashTable.hpp"
+#include "../inc/hashTable.hpp"
 
 HashTable::HashTable(){
     std::cout << "Default created" << std::endl;

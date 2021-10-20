@@ -1,4 +1,4 @@
-#include "point.hpp"
+#include "../inc/point.hpp"
 #include <cmath>
 
 Point::Point() {
@@ -58,7 +58,7 @@ double Point::l2Distance(Point *otherPoint) {
 }
 
 double Point::l2Distance(std::vector<double> otherVector) {
-    if (otherVector.size() != this->getDimension()) {
+    if ((int)otherVector.size() != this->getDimension()) {
         return -1;
     }
 
