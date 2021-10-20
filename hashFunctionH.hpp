@@ -9,5 +9,6 @@ public:
 	int computeH(std::vector<double>& p);
 private:
 	int w;
+	int t;
 	std::vector<double> v;
 };

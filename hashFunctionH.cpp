@@ -7,6 +7,7 @@ HashFunctionH::HashFunctionH(){}
 
 //Fill v with random doubles
 HashFunctionH::HashFunctionH(int w, int dims) : w(w){
+	t = getUniformRandomFloat()*w;
 	for(int i = 0; i < dims; i++){
 		this->v.push_back(getNormalRandom());
 	}
@@ -26,6 +27,5 @@ void HashFunctionH::printVec(){
 
 //Return h(p) used in LSH
 int HashFunctionH::computeH(std::vector<double>& p){
-	float t = (float)getNormalRandom();
 	return (std::inner_product(std::begin(this->v), std::end(this->v), std::begin(p), 0.0) + t)/w;
 }

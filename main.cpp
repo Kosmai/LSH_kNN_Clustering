@@ -5,25 +5,40 @@
 #include "hashFunctionG.hpp"
 #include "randGen.hpp"
 #include "hashTable.hpp"
+#define MAX_ELEMENTS 10000
+#define BUCKETS 1
+#define DIMS 2
+
 
 int main() {
-//	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-//	setRandomSeed(seed);
-//	std::vector<double> p = {1, 1, 1};
-//	HashFunctionG* g1 = new HashFunctionG(4, 2, 3);
-//	std::cout << g1->computeG(p);
-//
-//	delete g1;
+	Hashtable *ht = new Hashtable(BUCKETS);
 
-//hash table demo
-    Hashtable *ht = new Hashtable(5);
-    ht->insert(1, 1, NULL);
-    ht->insert(1, 2, NULL);
-    ht->insert(4, 64, NULL);
-    ht->insert(3, 48, NULL);
-    ht->remove(1, 1);
-    ht->print();
-    delete (ht);
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	setRandomSeed(seed);
+	std::vector<double> p[MAX_ELEMENTS];
+	for(int i = 0; i < MAX_ELEMENTS; i++){
+		for(int j = 0; j < DIMS; j++){
+			p[i].push_back(getNormalRandom()*MAX_ELEMENTS);
+		}
+	}
 
-    return 0;
+	unsigned int ID;
+	HashFunctionG* g1 = new HashFunctionG(4, 2, DIMS);
+	for(int i = 0; i < MAX_ELEMENTS; i++){
+		ID = g1->computeID(p[i]);
+		ht->insert(ID%BUCKETS, ID, NULL);
+	}
+	int c;
+	for(int i = 0; i < MAX_ELEMENTS; i++){
+		ID = g1->computeID(p[i]);
+		if((c = ht->count(ID%BUCKETS, ID)) != 1){
+			std::cout << c << std::endl;
+		}
+	}
+
+	//ht->print();
+	delete (g1);
+	delete (ht);
+
+	return 0;
 }

@@ -28,13 +28,28 @@ int Hashtable::search(unsigned int bucket, int key) const {
 
     for (it = this->hashArray[bucket].begin(); it != this->hashArray[bucket].end(); ++it) {
         if ((*it)->key == key) {
-            std::cout << "Item Found" << std::endl;
             return 1;
         }
     }
-
-    std::cout << "Item Not Found" << std::endl;
     return 0;
+}
+
+int Hashtable::count(unsigned int bucket, int key) const {
+
+    if (bucket >= this->numBuckets) {
+        return -1;
+    }
+
+    unsigned int count = 0;
+
+    std::list<Item *>::iterator it;
+
+    for (it = this->hashArray[bucket].begin(); it != this->hashArray[bucket].end(); ++it) {
+        if ((*it)->key == key) {
+            count++;
+        }
+    }
+    return count;
 }
 
 int Hashtable::insert(unsigned int bucket, int key, ITEM_TYPE *data) {

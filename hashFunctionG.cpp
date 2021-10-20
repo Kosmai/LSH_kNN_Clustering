@@ -22,20 +22,23 @@ HashFunctionG::~HashFunctionG(){
 	delete[] h;
 }
 
-int HashFunctionG::computeG(std::vector<double>& p){
+unsigned int HashFunctionG::computeID(std::vector<double>& p){
 	long term;
-	int total = 0;
-	const unsigned int M = 0xffffffff - 4;
-	std::cout << M << std::endl;
+	unsigned int termMod;
+	unsigned int total = 0;
+	const unsigned int M = 0xffffffff - 4; //prime 2^32 - 5
 	for(int i = 0; i < this->k; i++){
-		term = r[i]*h[i].computeH(p);
-		std::cout << "1: " << term << std::endl;
-		std::cout << "2: " << modulo(term,M) << std::endl;
-		total = modulo(total+term,M); //fix for corret mod opperation;
+		term = (long)r[i]*h[i].computeH(p);
+		termMod = modulo(term,M);
+		total = modulo((long)total+termMod,M);
 	}
-	return modulo(total,M); //%tableSize for G, without for ID
+	return total;
 }
 
-int HashFunctionG::modulo(long a,unsigned int b){
-	return a%b;//(long)(a%b+b)%b;
+unsigned int HashFunctionG::computeG(std::vector<double>& p, unsigned int tableSize){
+	return this->computeID(p) % tableSize;
+}
+
+unsigned int HashFunctionG::modulo(long a,unsigned int b){
+	return (long)(a%b+b)%b;
 }

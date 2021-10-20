@@ -23,6 +23,8 @@ public:
 
     int search(unsigned int, int) const;
 
+    int count (unsigned int, int) const;
+
     int insert(unsigned int, int, ITEM_TYPE *);
 
     int remove(unsigned int, int);

@@ -6,9 +6,10 @@ class HashFunctionG{
 public:
 	explicit HashFunctionG(int k, int w, int dims);
 	~HashFunctionG();
-	int computeG(std::vector<double>& p);
+	unsigned int computeID(std::vector<double>& p);
+	unsigned int computeG(std::vector<double>& p, unsigned int tableSize);
 private:
-	int modulo(long a,unsigned int b);
+	unsigned int modulo(long a,unsigned int b);
 	int k;
 	int w;
 	int dims;
