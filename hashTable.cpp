@@ -1,8 +1,8 @@
 #include "hashTable.hpp"
 
-Hashtable::Hashtable(){}
-
-//Hashtable::Hashtable(Hashtable& h){}
+Hashtable::Hashtable(){
+    std::cout << "Default created" << std::endl;
+}
 
 Hashtable::Hashtable(unsigned int numBuckets) {
     this->numBuckets = numBuckets;
@@ -17,9 +17,21 @@ Hashtable::~Hashtable() {
             delete (*it);
         }
     }
-
     delete[] (this->hashArray);
     std::cout << "Hashtable Deleted" << std::endl;
+}
+
+Hashtable::Hashtable(const Hashtable &copy){
+    this->numBuckets = copy.numBuckets;
+    this->hashArray = new std::list<Item *>[numBuckets];
+    std::cout << "Hashtable Copy Created" << std::endl;
+}
+
+Hashtable& Hashtable::operator=(const Hashtable &copy){
+    std::cout << "Hashtable Copy Opp Created" << std::endl;
+    this->numBuckets = copy.numBuckets;
+    this->hashArray = new std::list<Item *>[this->numBuckets];
+    return *this;
 }
 
 int Hashtable::search(unsigned int bucket, int key) const {

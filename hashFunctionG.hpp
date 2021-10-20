@@ -7,6 +7,8 @@ public:
 	HashFunctionG();
 	explicit HashFunctionG(int k, int w, int dims);
 	~HashFunctionG();
+
+	HashFunctionG& operator=(const HashFunctionG &copy);
 	unsigned int computeID(std::vector<double>& p);
 	unsigned int computeG(std::vector<double>& p, unsigned int tableSize);
 private:

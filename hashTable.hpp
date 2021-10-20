@@ -19,6 +19,10 @@ private:
 public:
     Hashtable();
 
+    Hashtable(const Hashtable &copy);
+
+    Hashtable& operator=(const Hashtable &copy);
+
     explicit Hashtable(unsigned int);
 
     ~Hashtable();

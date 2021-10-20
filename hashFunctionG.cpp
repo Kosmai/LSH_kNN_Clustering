@@ -3,26 +3,47 @@
 #include "hashFunctionH.hpp"
 #include "randGen.hpp"
 
-HashFunctionG::HashFunctionG(){};
+HashFunctionG::HashFunctionG(){
+	std::cout << "Dummy G created" << std::endl;
+};
 
 //Initialize k h functions and k "r" values.
 HashFunctionG::HashFunctionG(int k, int w, int dims) : k(k), w(w), dims(dims){
-	int i;
 	h = new HashFunctionH[k];
-	for(i = 0; i < k; i++){
+	for(int i = 0; i < k; i++){
 		h[i] = HashFunctionH(w, dims);
 	}
-	for(i = 0; i < k; i++){
-		h[i].printVec();
-	}
-	for(i = 0; i < k; i++){
+	// for(i = 0; i < k; i++){
+	// 	h[i].printVec();
+	// }
+	for(int i = 0; i < k; i++){
 		this->r.push_back(getUniformRandom());
 	}
+	std::cout << "Normal G created" << std::endl;
 }
 
 HashFunctionG::~HashFunctionG(){
+	std::cout << "G deleted" << std::endl;
 	delete[] h;
 }
+
+HashFunctionG& HashFunctionG::operator=(const HashFunctionG &copy){
+    std::cout << "HashFunctionG Copy Opp Created" << std::endl;
+    this->k = copy.k;
+    this->w = copy.w;
+    this->dims = copy.dims;
+    h = new HashFunctionH[k];
+	for(int i = 0; i < k; i++){
+		h[i] = HashFunctionH(w, dims);
+	}
+	for(int i = 0; i < k; i++){
+		this->r.push_back(getUniformRandom());
+	}
+    return *this;
+}
+
+
+
 
 unsigned int HashFunctionG::computeID(std::vector<double>& p){
 	long term;
