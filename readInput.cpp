@@ -18,7 +18,7 @@ int readDataSet(std::string fileName, char delimiter) {
         std::vector<double> vec;
 
         std::istringstream lineStream(lineBuffer);
-        getline(lineStream, item_id, delimiter);
+        std::getline(lineStream, item_id, delimiter);
 
         std::string valueBuffer;
 

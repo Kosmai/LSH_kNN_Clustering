@@ -8,6 +8,8 @@
 #define MAX_ELEMENTS 100
 #define BUCKETS 100
 #define DIMS 2
+#define W 2
+#define K 8
 #define L 1
 
 
@@ -16,7 +18,7 @@ int main() {
 	HashFunctionG* g = new HashFunctionG[L];
 	for(int i = 0; i < L; i++){
 		ht[i] = Hashtable(BUCKETS);
-		g[i]  = HashFunctionG(4, 4, DIMS);
+		g[i]  = HashFunctionG(K, W, DIMS);
 	}
 
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
