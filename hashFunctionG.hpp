@@ -4,6 +4,7 @@ class HashFunctionH;
 
 class HashFunctionG{
 public:
+	HashFunctionG();
 	explicit HashFunctionG(int k, int w, int dims);
 	~HashFunctionG();
 	unsigned int computeID(std::vector<double>& p);

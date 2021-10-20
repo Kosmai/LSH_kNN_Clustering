@@ -3,6 +3,8 @@
 #include "hashFunctionH.hpp"
 #include "randGen.hpp"
 
+HashFunctionG::HashFunctionG(){};
+
 //Initialize k h functions and k "r" values.
 HashFunctionG::HashFunctionG(int k, int w, int dims) : k(k), w(w), dims(dims){
 	int i;

@@ -1,5 +1,9 @@
 #include "hashTable.hpp"
 
+Hashtable::Hashtable(){}
+
+//Hashtable::Hashtable(Hashtable& h){}
+
 Hashtable::Hashtable(unsigned int numBuckets) {
     this->numBuckets = numBuckets;
     this->hashArray = new std::list<Item *>[numBuckets];

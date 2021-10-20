@@ -17,6 +17,8 @@ private:
     std::list<Item *> *hashArray;
 
 public:
+    Hashtable();
+
     explicit Hashtable(unsigned int);
 
     ~Hashtable();
