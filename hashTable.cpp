@@ -47,6 +47,7 @@ int Hashtable::remove(unsigned int bucket, int key) {
 
     for (it = this->hashArray[bucket].begin(); it != this->hashArray[bucket].end(); ++it) {
         if ((*it)->key == key) {
+            delete(*it);
             this->hashArray[bucket].remove(*it);
             return 1;
         }
