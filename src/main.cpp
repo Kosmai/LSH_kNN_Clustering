@@ -8,9 +8,10 @@
 #include "../inc/hashTable.hpp"
 #include "../inc/point.hpp"
 #include "../inc/LSH.hpp"
+#include "../inc/readInput.hpp"
 
 #define MAX_ELEMENTS 10000
-#define BUCKETS 100
+#define BUCKETS 100 //make dynamic
 #define DIMS 2
 #define W 2
 #define K 4
@@ -19,7 +20,7 @@
 int readClArguments(int argc, char **argv, std::string &inputFile, std::string &queryFile, int &k, int &l,
                     std::string &outputFile, int &numOfNearest, double &radius) {
 
-    //keep track of what arguments have been red
+    //keep track of what arguments have been read
     std::map<std::string, bool> argumentsRed;
 
     argumentsRed["-i"] = false;
@@ -30,7 +31,13 @@ int readClArguments(int argc, char **argv, std::string &inputFile, std::string &
     argumentsRed["-N"] = false;
     argumentsRed["-R"] = false;
 
-    //read arguments
+    //read config file first, then overwrite defaults by arguements if needed
+    if(readLshConfig("config/lsh.conf", argumentsRed, inputFile, queryFile, k, l,
+                    outputFile, numOfNearest, radius) < 0){
+        std::cout << "Config file contains a malformed value." << std::endl;
+    }
+
+    //read arguments, overwrite anything needed
     for (int i = 1; i < argc; i += 2) {
         if (std::string(argv[i]).compare("-i") == 0 && i + 1 < argc) {
             inputFile = argv[i + 1];
@@ -58,7 +65,7 @@ int readClArguments(int argc, char **argv, std::string &inputFile, std::string &
         }
     }
 
-    //missing arguments
+    //missing arguments/config defaults
     for (std::pair<std::string, bool> arg: argumentsRed) {
         if (!arg.second) {
             return -2;
