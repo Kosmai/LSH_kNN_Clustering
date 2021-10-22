@@ -33,7 +33,7 @@ HashTable& HashTable::operator=(const HashTable &copy){
 
 
 //Looks in bucket for ID==key, if found returns 1, otherwise 0
-int HashTable::search(unsigned int bucket, int key) const {
+int HashTable::search(unsigned int bucket, unsigned int key) const {
 
     if (bucket >= this->numBuckets) {
         return -1;
@@ -50,7 +50,7 @@ int HashTable::search(unsigned int bucket, int key) const {
 }
 
 //Counts the amount of instances in bucket with ID==key
-int HashTable::count(unsigned int bucket, int key) const {
+int HashTable::count(unsigned int bucket, unsigned int key) const {
 
     if (bucket >= this->numBuckets) {
         return -1;
@@ -69,7 +69,7 @@ int HashTable::count(unsigned int bucket, int key) const {
 }
 
 //Creates a new entry in bucket with ID=key and a ptr to the data
-int HashTable::insert(unsigned int bucket, int key, ITEM_TYPE *data) {
+int HashTable::insert(unsigned int bucket, unsigned int key, ITEM_TYPE *data) {
 
     if (bucket >= this->numBuckets) {
         return -1;
@@ -85,7 +85,7 @@ int HashTable::insert(unsigned int bucket, int key, ITEM_TYPE *data) {
 }
 
 //Removes only the first instance of key in bucket
-int HashTable::remove(unsigned int bucket, int key) {
+int HashTable::remove(unsigned int bucket, unsigned int key) {
 
     if (bucket >= this->numBuckets) {
         return -1;
@@ -102,6 +102,18 @@ int HashTable::remove(unsigned int bucket, int key) {
     }
 
     return 0;
+}
+
+std::list<Item *>& HashTable::getBucket(unsigned int bucket){
+
+    //cannot return NULL, maybe return pointer to list?
+    //    if(bucket >= this->numBuckets){
+    //        return NULL;
+    //    }
+
+//    else{
+        return this->hashArray[bucket];
+//    }
 }
 
 void HashTable::print() const {

@@ -36,5 +36,6 @@ public:
 	//Add a point p to the LSH class
 	int addPoint(Point& p);
 
+    int findKNN(Point& p, int, double);
 
 };
