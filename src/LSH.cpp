@@ -53,75 +53,99 @@ void LSH::printAllHT() {
     }
 }
 
-int LSH::addPoint(Point &p) {
+int LSH::addPoint(Point* p) {
 
     //make sure the point is valid
-    if (p.getDimension() != this->dims) {
+    if (p->getDimension() != this->dims) {
         return -1;
     }
 
     //append p in list of points
-    points.push_back(p);
+    points.push_back(*p);
 
     //add it's address in each hashtable
     for (int i = 0; i < L; i++) {
-        unsigned int ID = gFunctions[i].computeID(p.getVector());
+        unsigned int ID = gFunctions[i].computeID(p->getVector());
         unsigned int bucketID = ID % buckets;
-        if (hashTables[i].insert(bucketID, ID, &p) != 0) return -1;
+        if (hashTables[i].insert(bucketID, ID, p) != 0) return -1;
     }
 
     return 0;
 }
 
-bool compare(Neighbor a, Neighbor b) {
-    return a.distance < b.distance;
+static bool compare(Neighbor* a, Neighbor* b) {
+    return a->distance < b->distance;
 }
 
-bool equal(Neighbor a, Neighbor b) {
-    return a.point == b.point;
+static bool equal(Neighbor* a, Neighbor* b) {
+    return a->point == b->point;
 }
 
-int LSH::findKNN(Point &queryPoint, int numOfNN = 1, double r = -1.0) {
+void LSH::bruteForce(Point &queryPoint){
+    std::list<double> dists;
+    std::list<Point>::iterator it;
+    for (it = points.begin(); it != points.end(); ++it) {
+        dists.push_back(queryPoint.l2Distance(it->getVector()));
+    }
+    dists.sort();
+    dists.reverse();
+
+    std::list<double>::iterator d;
+    for (d = dists.begin(); d != dists.end(); ++d) {
+        std::cout << *d << std::endl;
+    }
+    
+}
+
+int LSH::findKNN(Point &queryPoint, unsigned int numOfNN = 1, double r = -1.0) {
 
     //make sure the query point is valid
     if (queryPoint.getDimension() != this->dims) {
         return -1;
     }
+    //queryPoint.print();
+
 
     //keep list of candidate close neighbors
-    std::list <Neighbor> candidates;
+    std::list <Neighbor*> candidates;
 
     //search each hashtable for candidate neighbors
     for (int i = 0; i < L; i++) {
         unsigned int ID = gFunctions[i].computeID(queryPoint.getVector());
         unsigned int bucketID = ID % buckets;
 
-        std::list < Item * > bucket = this->hashTables->getBucket(bucketID);
+        std::list < Item * > bucket = this->hashTables[i].getBucket(bucketID);
 
         std::list<Item *>::iterator it;
+        std::cout << "L " << i << std::endl;
         for (it = bucket.begin(); it != bucket.end(); ++it) {
+
             if ((*it)->key == ID) {
-                Neighbor candidate;
-                candidate.point = (*it)->data;
-                candidate.distance = queryPoint.l2Distance((*it)->data);
+                Neighbor* candidate = new Neighbor;
+                candidate->point = (*it)->data;
+                candidate->distance = queryPoint.l2Distance((*it)->data);
                 candidates.push_back(candidate);
+                if(queryPoint.l2Distance((*it)->data) < 350)
+                std::cout << "\tDis "<< queryPoint.l2Distance((*it)->data) << std::endl;
             }
         }
     }
+    std::cout << "Here we go - " << candidates.size() << std::endl;
 
-    std::list<Neighbor>::iterator it;
+    candidates.unique(equal);   //remove duplicates
+    candidates.sort(compare);   //sort by distances
+
+    std::list<Neighbor*>::iterator it;
 
     unsigned int neighborsFound = 0;
-
+    std::cout << "Here we go - " << candidates.size() << std::endl;
     for (it = candidates.begin(); it != candidates.end(); ++it) {
         if (neighborsFound == numOfNN){
             return 0;
         }
-
+        std::cout << "Nearest at " << (*it)->distance << ": " << std::endl;
+        neighborsFound++;
     }
-
-    candidates.unique(equal);   //remove duplicates
-    candidates.sort(compare);   //sort by distances
 
     return 0;
 }

@@ -41,6 +41,10 @@ int Point::getDimension() {
     return this->vec.size();
 }
 
+bool Point::operator==(Point &p){
+    return this->id == p.id;
+}
+
 double Point::l2Distance(Point *otherPoint) {
     if (otherPoint->getDimension() != this->getDimension()) {
         return -1;

@@ -28,6 +28,8 @@ public:
 
     int getDimension();
 
+    bool operator==(Point &p);
+
     double l2Distance(Point*);
 
     double l2Distance(std::vector<double>&);

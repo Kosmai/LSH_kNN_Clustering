@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "../inc/hashTable.hpp"
+#include "../inc/point.hpp"
 
 
 HashTable::HashTable(unsigned int numBuckets) {
@@ -39,13 +40,18 @@ int HashTable::search(unsigned int bucket, unsigned int key) const {
         return -1;
     }
 
-    std::list<Item *>::iterator it;
+    for(unsigned int i=0; i<this->numBuckets; i++){
+        std::list<Item *>::iterator it;
 
-    for (it = this->hashArray[bucket].begin(); it != this->hashArray[bucket].end(); ++it) {
-        if ((*it)->key == key) {
-            return 1;
+        for (it = this->hashArray[i].begin(); it != this->hashArray[i].end(); ++it) {
+            if ((*it)->data->getId() == "1") {
+                std::cout<<i<<std::endl;
+                return 1;
+            }
         }
     }
+
+
     return 0;
 }
 
@@ -116,6 +122,7 @@ std::list<Item *>& HashTable::getBucket(unsigned int bucket){
 //    }
 }
 
+
 void HashTable::print() const {
 
     std::cout << "------------------------------------------" << std::endl;
@@ -125,6 +132,7 @@ void HashTable::print() const {
         std::cout << "BUCKET " << bucket << " : ";
         for (it = this->hashArray[bucket].begin(); it != this->hashArray[bucket].end(); ++it) {
             std::cout << (*it)->key << " -> ";
+            //(*it)->data->print();
         }
         std::cout << std::endl;
     }

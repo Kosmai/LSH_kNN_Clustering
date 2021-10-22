@@ -1,6 +1,7 @@
 #include <algorithm>
+#include "../inc/point.hpp"
 #include "../inc/readInput.hpp"
-
+#include "../inc/LSH.hpp"
 
 void printVec(std::vector<double> v) {
     std::cout << "Vector v" << std::endl << "=================" << std::endl;
@@ -10,7 +11,7 @@ void printVec(std::vector<double> v) {
     std::cout << "=================" << std::endl;
 }
 
-int readDataSet(std::string fileName, char delimiter) {
+int readDataSet(std::string& fileName, char delimiter, LSH& lsh) {
     std::string lineBuffer;
     std::ifstream dataSetFile(fileName);
 
@@ -21,14 +22,47 @@ int readDataSet(std::string fileName, char delimiter) {
 
         std::istringstream lineStream(lineBuffer);
         std::getline(lineStream, item_id, delimiter);
-
         std::string valueBuffer;
 
         //read every value of the vector
         while (std::getline(lineStream, valueBuffer, delimiter)) {
+            //make sure there is a number in valueBuffer
+            if(valueBuffer[0] < '0' || valueBuffer[0] > '9'){
+                continue;
+            }
             vec.push_back(std::stod(valueBuffer));
         }
-        printVec(vec);
+        Point* p = new Point(vec, item_id);
+        lsh.addPoint(p);
+
+    }
+
+    return 0;
+}
+
+int readDataSet(std::string& fileName, char delimiter, std::vector<Point>& queries) {
+    std::string lineBuffer;
+    std::ifstream dataSetFile(fileName);
+
+    //read each line
+    while (std::getline(dataSetFile, lineBuffer)) {
+        std::string item_id;
+        std::vector<double> vec;
+
+        std::istringstream lineStream(lineBuffer);
+        std::getline(lineStream, item_id, delimiter);
+        std::string valueBuffer;
+
+        //read every value of the vector
+        while (std::getline(lineStream, valueBuffer, delimiter)) {
+            //make sure there is a number in valueBuffer
+            if(valueBuffer[0] < '0' || valueBuffer[0] > '9'){
+                continue;
+            }
+            vec.push_back(std::stod(valueBuffer));
+        }
+        Point p = Point(vec, item_id);
+        queries.push_back(p);
 
     }
 
@@ -80,6 +114,9 @@ int readLshConfig(const std::string &fileName, std::map<std::string, bool> &argu
         } else if (std::string(param).compare("output") == 0) {
             outputFile = value;
             argumentsRed["-o"] = true;
+        } else if (std::string(param).compare("query") == 0) {
+            queryFile = value;
+            argumentsRed["-q"] = true;
         } else {
             std::cout << "Invalid parameter (" << param << ") in config file. Ignored." << std::endl;
         }

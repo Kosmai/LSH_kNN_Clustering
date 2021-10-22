@@ -1,4 +1,5 @@
 #include <vector>
+#include <list>
 class HashTable;
 class HashFunctionG;
 class Point;
@@ -34,8 +35,11 @@ public:
 	void printAllHT();
 
 	//Add a point p to the LSH class
-	int addPoint(Point& p);
+	int addPoint(Point* p);
 
-    int findKNN(Point& p, int, double);
+	void bruteForce(Point &queryPoint);
+
+	//Returns N nearest neighbors or within R
+    int findKNN(Point& p, unsigned int numOfNN, double r);
 
 };

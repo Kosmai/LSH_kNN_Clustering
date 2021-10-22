@@ -11,11 +11,9 @@
 #include "../inc/readInput.hpp"
 
 #define MAX_ELEMENTS 10000
-#define BUCKETS 100 //make dynamic
+#define BUCKETS 1000 //make dynamic
 #define DIMS 128
-#define W 100
-#define K 4
-#define L 1
+#define W 200
 
 int readClArguments(int argc, char **argv, std::string &inputFile, std::string &queryFile, int &k, int &l,
 					std::string &outputFile, int &numOfNearest, double &radius) {
@@ -116,7 +114,10 @@ int main(int argc, char **argv) {
 		std::cout << "Error while reading input file. Aborting..." << std::endl;
 		return 1;
 	}
-	lsh.printAllHT();
+	//lsh.printAllHT();
+	lsh.bruteForce(queries[0]);
+	lsh.findKNN(queries[0], 1, -1);
+
 
 	return 0;
 }
