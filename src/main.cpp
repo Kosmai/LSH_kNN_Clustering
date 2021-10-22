@@ -116,7 +116,7 @@ int main(int argc, char **argv) {
 	}
 	//lsh.printAllHT();
 	lsh.bruteForce(queries[0]);
-	lsh.findKNN(queries[0], 1, -1);
+	lsh.findKNN(queries[0], 1, 280);
 
 
 	return 0;

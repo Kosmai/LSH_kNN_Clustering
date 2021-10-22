@@ -94,7 +94,7 @@ void LSH::bruteForce(Point &queryPoint){
     for (d = dists.begin(); d != dists.end(); ++d) {
         std::cout << *d << std::endl;
     }
-    
+
 }
 
 int LSH::findKNN(Point &queryPoint, unsigned int numOfNN = 1, double r = -1.0) {
@@ -124,6 +124,11 @@ int LSH::findKNN(Point &queryPoint, unsigned int numOfNN = 1, double r = -1.0) {
                 Neighbor* candidate = new Neighbor;
                 candidate->point = (*it)->data;
                 candidate->distance = queryPoint.l2Distance((*it)->data);
+
+                if (r >= 0.0 && r < candidate->distance){
+                    continue;
+                }
+
                 candidates.push_back(candidate);
                 if(queryPoint.l2Distance((*it)->data) < 350)
                 std::cout << "\tDis "<< queryPoint.l2Distance((*it)->data) << std::endl;
