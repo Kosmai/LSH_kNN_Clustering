@@ -4,11 +4,6 @@
 #include "../inc/point.hpp"
 #include "../inc/LSH.hpp"
 
-struct Neighbor {
-    Point *point;
-    double distance;
-};
-
 LSH::LSH() {
     std::cout << "Default LSH ctr implicitly called" << std::endl;
 }
@@ -81,23 +76,21 @@ static bool equal(Neighbor* a, Neighbor* b) {
     return a->point == b->point;
 }
 
-void LSH::bruteForce(Point &queryPoint){
-    std::list<double> dists;
+void LSH::bruteForceSearch(Point &queryPoint){
     std::list<Point>::iterator it;
     for (it = points.begin(); it != points.end(); ++it) {
-        dists.push_back(queryPoint.l2Distance(it->getVector()));
-    }
-    dists.sort();
-    dists.reverse();
 
-    std::list<double>::iterator d;
-    for (d = dists.begin(); d != dists.end(); ++d) {
-        std::cout << *d << std::endl;
+        Neighbor* candidate = new Neighbor;
+        candidate->point = (Point*)&(*it);
+        candidate->distance = queryPoint.l2Distance((Point*)&(*it));
+
+        realNeighbors.push_back(candidate);
     }
+    realNeighbors.sort(compare);
 
 }
 
-int LSH::findKNN(Point &queryPoint, unsigned int numOfNN = 1, double r = -1.0) {
+int LSH::LSHSearch(Point &queryPoint) {
 
     //make sure the query point is valid
     if (queryPoint.getDimension() != this->dims) {
@@ -105,19 +98,15 @@ int LSH::findKNN(Point &queryPoint, unsigned int numOfNN = 1, double r = -1.0) {
     }
     //queryPoint.print();
 
-
-    //keep list of candidate close neighbors
-    std::list <Neighbor*> candidates;
-
     //search each hashtable for candidate neighbors
     for (int i = 0; i < L; i++) {
         unsigned int ID = gFunctions[i].computeID(queryPoint.getVector());
         unsigned int bucketID = ID % buckets;
 
-        std::list < Item * > bucket = this->hashTables[i].getBucket(bucketID);
+        std::list <Item *> bucket = this->hashTables[i].getBucket(bucketID);
 
         std::list<Item *>::iterator it;
-        std::cout << "L " << i << std::endl;
+        //std::cout << "L " << i << std::endl;
         for (it = bucket.begin(); it != bucket.end(); ++it) {
 
             if ((*it)->key == ID) {
@@ -125,32 +114,83 @@ int LSH::findKNN(Point &queryPoint, unsigned int numOfNN = 1, double r = -1.0) {
                 candidate->point = (*it)->data;
                 candidate->distance = queryPoint.l2Distance((*it)->data);
 
-                if (r >= 0.0 && r < candidate->distance){
-                    continue;
-                }
-
-                candidates.push_back(candidate);
-                if(queryPoint.l2Distance((*it)->data) < 350)
-                std::cout << "\tDis "<< queryPoint.l2Distance((*it)->data) << std::endl;
+                LSHNeighbors.push_back(candidate);
+                //if(queryPoint.l2Distance((*it)->data) < 350){
+                //std::cout << "\tDis "<< queryPoint.l2Distance((*it)->data) << std::endl;}
             }
         }
     }
-    std::cout << "Here we go - " << candidates.size() << std::endl;
 
-    candidates.unique(equal);   //remove duplicates
-    candidates.sort(compare);   //sort by distances
+    LSHNeighbors.sort(compare);   //sort by distances
+    LSHNeighbors.unique(equal);   //remove duplicates
+
+
+
+    return 0;
+}
+
+
+void LSH::displayResults(Point &queryPoint, unsigned int numOfNN, double r){
+
+    //Print query ID
+    std::cout << "Query: " << queryPoint.getId() << std::endl;
+
+    //Print K nearest neighbors
+    std::list<Neighbor*>::iterator LSHIterator = LSHNeighbors.begin();
+    std::list<Neighbor*>::iterator realIterator = realNeighbors.begin();
+
+    for(unsigned int i = 0; i < numOfNN; i++){
+
+        if(LSHIterator == LSHNeighbors.end() || realIterator == realNeighbors.end()){
+            break;
+        }
+
+        std::cout << "Nearest Neighbor-" << i+1 << ": " << (*LSHIterator)->point->getId() << std::endl;
+        std::cout << "distanceLSH: " << (*LSHIterator)->distance << std::endl;
+        std::cout << "distanceTrue: " << (*realIterator)->distance << std::endl;
+        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+
+        LSHIterator++;
+        realIterator++;
+    }
+
+}
+
+int LSH::calculateNN(Point &queryPoint, unsigned int numOfNN = 1, double r = -1.0){
+
+    using std::chrono::high_resolution_clock;
+    using std::chrono::duration_cast;
+    using std::chrono::duration;
+    using std::chrono::milliseconds;
+
+    auto LSH_t1 = high_resolution_clock::now();
+    LSHSearch(queryPoint);
+    auto LSH_t2 = high_resolution_clock::now();
+
+    auto brute_t1 = high_resolution_clock::now();
+    bruteForceSearch(queryPoint);
+    auto brute_t2 = high_resolution_clock::now();
+
+    auto LSH_ms = duration_cast<milliseconds>(LSH_t2 - LSH_t1);
+    auto brute_ms = duration_cast<milliseconds>(brute_t2 - brute_t1);
+
+    displayResults(queryPoint, numOfNN, r);
+
+    std::cout << "tLSH: "  << LSH_ms.count() << "ms" << std::endl;
+    std::cout << "tTrue: " << brute_ms.count() << "ms" << std::endl;
+ 
+    std::cout << "R-near neighbors:"<< std::endl;
 
     std::list<Neighbor*>::iterator it;
 
-    unsigned int neighborsFound = 0;
-    std::cout << "Here we go - " << candidates.size() << std::endl;
-    for (it = candidates.begin(); it != candidates.end(); ++it) {
-        if (neighborsFound == numOfNN){
-            return 0;
-        }
-        std::cout << "Nearest at " << (*it)->distance << ": " << std::endl;
-        neighborsFound++;
-    }
+    for (it = LSHNeighbors.begin(); it != LSHNeighbors.end(); ++it) {
 
+        if((*it)->distance > r){
+            break;
+        }
+
+        std::cout << (*it)->point->getId() << std::endl;
+    }
+    
     return 0;
 }

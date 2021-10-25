@@ -4,6 +4,11 @@ class HashTable;
 class HashFunctionG;
 class Point;
 
+struct Neighbor {
+    Point *point;
+    double distance;
+};
+
 class LSH{
 private:
 	int dims;    //amount of dimensions used
@@ -14,6 +19,15 @@ private:
 	HashTable*     hashTables;
 	HashFunctionG* gFunctions;
 	std::list<Point> points;
+	std::list<Neighbor*> LSHNeighbors;
+	std::list<Neighbor*> realNeighbors;
+	std::list<Neighbor*> radiusNeighbors;
+
+	//
+	void bruteForceSearch(Point &queryPoint);
+
+	//Returns N nearest neighbors or within R
+    int LSHSearch(Point& queryPoint);
 
 public:
 
@@ -27,6 +41,8 @@ public:
 
 	LSH& operator=(const LSH& copy) = delete;
 
+	//Add a point p to the LSH class
+	int addPoint(Point* p);
 
 	//print specified HashTable
 	void printHT(int id);
@@ -34,12 +50,10 @@ public:
 	//print all HashTables
 	void printAllHT();
 
-	//Add a point p to the LSH class
-	int addPoint(Point* p);
+    //Print the results
+	void displayResults(Point &queryPoint, unsigned int numOfNN, double r);
 
-	void bruteForce(Point &queryPoint);
-
-	//Returns N nearest neighbors or within R
-    int findKNN(Point& p, unsigned int numOfNN, double r);
+	//
+	int calculateNN(Point &queryPoint, unsigned int numOfNN, double r);
 
 };
