@@ -1,4 +1,4 @@
 *.o
-lsh
+lsh/lsh
 .idea/
-datasets/
+lsh/datasets/
