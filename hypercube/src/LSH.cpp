@@ -1,8 +1,10 @@
 #include <chrono>
+#include <numeric>
 #include "../inc/hashFunctionG.hpp"
 #include "../inc/hashTable.hpp"
 #include "../inc/point.hpp"
 #include "../inc/LSH.hpp"
+#include "../inc/hamming.hpp"
 
 LSH::LSH() {
     std::cout << "Default LSH ctr implicitly called" << std::endl;
@@ -76,6 +78,7 @@ static bool equal(Neighbor* a, Neighbor* b) {
 }
 
 void LSH::bruteForceSearch(Point &queryPoint){
+    std::list<double> distances;
     std::list<Point>::iterator it;
     for (it = points.begin(); it != points.end(); ++it) {
 
@@ -84,12 +87,22 @@ void LSH::bruteForceSearch(Point &queryPoint){
         candidate->distance = queryPoint.l2Distance((Point*)&(*it));
 
         realNeighbors.push_back(candidate);
+        distances.push_back(candidate->distance);
     }
     realNeighbors.sort(compare);
 
+    int avg = std::accumulate(distances.begin(), distances.end(), 0.0) / distances.size();
+    std::cout << "Average Distance: " << avg << std::endl;
+
 }
 
-int LSH::LSHSearch(Point &queryPoint) {
+
+int LSH::LSHSearch(Point &queryPoint, int M, int probes) {
+
+    int pointsChecked = 0;
+    int probesChecked = 0;
+    bool searchFinished = false;
+    unsigned int currentBucket;
 
     //make sure the query point is valid
     if (queryPoint.getDimension() != this->dims) {
@@ -97,33 +110,39 @@ int LSH::LSHSearch(Point &queryPoint) {
     }
     //queryPoint.print();
 
-    //search each hashtable for candidate neighbors
+    //L = 1 always for hypercube, code uses for, for easy expansion to multiple cubes
     for (int i = 0; i < L; i++) {
-        unsigned int ID = gFunctions[i].computeID(queryPoint.getVector());
-        unsigned int bucketID = ID % buckets;
+        unsigned int bucketID = gFunctions[i].computeID(queryPoint.getVector());
 
-        std::list <Item *> bucket = this->hashTables[i].getBucket(bucketID);
+        Hamming gen = Hamming(bucketID, k);
 
-        std::list<Item *>::iterator it;
-        //std::cout << "L " << i << std::endl;
-        for (it = bucket.begin(); it != bucket.end(); ++it) {
+        while(probesChecked < probes){
+            if(searchFinished){
+                break;
+            }
+            currentBucket = gen.getNext();
+            //gen.printMaskList();
+            std::list<Item *> bucket = this->hashTables[i].getBucket(currentBucket);
+            std::list<Item *>::iterator it;
 
-            if ((*it)->key == ID) {
+            //look through all points in this cube's vectice (provided by hamming class)
+            for (it = bucket.begin(); it != bucket.end(); ++it) {
                 Neighbor* candidate = new Neighbor;
                 candidate->point = (*it)->data;
                 candidate->distance = queryPoint.l2Distance((*it)->data);
-
                 LSHNeighbors.push_back(candidate);
-                //if(queryPoint.l2Distance((*it)->data) < 350){
-                //std::cout << "\tDis "<< queryPoint.l2Distance((*it)->data) << std::endl;}
+                if(++pointsChecked >= M){
+                    searchFinished = true;
+                    break;
+                }
             }
+            probesChecked++;
         }
     }
+    std::cout << "Found " << pointsChecked << " points in " << probesChecked << " vertices" << std::endl;
 
     LSHNeighbors.sort(compare);   //sort by distances
     LSHNeighbors.unique(equal);   //remove duplicates
-
-
 
     return 0;
 }
@@ -155,7 +174,7 @@ void LSH::displayResults(Point &queryPoint, unsigned int numOfNN, double r){
 
 }
 
-int LSH::calculateNN(Point &queryPoint, unsigned int numOfNN = 1, double r = -1.0){
+int LSH::calculateNN(Point &queryPoint, int M, int probes, unsigned int numOfNN = 1, double r = -1.0){
 
     using std::chrono::high_resolution_clock;
     using std::chrono::duration_cast;
@@ -163,7 +182,7 @@ int LSH::calculateNN(Point &queryPoint, unsigned int numOfNN = 1, double r = -1.
     using std::chrono::milliseconds;
 
     auto LSH_t1 = high_resolution_clock::now();
-    LSHSearch(queryPoint);
+    LSHSearch(queryPoint, M, probes);
     auto LSH_t2 = high_resolution_clock::now();
 
     auto brute_t1 = high_resolution_clock::now();

@@ -27,7 +27,7 @@ private:
 	void bruteForceSearch(Point &queryPoint);
 
 	//Returns N nearest neighbors or within R
-    int LSHSearch(Point& queryPoint);
+    int LSHSearch(Point& queryPoint, int M, int probes);
 
 public:
 
@@ -54,6 +54,6 @@ public:
 	void displayResults(Point &queryPoint, unsigned int numOfNN, double r);
 
 	//
-	int calculateNN(Point &queryPoint, unsigned int numOfNN, double r);
+	int calculateNN(Point &queryPoint, int M, int probes, unsigned int numOfNN, double r);
 
 };
