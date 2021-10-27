@@ -12,3 +12,6 @@ float getUniformRandomFloat();
 
 //Returns a uniform random int in [-2^31 , 2^31-1]
 int getUniformRandom();
+
+//Returns 0 or 1 randomly
+int tossCoin();

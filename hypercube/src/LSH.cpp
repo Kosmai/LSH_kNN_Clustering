@@ -49,7 +49,6 @@ void LSH::printAllHT() {
 }
 
 int LSH::addPoint(Point* p) {
-
     //make sure the point is valid
     if (p->getDimension() != this->dims) {
         return -1;
@@ -178,7 +177,7 @@ int LSH::calculateNN(Point &queryPoint, unsigned int numOfNN = 1, double r = -1.
 
     std::cout << "tLSH: "  << LSH_ms.count() << "ms" << std::endl;
     std::cout << "tTrue: " << brute_ms.count() << "ms" << std::endl;
- 
+
     std::cout << "R-near neighbors:"<< std::endl;
 
     std::list<Neighbor*>::iterator it;
@@ -191,6 +190,6 @@ int LSH::calculateNN(Point &queryPoint, unsigned int numOfNN = 1, double r = -1.
 
         std::cout << (*it)->point->getId() << std::endl;
     }
-    
+
     return 0;
 }
