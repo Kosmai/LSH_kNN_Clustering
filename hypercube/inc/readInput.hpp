@@ -16,5 +16,5 @@ int readDataSet(std::string& fileName, char delimiter, std::vector<Point>& queri
 
 int readQuery(std::string&);
 
-int readLshConfig(const std::string &fileName, std::map<std::string, bool> &argumentsRed, std::string &inputFile, std::string &queryFile, int &k, int &l,
-                    std::string &outputFile, int &numOfNearest, double &radius);
+int readLshConfig(const std::string &fileName, std::map<std::string, bool> &argumentsRed, std::string &inputFile, std::string &queryFile, int &k, int &m,
+                    int &probes, std::string &outputFile, int &numOfNearest, double &radius);

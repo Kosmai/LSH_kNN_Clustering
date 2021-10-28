@@ -1,6 +1,6 @@
 CC=g++
 CFLAGS=-Wall
-BUILDNAME=hypercube
+BUILDNAME=cube
 OBJ=obj/main.o obj/hashFunctionH.o obj/hashFunctionG.o obj/randGen.o obj/hashTable.o obj/readInput.o obj/point.o obj/LSH.o obj/hamming.o
 OBJDIR := obj
 
