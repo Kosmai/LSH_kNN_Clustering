@@ -31,6 +31,15 @@ LSH::~LSH() {
 
     delete[] hashTables;
     delete[] gFunctions;
+    for(auto v : LSHNeighbors){
+        delete v;
+    }
+    for(auto v : realNeighbors){
+        delete v;
+    }
+    for(auto v : points){
+        delete v;
+    }
 }
 
 void LSH::printHT(int id) {
@@ -56,7 +65,7 @@ int LSH::addPoint(Point* p) {
     }
 
     //append p in list of points
-    points.push_back(*p);
+    points.push_back(p);
 
     //add it's address in each hashtable
     for (int i = 0; i < L; i++) {
@@ -73,16 +82,18 @@ static bool compare(Neighbor* a, Neighbor* b) {
 }
 
 static bool equal(Neighbor* a, Neighbor* b) {
-    return a->point == b->point;
+    bool equality = (a->point == b->point);
+    if(equality){delete b;}
+    return equality;
 }
 
 void LSH::bruteForceSearch(Point &queryPoint){
-    std::list<Point>::iterator it;
+    std::list<Point*>::iterator it;
     for (it = points.begin(); it != points.end(); ++it) {
 
         Neighbor* candidate = new Neighbor;
-        candidate->point = (Point*)&(*it);
-        candidate->distance = queryPoint.l2Distance((Point*)&(*it));
+        candidate->point = (Point*)(*it);
+        candidate->distance = queryPoint.l2Distance((Point*)(*it));
 
         realNeighbors.push_back(candidate);
     }

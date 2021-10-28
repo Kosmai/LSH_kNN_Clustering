@@ -114,13 +114,13 @@ int main(int argc, char **argv) {
 
     //LSH initialize will all points in inputfile
     inputFile = "datasets/" + inputFile;
-    LSH lsh = LSH(DIMS, pow(2, k), 1, k, W);
+    LSH lsh = LSH(DIMS, pow(2, 14), 1, k, W);
     if (readDataSet(inputFile, ' ', lsh) < 0) {
-        std::cout << "Error while reading input file. Aborting..." << std::endl;
-        return 1;
+       std::cout << "Error while reading input file. Aborting..." << std::endl;
+       return 1;
     }
     //lsh.printAllHT();
-    lsh.calculateNN(queries[0], m, 50, 10, 300);
+    lsh.calculateNN(queries[0], m, probes, numOfNearest, radius);
 
     return 0;
 }

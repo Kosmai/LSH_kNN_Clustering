@@ -18,7 +18,7 @@ private:
 	int w;       //determines the size of the gap used in H funtions
 	HashTable*     hashTables;
 	HashFunctionG* gFunctions;
-	std::list<Point> points;
+	std::list<Point*> points;
 	std::list<Neighbor*> LSHNeighbors;
 	std::list<Neighbor*> realNeighbors;
 	std::list<Neighbor*> radiusNeighbors;

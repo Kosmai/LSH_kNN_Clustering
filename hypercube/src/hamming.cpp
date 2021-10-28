@@ -29,6 +29,7 @@ void Hamming::fillHammingMasks(int hammingDistance){
     while(dist-- > 0){
         v = (v << 1) | 0b1;
     }
+
     masks.push_back(v);
     unsigned int w;
     unsigned int t;

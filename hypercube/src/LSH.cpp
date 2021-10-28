@@ -33,6 +33,15 @@ LSH::~LSH() {
 
     delete[] hashTables;
     delete[] gFunctions;
+    for(auto v : LSHNeighbors){
+        delete v;
+    }
+    for(auto v : realNeighbors){
+        delete v;
+    }
+    for(auto v : points){
+        delete v;
+    }
 }
 
 void LSH::printHT(int id) {
@@ -57,7 +66,7 @@ int LSH::addPoint(Point* p) {
     }
 
     //append p in list of points
-    points.push_back(*p);
+    points.push_back(p);
 
     //add it's address in each hashtable
     for (int i = 0; i < L; i++) {
@@ -79,12 +88,12 @@ static bool equal(Neighbor* a, Neighbor* b) {
 
 void LSH::bruteForceSearch(Point &queryPoint){
     std::list<double> distances;
-    std::list<Point>::iterator it;
+    std::list<Point*>::iterator it;
     for (it = points.begin(); it != points.end(); ++it) {
 
         Neighbor* candidate = new Neighbor;
-        candidate->point = (Point*)&(*it);
-        candidate->distance = queryPoint.l2Distance((Point*)&(*it));
+        candidate->point = (Point*)(*it);
+        candidate->distance = queryPoint.l2Distance((Point*)(*it));
 
         realNeighbors.push_back(candidate);
         distances.push_back(candidate->distance);
@@ -120,7 +129,7 @@ int LSH::LSHSearch(Point &queryPoint, int M, int probes) {
             if(searchFinished){
                 break;
             }
-            currentBucket = gen.getNext();
+            currentBucket = gen.getNext() % this->buckets;
             //gen.printMaskList();
             std::list<Item *> bucket = this->hashTables[i].getBucket(currentBucket);
             std::list<Item *>::iterator it;
@@ -164,7 +173,7 @@ void LSH::displayResults(Point &queryPoint, unsigned int numOfNN, double r){
         }
 
         std::cout << "Nearest Neighbor-" << i+1 << ": " << (*LSHIterator)->point->getId() << std::endl;
-        std::cout << "distanceLSH: " << (*LSHIterator)->distance << std::endl;
+        std::cout << "distanceHypercube: " << (*LSHIterator)->distance << std::endl;
         std::cout << "distanceTrue: " << (*realIterator)->distance << std::endl;
         std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 
