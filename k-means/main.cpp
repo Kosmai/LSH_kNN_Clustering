@@ -6,6 +6,7 @@
 #include "readInput.hpp"
 #include "point.hpp"
 #include "randGen.hpp"
+#include "cluster.hpp"
 
 void findRandomCentroids(std::vector<Point*> points, int k, int* centroids){
 	int size = points.size();
@@ -19,18 +20,34 @@ void findRandomCentroids(std::vector<Point*> points, int k, int* centroids){
 
 
 int main(){
-	int k = 100;
-	setRandomSeed(time(NULL));
-	std::vector<Point*> points;
-	std::string inputFile = "datasets/input_small_id";
-	readDataSet(inputFile, ' ', points);
+//	int k = 100;
+//	setRandomSeed(time(NULL));
+//	std::vector<Point*> points;
+//	std::string inputFile = "datasets/input_small_id";
+//	readDataSet(inputFile, ' ', points);
+//
+//	int* centroids = new int[k];
+//
+//	findRandomCentroids(points, k, centroids);
+//
+//	for(int i = 0; i < k; i++){
+//		std::cout << centroids[i] << std::endl;
+//	}
 
-	int* centroids = new int[k];
+    Cluster a(128);
+    std::vector<double> vec1(128, 1);
+    std::vector<double> vec2(128, 2);
+    std::vector<double> vec3(128, 3);
 
-	findRandomCentroids(points, k, centroids);
+    Point* p1 = new Point(vec1, "test_point_1");
+    Point* p2 = new Point(vec2, "test_point_2");
+    Point* p3 = new Point(vec3, "test_point_3");
 
-	for(int i = 0; i < k; i++){
-		std::cout << centroids[i] << std::endl;
-	}
-	return 0;
+    a.setCentroid(p1);
+    a.insertPoint(p2);
+    a.insertPoint(p3);
+
+    a.recenter();
+    a.print();
+    return 0;
 }

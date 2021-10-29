@@ -5,11 +5,12 @@
 
 class Cluster {
 private:
+    int dimension;
     std::list<Point *> clusteredPoints;
-    Point centroid;
+    Point* centroid;
 
 public:
-    Cluster();
+    Cluster(int dimension);
 
     ~Cluster();
 
@@ -17,8 +18,18 @@ public:
 
     Cluster &operator=(const Cluster &copy);
 
+    int insertPoint(Point* point);
+
+    int clearList();
+
+    int setCentroid(Point* centroid);
+
+    Point &getCentroid();
+
+    std::list<Point *> getClusteredPoints();
+
     int recenter();
 
-    void display();
+    void print();
 
 };
