@@ -4,3 +4,5 @@ lsh/lsh
 lsh/datasets/
 hypercube/datasets/
 hypercube/cube
+k-means/datasets/
+k-means/kmeans
