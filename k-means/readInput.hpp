@@ -12,6 +12,8 @@ class LSH;
 
 int readDataSet(std::string& fileName, char delimeter, LSH& lsh);
 
+int readDataSet(std::string& fileName, char delimiter, std::vector<Point*>& points);
+
 int readDataSet(std::string& fileName, char delimiter, std::vector<Point>& queries);
 
 int readQuery(std::string&);

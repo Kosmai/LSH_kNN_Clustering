@@ -40,6 +40,36 @@ int readDataSet(std::string& fileName, char delimiter, LSH& lsh) {
     return 0;
 }
 
+
+int readDataSet(std::string& fileName, char delimiter, std::vector<Point*>& points) {
+    std::string lineBuffer;
+    std::ifstream dataSetFile(fileName);
+
+    //read each line
+    while (std::getline(dataSetFile, lineBuffer)) {
+        std::string item_id;
+        std::vector<double> vec;
+
+        std::istringstream lineStream(lineBuffer);
+        std::getline(lineStream, item_id, delimiter);
+        std::string valueBuffer;
+
+        //read every value of the vector
+        while (std::getline(lineStream, valueBuffer, delimiter)) {
+            //make sure there is a number in valueBuffer
+            if(valueBuffer[0] < '0' || valueBuffer[0] > '9'){
+                continue;
+            }
+            vec.push_back(std::stod(valueBuffer));
+        }
+        Point p = new Point(vec, item_id);
+        points.push_back(p);
+
+    }
+
+    return 0;
+}
+
 int readDataSet(std::string& fileName, char delimiter, std::vector<Point>& queries) {
     std::string lineBuffer;
     std::ifstream dataSetFile(fileName);
