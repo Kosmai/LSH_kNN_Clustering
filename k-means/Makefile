@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-Wall
 BUILDNAME=kmeans
-OBJ= main.o readInput.o point.o cluster.o
+OBJ= main.o readInput.o point.o randGen.o cluster.o
 
 all: clean $(BUILDNAME)
 
