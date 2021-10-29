@@ -1,7 +1,6 @@
 #include <algorithm>
-#include "../inc/point.hpp"
-#include "../inc/readInput.hpp"
-#include "../inc/LSH.hpp"
+#include "point.hpp"
+#include "readInput.hpp"
 
 void printVec(std::vector<double> v) {
     std::cout << "Vector v" << std::endl << "=================" << std::endl;
@@ -10,36 +9,6 @@ void printVec(std::vector<double> v) {
     }
     std::cout << "=================" << std::endl;
 }
-
-int readDataSet(std::string& fileName, char delimiter, LSH& lsh) {
-    std::string lineBuffer;
-    std::ifstream dataSetFile(fileName);
-
-    //read each line
-    while (std::getline(dataSetFile, lineBuffer)) {
-        std::string item_id;
-        std::vector<double> vec;
-
-        std::istringstream lineStream(lineBuffer);
-        std::getline(lineStream, item_id, delimiter);
-        std::string valueBuffer;
-
-        //read every value of the vector
-        while (std::getline(lineStream, valueBuffer, delimiter)) {
-            //make sure there is a number in valueBuffer
-            if(valueBuffer[0] < '0' || valueBuffer[0] > '9'){
-                continue;
-            }
-            vec.push_back(std::stod(valueBuffer));
-        }
-        Point* p = new Point(vec, item_id);
-        lsh.addPoint(p);
-
-    }
-
-    return 0;
-}
-
 
 int readDataSet(std::string& fileName, char delimiter, std::vector<Point*>& points) {
     std::string lineBuffer;
@@ -62,7 +31,7 @@ int readDataSet(std::string& fileName, char delimiter, std::vector<Point*>& poin
             }
             vec.push_back(std::stod(valueBuffer));
         }
-        Point p = new Point(vec, item_id);
+        Point* p = new Point(vec, item_id);
         points.push_back(p);
 
     }

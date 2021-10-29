@@ -1,5 +1,5 @@
 #include <cmath>
-#include "../inc/point.hpp"
+#include "point.hpp"
 
 Point::Point() {
     this->id = "Uninitialized";

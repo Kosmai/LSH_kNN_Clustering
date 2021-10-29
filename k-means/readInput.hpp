@@ -8,9 +8,7 @@
 #include <iostream>
 #include <map>
 
-class LSH;
-
-int readDataSet(std::string& fileName, char delimeter, LSH& lsh);
+class Point;
 
 int readDataSet(std::string& fileName, char delimiter, std::vector<Point*>& points);
 
