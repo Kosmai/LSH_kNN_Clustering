@@ -3,14 +3,17 @@
 #include <string>
 #include <algorithm>
 #include <random>
+#include <cfloat>
 #include "readInput.hpp"
 #include "point.hpp"
 #include "randGen.hpp"
 #include "cluster.hpp"
 
+#define DIMS 128
+
 void findRandomCentroids(std::vector<Point*> points, int k, int* centroids){
-	int size = points.size();
-	std::cout << size << std::endl;
+	//int size = points.size();
+	//std::cout << size << std::endl;
 	std::vector<Point*> shuffledPoints = points;
 	std::random_shuffle(std::begin(shuffledPoints), std::end(shuffledPoints));
 	for(int i = 0; i < k; i++){
@@ -20,34 +23,60 @@ void findRandomCentroids(std::vector<Point*> points, int k, int* centroids){
 
 
 int main(){
-//	int k = 100;
-//	setRandomSeed(time(NULL));
-//	std::vector<Point*> points;
-//	std::string inputFile = "datasets/input_small_id";
-//	readDataSet(inputFile, ' ', points);
-//
-//	int* centroids = new int[k];
-//
-//	findRandomCentroids(points, k, centroids);
-//
-//	for(int i = 0; i < k; i++){
-//		std::cout << centroids[i] << std::endl;
-//	}
+	int k = 100;
+	setRandomSeed(time(NULL));
+    std::vector<Point*> points;
+	std::vector<Point*> queries;
+    std::string inputFile = "datasets/input_small_id";
+	std::string queryFile = "datasets/query_small_id";
+    readDataSet(inputFile, ' ', points);
+	readDataSet(queryFile, ' ', queries);
 
-    Cluster a(128);
-    std::vector<double> vec1(128, 1);
-    std::vector<double> vec2(128, 2);
-    std::vector<double> vec3(128, 3);
+	int* centroids = new int[k];
 
-    Point* p1 = new Point(vec1, "test_point_1");
-    Point* p2 = new Point(vec2, "test_point_2");
-    Point* p3 = new Point(vec3, "test_point_3");
+	findRandomCentroids(points, k, centroids);
 
-    a.setCentroid(p1);
-    a.insertPoint(p2);
-    a.insertPoint(p3);
+	// for(int i = 0; i < k; i++){
+	// 	std::cout << centroids[i] << std::endl;
+	// }
 
-    a.recenter();
-    a.print();
+    Cluster* clusters = new Cluster[k];
+    for(int i = 0; i < k; i++){
+        clusters[i] = Cluster(DIMS);
+        clusters[i].setCentroid(points[centroids[i]]);
+        //clusters[i].setCentroid(queries[i]);
+    }
+    double dist, minDist;
+    int minIndex;
+
+
+
+    for(int iter = 0; iter < 10; iter++){
+        for(auto point : points){
+            minDist = DBL_MAX;
+            minIndex = -1;
+            for(int i = 0; i < k; i++){
+                dist = clusters[i].getCentroid().l2Distance(point);
+                if(dist <= minDist){
+                    minDist = dist;
+                    minIndex = i;
+                }
+            }
+            clusters[minIndex].insertPoint(point);
+        }
+        for(int i = 0; i < k; i++){
+            clusters[i].recenter();
+            if(iter<8)clusters[i].clearList();
+        }
+    }
+
+
+
+
+    // a.insertPoint(p2);
+    // a.insertPoint(p3);
+
+    // a.recenter();
+    clusters[0].print();
     return 0;
 }

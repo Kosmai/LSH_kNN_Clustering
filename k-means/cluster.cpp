@@ -12,6 +12,7 @@ Cluster::~Cluster() {
 Cluster &Cluster::operator=(const Cluster &copy) {
     this->clusteredPoints = copy.clusteredPoints;
     this->centroid = copy.centroid;
+    this->dimension = copy.dimension;
 
     return *this;
 }
@@ -27,8 +28,12 @@ int Cluster::clearList() {
 }
 
 int Cluster::setCentroid(Point *centroid) {
-    this->centroid = centroid;
+    this->centroid = *centroid;
     return 0;
+}
+
+Point& Cluster::getCentroid() {
+    return this->centroid;
 }
 
 int Cluster::recenter() {
@@ -49,15 +54,16 @@ int Cluster::recenter() {
         average[i] /= this->clusteredPoints.size();
     }
 
-    this->centroid->setVector(average);
+    this->centroid.setVector(average);
     return 0;
 }
 
 void Cluster::print() {
     std::cout << "Centroid:" << std::endl;
-    this->centroid->print();
+    this->centroid.print();
 
     for (auto point: this->clusteredPoints) {
         std::cout << point->getId() << std::endl;
+        std::cout << "  " << this->centroid.l2Distance(point) << std::endl;
     }
 }

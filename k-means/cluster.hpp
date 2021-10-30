@@ -7,9 +7,12 @@ class Cluster {
 private:
     int dimension;
     std::list<Point *> clusteredPoints;
-    Point* centroid;
+    Point centroid;
 
 public:
+
+    Cluster() = default;
+
     Cluster(int dimension);
 
     ~Cluster();
