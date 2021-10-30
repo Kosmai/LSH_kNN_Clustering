@@ -36,6 +36,10 @@ Point& Cluster::getCentroid() {
     return this->centroid;
 }
 
+int Cluster::count() {
+    return this->clusteredPoints.size();
+} 
+
 int Cluster::recenter() {
 
     //if cluster has no points return -1

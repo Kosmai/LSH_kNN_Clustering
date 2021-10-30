@@ -29,6 +29,8 @@ public:
 
     Point &getCentroid();
 
+    int count();
+
     std::list<Point *> getClusteredPoints();
 
     int recenter();
