@@ -40,7 +40,7 @@ int Cluster::count() {
     return this->clusteredPoints.size();
 } 
 
-int Cluster::recenter() {
+double Cluster::recenter() {
 
     //if cluster has no points return -1
     if (!this->clusteredPoints.size()) {
@@ -58,8 +58,9 @@ int Cluster::recenter() {
         average[i] /= this->clusteredPoints.size();
     }
 
+    double moved = this->centroid.l2Distance(average);
     this->centroid.setVector(average);
-    return 0;
+    return moved;
 }
 
 void Cluster::print() {

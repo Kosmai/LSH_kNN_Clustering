@@ -33,7 +33,7 @@ public:
 
     std::list<Point *> getClusteredPoints();
 
-    int recenter();
+    double recenter();
 
     void print();
 
