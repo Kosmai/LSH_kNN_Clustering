@@ -2,6 +2,7 @@
 #include "point.hpp"
 #include "readInput.hpp"
 
+
 void printVec(std::vector<double> v) {
     std::cout << "Vector v" << std::endl << "=================" << std::endl;
     for (auto i: v) {
@@ -10,7 +11,7 @@ void printVec(std::vector<double> v) {
     std::cout << "=================" << std::endl;
 }
 
-int readDataSet(std::string& fileName, char delimiter, std::vector<Point*>& points) {
+int readDataSet(std::string &fileName, char delimiter, Kmeans &kmeans) {
     std::string lineBuffer;
     std::ifstream dataSetFile(fileName);
 
@@ -26,12 +27,41 @@ int readDataSet(std::string& fileName, char delimiter, std::vector<Point*>& poin
         //read every value of the vector
         while (std::getline(lineStream, valueBuffer, delimiter)) {
             //make sure there is a number in valueBuffer
-            if(valueBuffer[0] < '0' || valueBuffer[0] > '9'){
+            if (valueBuffer[0] < '0' || valueBuffer[0] > '9') {
                 continue;
             }
             vec.push_back(std::stod(valueBuffer));
         }
-        Point* p = new Point(vec, item_id);
+        Point *p = new Point(vec, item_id);
+        kmeans.addPoint(p);
+
+    }
+
+    return 0;
+}
+
+int readDataSet(std::string &fileName, char delimiter, std::vector<Point *> &points) {
+    std::string lineBuffer;
+    std::ifstream dataSetFile(fileName);
+
+    //read each line
+    while (std::getline(dataSetFile, lineBuffer)) {
+        std::string item_id;
+        std::vector<double> vec;
+
+        std::istringstream lineStream(lineBuffer);
+        std::getline(lineStream, item_id, delimiter);
+        std::string valueBuffer;
+
+        //read every value of the vector
+        while (std::getline(lineStream, valueBuffer, delimiter)) {
+            //make sure there is a number in valueBuffer
+            if (valueBuffer[0] < '0' || valueBuffer[0] > '9') {
+                continue;
+            }
+            vec.push_back(std::stod(valueBuffer));
+        }
+        Point *p = new Point(vec, item_id);
         points.push_back(p);
 
     }
@@ -39,7 +69,7 @@ int readDataSet(std::string& fileName, char delimiter, std::vector<Point*>& poin
     return 0;
 }
 
-int readDataSet(std::string& fileName, char delimiter, std::vector<Point>& queries) {
+int readDataSet(std::string &fileName, char delimiter, std::vector <Point> &queries) {
     std::string lineBuffer;
     std::ifstream dataSetFile(fileName);
 
@@ -55,7 +85,7 @@ int readDataSet(std::string& fileName, char delimiter, std::vector<Point>& queri
         //read every value of the vector
         while (std::getline(lineStream, valueBuffer, delimiter)) {
             //make sure there is a number in valueBuffer
-            if(valueBuffer[0] < '0' || valueBuffer[0] > '9'){
+            if (valueBuffer[0] < '0' || valueBuffer[0] > '9') {
                 continue;
             }
             vec.push_back(std::stod(valueBuffer));
@@ -72,8 +102,9 @@ int readQuery(std::string fileName) {
     return 0;
 }
 
-int readLshConfig(const std::string &fileName, std::map<std::string, bool> &argumentsRed, std::string &inputFile, std::string &queryFile, int &k, int &l,
-                    std::string &outputFile, int &numOfNearest, double &radius){
+int readLshConfig(const std::string &fileName, std::map<std::string, bool> &argumentsRed, std::string &inputFile,
+                  std::string &queryFile, int &k, int &l,
+                  std::string &outputFile, int &numOfNearest, double &radius) {
 
     std::string lineBuffer;
     std::ifstream dataSetFile(fileName);
@@ -90,22 +121,22 @@ int readLshConfig(const std::string &fileName, std::map<std::string, bool> &argu
         value.erase(end_pos, value.end());
         end_pos = std::remove(value.begin(), value.end(), '\n');
         value.erase(end_pos, value.end());
-        if(value[0] == 0){
+        if (value[0] == 0) {
             continue; //no value assigned in config file (only spaces)
         }
 
         //read arguments
         if (std::string(param).compare("hash_h_amount") == 0) {
-            if((k = atoi(value.c_str())) == 0) return -1;
+            if ((k = atoi(value.c_str())) == 0) return -1;
             argumentsRed["-k"] = true;
         } else if (std::string(param).compare("tables_amount") == 0) {
-            if((l = atoi(value.c_str())) == 0) return -1;
+            if ((l = atoi(value.c_str())) == 0) return -1;
             argumentsRed["-L"] = true;
         } else if (std::string(param).compare("nearest_amount") == 0) {
-            if((numOfNearest = atoi(value.c_str())) == 0) return -1;
+            if ((numOfNearest = atoi(value.c_str())) == 0) return -1;
             argumentsRed["-N"] = true;
         } else if (std::string(param).compare("max_radius") == 0) {
-            if((radius = atof(value.c_str())) == 0) return -1;
+            if ((radius = atof(value.c_str())) == 0) return -1;
             argumentsRed["-R"] = true;
         } else if (std::string(param).compare("dataset") == 0) {
             inputFile = value;

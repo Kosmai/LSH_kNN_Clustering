@@ -7,8 +7,11 @@
 #include <vector>
 #include <iostream>
 #include <map>
+#include "kmeans.hpp"
 
 class Point;
+
+int readDataSet(std::string& fileName, char delimiter, Kmeans& kmeans);
 
 int readDataSet(std::string& fileName, char delimiter, std::vector<Point*>& points);
 
