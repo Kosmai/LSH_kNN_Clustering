@@ -38,7 +38,11 @@ Point& Cluster::getCentroid() {
 
 int Cluster::count() {
     return this->clusteredPoints.size();
-} 
+}
+
+std::list<Point *>& Cluster::getClusteredPoints(){
+    return this->clusteredPoints;
+}
 
 double Cluster::recenter() {
 

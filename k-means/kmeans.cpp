@@ -58,6 +58,7 @@ int Kmeans::computeLoyd(double iterThreshold, unsigned int maxIters, centroidIni
                 }
             }
             this->clusters[minIndex].insertPoint(point);
+            point->setClusterIndex(minIndex);
         }
 
         double sumOfCentroidMoves = 0;
@@ -173,4 +174,60 @@ void Kmeans::findPlusPlusCentroids(std::list<Point *> &points, unsigned int k, s
         }
         k--;
     }
+}
+
+double Kmeans::calculatePointSilhouette(Point *point) {
+    double a = 0;
+    double b = 0;
+
+    //calculate average distance from other points of the same cluster
+    for (auto p: clusters[point->getClusterIndex()].getClusteredPoints()) {
+        if (p->getId() == point->getId())continue;
+        a += point->l2Distance(p);
+    }
+
+    a /= (clusters[point->getClusterIndex()].getClusteredPoints().size() - 1);
+
+
+    double minDistance = DBL_MAX;
+    unsigned int minIndex = -1;
+    double tempDistance = 0;
+
+    //calculate average distance from points of the next best cluster
+    for (unsigned int i = 0; i < this->numOfClusters; i++) {
+        if ((unsigned int) point->getClusterIndex() == i)continue;
+        tempDistance = point->l2Distance(&(clusters[i].getCentroid()));
+        if (tempDistance <= minDistance) {
+            minDistance = tempDistance;
+            minIndex = i;
+        }
+    }
+
+    for (auto p: clusters[minIndex].getClusteredPoints()) {
+        b += point->l2Distance(p);
+    }
+
+    b /= (clusters[minIndex].getClusteredPoints().size());
+
+    //calculate silhouette
+    double silhouette = (b - a) / std::max(a, b);
+
+    return silhouette;
+
+}
+
+void Kmeans::displaySilhouette() {
+    double totalSilhouette = 0;
+    double sil = 0;
+
+    int counter=0;
+    for (auto p: this->points) {
+        counter++;
+        sil = this->calculatePointSilhouette(p);
+        std::cout << "Silhouette: " << sil << std::endl;
+        totalSilhouette += sil;
+    }
+
+    double averageSilhouette = totalSilhouette/this->points.size();
+    std::cout << std::endl << "Average Silhouette: " << averageSilhouette << std::endl;
 }

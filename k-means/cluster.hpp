@@ -31,7 +31,7 @@ public:
 
     int count();
 
-    std::list<Point *> getClusteredPoints();
+    std::list<Point *>& getClusteredPoints();
 
     double recenter();
 

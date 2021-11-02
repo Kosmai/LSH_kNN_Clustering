@@ -3,11 +3,13 @@
 
 Point::Point() {
     this->id = "Uninitialized";
+    this->clusterIndex = -1;
 }
 
-Point::Point(std::vector<double>& vec, const std::string& id) {
+Point::Point(std::vector<double> &vec, const std::string &id) {
     this->vec = vec; //copy construct
     this->id = id;
+    this->clusterIndex = -1;
 }
 
 Point &Point::operator=(const Point &copy) {
@@ -17,15 +19,20 @@ Point &Point::operator=(const Point &copy) {
     return *this;
 }
 
-int Point::setId(std::string& id) {
+int Point::setId(std::string &id) {
     this->id = id;
 
     return 0;
 }
 
-int Point::setVector(std::vector<double>& vec) {
+int Point::setVector(std::vector<double> &vec) {
     this->vec = vec; //copy construct
 
+    return 0;
+}
+
+int Point::setClusterIndex(int clusterIndex) {
+    this->clusterIndex = clusterIndex;
     return 0;
 }
 
@@ -33,15 +40,19 @@ std::string Point::getId() {
     return this->id;
 }
 
-std::vector<double>& Point::getVector() {
+std::vector<double> &Point::getVector() {
     return this->vec;
+}
+
+int Point::getClusterIndex() {
+    return this->clusterIndex;
 }
 
 int Point::getDimension() {
     return this->vec.size();
 }
 
-bool Point::operator==(Point &p){
+bool Point::operator==(Point &p) {
     return this->id == p.id;
 }
 
@@ -57,8 +68,8 @@ double Point::l2Distance(Point *otherPoint) {
     return sqrt(sum);
 }
 
-double Point::l2Distance(std::vector<double>& otherVector) {
-    if ((int)otherVector.size() != this->getDimension()) {
+double Point::l2Distance(std::vector<double> &otherVector) {
+    if ((int) otherVector.size() != this->getDimension()) {
         return -1;
     }
 
