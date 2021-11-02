@@ -205,3 +205,17 @@ int LSH::calculateNN(Point &queryPoint, unsigned int numOfNN = 1, double r = -1.
     
     return 0;
 }
+
+void LSH::getNearestByR(Point &queryPoint, double r, std::list<Point*>& results){
+
+    LSHSearch(queryPoint);
+
+    std::list<Neighbor*>::iterator it;
+
+    for (it = LSHNeighbors.begin(); it != LSHNeighbors.end(); ++it) {
+
+        if((*it)->distance < r){
+            results.push_back((*it)->point);
+        }
+    }
+}

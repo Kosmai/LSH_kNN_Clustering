@@ -21,7 +21,7 @@ private:
 	std::list<Point*> points;
 	std::list<Neighbor*> LSHNeighbors;
 	std::list<Neighbor*> realNeighbors;
-	std::list<Neighbor*> radiusNeighbors;
+	std::list<Point*> radiusNeighbors;
 
 	//
 	void bruteForceSearch(Point &queryPoint);
@@ -55,5 +55,7 @@ public:
 
 	//
 	int calculateNN(Point &queryPoint, unsigned int numOfNN, double r);
+
+	void getNearestByR(Point &queryPoint, double r, std::list<Point*>& results);
 
 };
