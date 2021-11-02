@@ -8,6 +8,7 @@ private:
     std::string id;
     std::vector<double> vec;
     int clusterIndex;
+    int rangeIndex; //used in lsh clustering
 public:
     Point();
 
@@ -26,11 +27,15 @@ public:
 
     int setClusterIndex(int clusterIndex);
 
+    int setRangeIndex(int rangeIndex);
+
     std::string getId();
 
     std::vector<double> &getVector();
 
     int getClusterIndex();
+
+    int getRangeIndex();
 
     int getDimension();
 
@@ -42,4 +47,5 @@ public:
 
     void print();
 
+    void printInfo();
 };

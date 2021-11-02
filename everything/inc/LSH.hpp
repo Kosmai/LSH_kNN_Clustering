@@ -3,6 +3,7 @@
 class HashTable;
 class HashFunctionG;
 class Point;
+class Cluster;
 
 struct Neighbor {
     Point *point;
@@ -44,6 +45,8 @@ public:
 	//Add a point p to the LSH class
 	int addPoint(Point* p);
 
+	std::list<Point*>& getPoints();
+
 	//print specified HashTable
 	void printHT(int id);
 
@@ -56,6 +59,6 @@ public:
 	//
 	int calculateNN(Point &queryPoint, unsigned int numOfNN, double r);
 
-	void getNearestByR(Point &queryPoint, double r, std::list<Point*>& results);
+	void getNearestByR(double r, int rangeIndex, Cluster* clusters, int currentCluster);
 
 };

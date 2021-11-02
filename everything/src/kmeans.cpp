@@ -2,6 +2,8 @@
 #include <algorithm>
 #include "../inc/kmeans.hpp"
 #include "../inc/randGen.hpp"
+#include "../inc/LSH.hpp"
+#include "../inc/readInput.hpp"
 
 Kmeans::Kmeans(unsigned int dimension, unsigned int numOfClusters) : dimension(dimension),
                                                                      numOfClusters(numOfClusters) {
@@ -21,20 +23,100 @@ int Kmeans::addPoint(Point *point) {
     return 0;
 }
 
-int Kmeans::computeLoyd(double iterThreshold, unsigned int maxIters, centroidInitializationMethod method) {
-    std::vector < Point * > centroids;
+int Kmeans::initializeCentroids(std::list<Point *> &points, centroidInitializationMethod method){
+
+    std::vector <Point *> centroids;
+
+    std::cout << "Attempting to find centroids\n";
 
     if (method == Random) {
-        this->findRandomCentroids(this->points, this->numOfClusters, centroids);
+        this->findRandomCentroids(points, this->numOfClusters, centroids);
     } else if (method == PlusPlus) {
-        this->findPlusPlusCentroids(this->points, this->numOfClusters, centroids);
+        this->findPlusPlusCentroids(points, this->numOfClusters, centroids);
     } else {
         return -1;
     }
+    std::cout << "Found centroids\n";
 
     for (unsigned int i = 0; i < this->numOfClusters; i++) {
         this->clusters[i].setCentroid(centroids[i]);
     }
+    return 0;
+}
+
+int Kmeans::computeLSH(std::string inputFile, double maxRadius, unsigned int maxIters, centroidInitializationMethod method) {
+
+    int radius = 200;
+
+    std::cout << "Appending points in lsh structure\n";
+    
+    LSH lsh = LSH(128, 1000, 10, 4, 500); //TODO pass these or read form config etc
+
+    std::cout << "Done\n";
+
+    readDataSet(inputFile, ' ', lsh);
+
+    std::cout << "Initializing centroids\n";
+
+    if(initializeCentroids(lsh.getPoints(), method) < 0) return -1;
+
+    unsigned int iter;
+    double sumOfCentroidMoves = DBL_MAX;
+
+    std::cout << "Clearing clusters\n";
+
+    for (unsigned int i = 0; i < this->numOfClusters; i++) {
+        this->clusters[i].clearList();
+    }
+
+    for (iter = 0; iter < maxIters; iter++) {
+
+        for(unsigned int i = 0; i < this->numOfClusters; i++){
+            //std::cout << "Calculating points for cluster i\n";
+            lsh.getNearestByR(radius, iter, this->clusters, i);
+        }
+
+        //if (sumOfCentroidMoves < iterThreshold)break;
+        //sumOfCentroidMoves = 0;
+
+        for (unsigned int i = 0; i < this->numOfClusters; i++) {
+            sumOfCentroidMoves += this->clusters[i].recenter();
+        }
+
+        radius *= 2;
+        if(radius >= maxRadius)break;
+        std::cout << radius << std::endl;
+
+    }
+
+    int counter = 0;
+    for(auto p : lsh.getPoints()){
+        int idx = p->getClusterIndex();
+        if(idx != -1){
+            this->clusters[idx].insertPoint(p);
+            counter++;
+        }
+        //p->printInfo();
+    }
+
+
+
+
+    std::cout << "Total Iterations: " << iter << std::endl;
+
+    for (unsigned int i = 0; i < this->numOfClusters; i++) {
+        std::cout << "Items in cluster " << i << ": " << clusters[i].count() << std::endl;
+        //clusters[i].print();
+    }
+
+    std::cout << "Total points assigned: " << counter << std::endl;
+
+    return 0;
+}
+
+int Kmeans::computeLoyd(double iterThreshold, unsigned int maxIters, centroidInitializationMethod method) {
+
+    if(initializeCentroids(this->points, method) < 0) return -1;
 
     double dist, minDist;
     unsigned int minIndex;
@@ -82,17 +164,13 @@ int Kmeans::computeLoyd(double iterThreshold, unsigned int maxIters, centroidIni
     return 0;
 }
 
-int Kmeans::computeLSH() {
-    return 0;
-}
-
 int Kmeans::computeHypercube() {
     return 0;
 }
 
 void Kmeans::findRandomCentroids(std::list<Point *> &points, unsigned int k, std::vector<Point *> &centroids) {
-    //int size = points.size();
-    //std::cout << size << std::endl;
+    int size = points.size();
+    std::cout << size << std::endl;
 
     std::vector < Point * > shuffledPoints(points.begin(), points.end());
     std::random_shuffle(std::begin(shuffledPoints), std::end(shuffledPoints));

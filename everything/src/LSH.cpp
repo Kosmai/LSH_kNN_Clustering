@@ -3,6 +3,7 @@
 #include "../inc/hashTable.hpp"
 #include "../inc/point.hpp"
 #include "../inc/LSH.hpp"
+#include "../inc/cluster.hpp"
 
 LSH::LSH() {
     std::cout << "Default LSH ctr implicitly called" << std::endl;
@@ -41,6 +42,11 @@ LSH::~LSH() {
         delete v;
     }
 }
+
+std::list<Point*>& LSH::getPoints(){
+    return this->points;
+}
+
 
 void LSH::printHT(int id) {
     if (id >= L || id < 0) {
@@ -206,16 +212,38 @@ int LSH::calculateNN(Point &queryPoint, unsigned int numOfNN = 1, double r = -1.
     return 0;
 }
 
-void LSH::getNearestByR(Point &queryPoint, double r, std::list<Point*>& results){
+void LSH::getNearestByR(double r, int rangeIndex, Cluster* clusters, int currentCluster){
 
-    LSHSearch(queryPoint);
+    Point centroid = clusters[currentCluster].getCentroid();
+
+    LSHSearch(centroid);
 
     std::list<Neighbor*>::iterator it;
 
     for (it = LSHNeighbors.begin(); it != LSHNeighbors.end(); ++it) {
 
         if((*it)->distance < r){
-            results.push_back((*it)->point);
+            Point* point = (*it)->point;
+
+            int pointRangeIndex = point->getRangeIndex();
+            int pointCluster    = point->getClusterIndex();
+
+            //if unassigned cluster for this point
+            if(pointCluster == -1){
+                point->setRangeIndex(rangeIndex);
+                point->setClusterIndex(currentCluster);
+                //clusters[currentCluster].getClusteredPoints().push_back(point);
+            }
+            else{
+                //if cluster was assigned at this iteration of the algorithm
+                if(pointRangeIndex == rangeIndex){
+                    //if its closer to this cluster, assign the point to it
+                    if(point->l2Distance(&centroid) < point->l2Distance(&clusters[pointCluster].getCentroid())){
+                        point->setClusterIndex(currentCluster);
+                        //clusters[currentCluster].getClusteredPoints().push_back(point);
+                    }
+                }
+            }
         }
     }
 }
