@@ -40,6 +40,7 @@ int Kmeans::computeLoyd(double iterThreshold, unsigned int maxIters, centroidIni
     unsigned int minIndex;
 
     unsigned int iter;
+    double sumOfCentroidMoves = DBL_MAX;
 
     for (iter = 0; iter < maxIters; iter++) {
 
@@ -60,15 +61,15 @@ int Kmeans::computeLoyd(double iterThreshold, unsigned int maxIters, centroidIni
             this->clusters[minIndex].insertPoint(point);
             point->setClusterIndex(minIndex);
         }
-
-        double sumOfCentroidMoves = 0;
+        if (sumOfCentroidMoves < iterThreshold)break;
+        sumOfCentroidMoves = 0;
 
         for (unsigned int i = 0; i < this->numOfClusters; i++) {
             sumOfCentroidMoves += this->clusters[i].recenter();
         }
 
         std::cout << sumOfCentroidMoves << std::endl;
-        if (sumOfCentroidMoves < iterThreshold)break;
+
     }
 
     std::cout << "Total Iterations: " << iter << std::endl;
@@ -127,6 +128,7 @@ void Kmeans::findPlusPlusCentroids(std::list<Point *> &points, unsigned int k, s
                 dist = point->l2Distance(centroid);
 
                 //square dist TODO
+                dist = dist * dist;
 
                 if (dist < distances[id]) {
                     distances[id] = dist;
@@ -158,6 +160,8 @@ void Kmeans::findPlusPlusCentroids(std::list<Point *> &points, unsigned int k, s
             idx++;
         }
 
+        idx--;
+
         //get the id of the point so we can delete it from the list
         std::string targetId = shuffledPoints[idx]->getId();
 
@@ -186,7 +190,12 @@ double Kmeans::calculatePointSilhouette(Point *point) {
         a += point->l2Distance(p);
     }
 
-    a /= (clusters[point->getClusterIndex()].getClusteredPoints().size() - 1);
+    int clusterSize = (clusters[point->getClusterIndex()].getClusteredPoints().size());
+    if (clusterSize - 1 == 0) {
+        a = 0;
+    } else {
+        a /= clusterSize - 1;
+    }
 
 
     double minDistance = DBL_MAX;
@@ -207,10 +216,17 @@ double Kmeans::calculatePointSilhouette(Point *point) {
         b += point->l2Distance(p);
     }
 
-    b /= (clusters[minIndex].getClusteredPoints().size());
+    clusterSize = (clusters[minIndex].getClusteredPoints().size());
+
+    if (clusterSize != 0) {
+        b /= clusterSize;
+    } else {
+        b = 0;
+    }
 
     //calculate silhouette
-    double silhouette = (b - a) / std::max(a, b);
+    double silhouette;
+    (a != 0 || b != 0) ? silhouette = (b - a) / std::max(a, b) : silhouette = 0;
 
     return silhouette;
 
@@ -220,7 +236,7 @@ void Kmeans::displaySilhouette() {
     double totalSilhouette = 0;
     double sil = 0;
 
-    int counter=0;
+    int counter = 0;
     for (auto p: this->points) {
         counter++;
         sil = this->calculatePointSilhouette(p);
@@ -228,6 +244,6 @@ void Kmeans::displaySilhouette() {
         totalSilhouette += sil;
     }
 
-    double averageSilhouette = totalSilhouette/this->points.size();
+    double averageSilhouette = totalSilhouette / this->points.size();
     std::cout << std::endl << "Average Silhouette: " << averageSilhouette << std::endl;
 }

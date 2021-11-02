@@ -18,11 +18,11 @@ int main() {
     std::string inputFile = "datasets/input_small_id";
     std::string queryFile = "datasets/query_small_id";
 
-    Kmeans kmeans(128, 3);
+    Kmeans kmeans(128, 4);
     std::vector < Point * > points;
     readDataSet(inputFile, ' ', kmeans);
 
-    kmeans.computeLoyd(0.005, 50, Random);
+    kmeans.computeLoyd(0.005, 100, PlusPlus);
     kmeans.displaySilhouette();
 
     return 0;
