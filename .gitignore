@@ -6,3 +6,7 @@ hypercube/datasets/
 hypercube/cube
 k-means/datasets/
 k-means/kmeans
+everything/datasets/
+everything/lsh
+everything/cube
+everything/cluster
