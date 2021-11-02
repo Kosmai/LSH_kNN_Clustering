@@ -233,17 +233,34 @@ double Kmeans::calculatePointSilhouette(Point *point) {
 }
 
 void Kmeans::displaySilhouette() {
-    double totalSilhouette = 0;
+    std::cout << std::endl << "-----------------------------------------------" << std::endl;
+    std::cout << "                SILHOUETTES                    " << std::endl;
+    std::cout << "-----------------------------------------------" << std::endl;
+    double averageSilhouettes[this->numOfClusters];
+
+    for (unsigned int i = 0; i < this->numOfClusters; i++) {
+        averageSilhouettes[i] = 0;
+    }
+    double averageTotalSilhouette = 0;
     double sil = 0;
 
-    int counter = 0;
     for (auto p: this->points) {
-        counter++;
         sil = this->calculatePointSilhouette(p);
-        std::cout << "Silhouette: " << sil << std::endl;
-        totalSilhouette += sil;
+        //std::cout << "Silhouette: " << sil << std::endl;
+        averageTotalSilhouette += sil;
+        averageSilhouettes[p->getClusterIndex()] += sil;
+    }
+    double clusterSize;
+    for (unsigned int i = 0; i < this->numOfClusters; i++) {
+        clusterSize = this->clusters[i].getClusteredPoints().size();
+        if (clusterSize == 0) {
+            std::cout << "Cluster " << i << ": No Points In This Cluster" << std::endl;
+        } else {
+            averageSilhouettes[i] /= clusterSize;
+            std::cout << "Cluster " << i << ": " << averageSilhouettes[i] << std::endl;
+        }
     }
 
-    double averageSilhouette = totalSilhouette / this->points.size();
-    std::cout << std::endl << "Average Silhouette: " << averageSilhouette << std::endl;
+    averageTotalSilhouette = averageTotalSilhouette / this->points.size();
+    std::cout << std::endl << "Average Silhouette: " << averageTotalSilhouette << std::endl;
 }

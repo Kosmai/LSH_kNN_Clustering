@@ -27,7 +27,7 @@ int readDataSet(std::string &fileName, char delimiter, Kmeans &kmeans) {
         //read every value of the vector
         while (std::getline(lineStream, valueBuffer, delimiter)) {
             //make sure there is a number in valueBuffer
-            if (valueBuffer[0] < '0' || valueBuffer[0] > '9') {
+            if ((valueBuffer[0] < '0' || valueBuffer[0] > '9') && valueBuffer[0] != '-') {
                 continue;
             }
             vec.push_back(std::stod(valueBuffer));

@@ -58,12 +58,14 @@ double Cluster::recenter() {
             average[i] += v->getVector()[i];
         }
     }
+
     for (int i = 0; i < this->dimension; i++) {
         average[i] /= this->clusteredPoints.size();
     }
 
     double moved = this->centroid.l2Distance(average);
     this->centroid.setVector(average);
+
     return moved;
 }
 

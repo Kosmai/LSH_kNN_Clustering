@@ -15,10 +15,10 @@
 int main() {
     setRandomSeed(time(NULL));
 
-    std::string inputFile = "datasets/input_small_id";
+    std::string inputFile = "datasets/train.txt";
     std::string queryFile = "datasets/query_small_id";
 
-    Kmeans kmeans(128, 4);
+    Kmeans kmeans(2, 2);
     std::vector < Point * > points;
     readDataSet(inputFile, ' ', kmeans);
 
