@@ -50,15 +50,19 @@ int Kmeans::computeLSH(std::string inputFile, double maxRadius, unsigned int max
 
     std::cout << "Appending points in lsh structure\n";
     
-    LSH lsh = LSH(128, 1000, 10, 4, 500); //TODO pass these or read form config etc
+    LSH* lsh = new LSH(128, 1000, 10, 4, 1000); //TODO pass these or read form config etc
 
     std::cout << "Done\n";
 
-    readDataSet(inputFile, ' ', lsh);
+    //readDataSet(inputFile, ' ', lsh->;
+
+    for(auto point: this->points){
+        lsh->addPoint(point);
+    }
 
     std::cout << "Initializing centroids\n";
 
-    if(initializeCentroids(lsh.getPoints(), method) < 0) return -1;
+    if(initializeCentroids(lsh->getPoints(), method) < 0) return -1;
 
     unsigned int iter;
     double sumOfCentroidMoves = DBL_MAX;
@@ -73,7 +77,7 @@ int Kmeans::computeLSH(std::string inputFile, double maxRadius, unsigned int max
 
         for(unsigned int i = 0; i < this->numOfClusters; i++){
             //std::cout << "Calculating points for cluster i\n";
-            lsh.getNearestByR(radius, iter, this->clusters, i);
+            lsh->getNearestByR(radius, iter, this->clusters, i);
         }
 
         //if (sumOfCentroidMoves < iterThreshold)break;
@@ -89,27 +93,43 @@ int Kmeans::computeLSH(std::string inputFile, double maxRadius, unsigned int max
 
     }
 
-    int counter = 0;
-    for(auto p : lsh.getPoints()){
+    double minDistance;
+    double distance;
+    int minIndex;
+
+    for(auto p : lsh->getPoints()){
         int idx = p->getClusterIndex();
         if(idx != -1){
             this->clusters[idx].insertPoint(p);
-            counter++;
         }
-        //p->printInfo();
+        else{
+            minDistance = DBL_MAX;
+            minIndex = -1;
+
+            for(unsigned int i = 0; i < this->numOfClusters; i++){
+                distance = p->l2Distance(this->clusters[i].getCentroid().getVector());
+                if(distance <= minDistance){
+                    minDistance = distance;
+                    minIndex = i;
+                }
+            }   
+            p->setClusterIndex(minIndex);
+            this->clusters[minIndex].insertPoint(p);
+        }
     }
 
 
-
+    unsigned int pointsAssigned = 0;
 
     std::cout << "Total Iterations: " << iter << std::endl;
 
     for (unsigned int i = 0; i < this->numOfClusters; i++) {
-        std::cout << "Items in cluster " << i << ": " << clusters[i].count() << std::endl;
-        //clusters[i].print();
+        unsigned int clusterPoints = clusters[i].count();
+        std::cout << "Items in cluster " << i << ": " << clusterPoints << std::endl;
+        pointsAssigned += clusterPoints; 
     }
 
-    std::cout << "Total points assigned: " << counter << std::endl;
+    std::cout << "Total points assigned: " << pointsAssigned << std::endl;
 
     return 0;
 }
@@ -260,21 +280,23 @@ void Kmeans::findPlusPlusCentroids(std::list<Point *> &points, unsigned int k, s
 
 double Kmeans::calculatePointSilhouette(Point *point) {
     double a = 0;
-    double b = 0;
+    double b = 0;   
+
 
     //calculate average distance from other points of the same cluster
+    //std::cout<<point->getClusterIndex();
+
     for (auto p: clusters[point->getClusterIndex()].getClusteredPoints()) {
         if (p->getId() == point->getId())continue;
         a += point->l2Distance(p);
     }
-
     int clusterSize = (clusters[point->getClusterIndex()].getClusteredPoints().size());
     if (clusterSize - 1 == 0) {
         a = 0;
     } else {
         a /= clusterSize - 1;
     }
-
+    
 
     double minDistance = DBL_MAX;
     unsigned int minIndex = -1;
@@ -314,6 +336,7 @@ void Kmeans::displaySilhouette() {
     std::cout << std::endl << "-----------------------------------------------" << std::endl;
     std::cout << "                SILHOUETTES                    " << std::endl;
     std::cout << "-----------------------------------------------" << std::endl;
+
     double averageSilhouettes[this->numOfClusters];
 
     for (unsigned int i = 0; i < this->numOfClusters; i++) {
@@ -323,8 +346,9 @@ void Kmeans::displaySilhouette() {
     double sil = 0;
 
     for (auto p: this->points) {
+        if(p->getClusterIndex() == -1)continue;
         sil = this->calculatePointSilhouette(p);
-        //std::cout << "Silhouette: " << sil << std::endl;
+        std::cout << "Silhouette: " << sil << std::endl;
         averageTotalSilhouette += sil;
         averageSilhouettes[p->getClusterIndex()] += sil;
     }

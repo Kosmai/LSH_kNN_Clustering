@@ -115,6 +115,15 @@ int LSH::LSHSearch(Point &queryPoint) {
     }
     //queryPoint.print();
 
+    for(auto v : LSHNeighbors){
+        delete v;
+    }
+    for(auto v : realNeighbors){
+        delete v;
+    }
+    this->LSHNeighbors.clear();
+    this->realNeighbors.clear();
+
     //search each hashtable for candidate neighbors
     for (int i = 0; i < L; i++) {
         unsigned int ID = gFunctions[i].computeID(queryPoint.getVector());
