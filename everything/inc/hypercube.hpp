@@ -6,6 +6,7 @@ class HashTable;
 class HashFunctionF;
 class Point;
 struct Neighbor;
+class Cluster;
 
 class Hypercube{
 private:
@@ -53,5 +54,7 @@ public:
 
 	//
 	int calculateNN(Point &queryPoint, int M, int probes, unsigned int numOfNN, double r);
+
+    void getNearestByR(double r, int rangeIndex, Cluster* clusters, int currentCluster);
 
 };

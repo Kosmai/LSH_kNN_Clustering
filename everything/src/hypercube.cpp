@@ -6,6 +6,7 @@
 #include "../inc/hypercube.hpp"
 #include "../inc/hamming.hpp"
 #include "../inc/LSH.hpp"
+#include "../inc/cluster.hpp"
 
 Hypercube::Hypercube() {
     std::cout << "Default Hypercube ctr implicitly called" << std::endl;
@@ -221,4 +222,40 @@ int Hypercube::calculateNN(Point &queryPoint, int M, int probes, unsigned int nu
     }
 
     return 0;
+}
+
+void Hypercube::getNearestByR(double r, int rangeIndex, Cluster* clusters, int currentCluster){
+
+    Point centroid = clusters[currentCluster].getCentroid();
+
+    hyperSearch(centroid, 10, 2);
+
+    std::list<Neighbor*>::iterator it;
+
+    for (it = HyperNeighbors.begin(); it != HyperNeighbors.end(); ++it) {
+
+        if((*it)->distance < r){
+            Point* point = (*it)->point;
+
+            int pointRangeIndex = point->getRangeIndex();
+            int pointCluster    = point->getClusterIndex();
+
+            //if unassigned cluster for this point
+            if(pointCluster == -1){
+                point->setRangeIndex(rangeIndex);
+                point->setClusterIndex(currentCluster);
+                //clusters[currentCluster].getClusteredPoints().push_back(point);
+            }
+            else{
+                //if cluster was assigned at this iteration of the algorithm
+                if(pointRangeIndex == rangeIndex){
+                    //if its closer to this cluster, assign the point to it
+                    if(point->l2Distance(&centroid) < point->l2Distance(&clusters[pointCluster].getCentroid())){
+                        point->setClusterIndex(currentCluster);
+                        //clusters[currentCluster].getClusteredPoints().push_back(point);
+                    }
+                }
+            }
+        }
+    }
 }

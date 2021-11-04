@@ -30,11 +30,12 @@ int main() {
     readDataSet(inputFile, ' ', kmeans);
 
     auto t1 = high_resolution_clock::now();
-    kmeans.computeLoyd(0.005, 100, PlusPlus);
+    //kmeans.computeLoyd(0.005, 100, PlusPlus);
     auto t2 = high_resolution_clock::now();
 
     auto t3 = high_resolution_clock::now();
     //kmeans.computeLSH(inputFile, 55000, 50, Random);
+    kmeans.computeHypercube(55000, 50, Random);
     auto t4 = high_resolution_clock::now();
 
     auto loyd = duration_cast<milliseconds>(t2 - t1);
@@ -42,6 +43,6 @@ int main() {
     std::cout << loyd.count() << std::endl;
     std::cout << lsh.count() << std::endl;
 
-    //kmeans.displaySilhouette();
+    kmeans.displaySilhouette();
     return 0;
 }

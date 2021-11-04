@@ -33,7 +33,7 @@ public:
 
     int computeLSH(std::string inputFile, double maxRadius, unsigned int maxIters, centroidInitializationMethod);
 
-    int computeHypercube();
+    int computeHypercube(double maxRadius, unsigned int maxIters, centroidInitializationMethod);
 
     double calculatePointSilhouette(Point *point);
 
