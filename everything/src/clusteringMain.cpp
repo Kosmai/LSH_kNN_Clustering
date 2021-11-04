@@ -34,14 +34,19 @@ int main() {
     auto t2 = high_resolution_clock::now();
 
     auto t3 = high_resolution_clock::now();
-    //kmeans.computeLSH(inputFile, 55000, 50, Random);
-    kmeans.computeHypercube(55000, 50, Random);
+    //kmeans.computeLSH(55000, 50, Random);
     auto t4 = high_resolution_clock::now();
+
+    auto t5 = high_resolution_clock::now();
+    kmeans.computeHypercube(55000, 50, PlusPlus);
+    auto t6 = high_resolution_clock::now();
 
     auto loyd = duration_cast<milliseconds>(t2 - t1);
     auto lsh = duration_cast<milliseconds>(t4 - t3);
-    std::cout << loyd.count() << std::endl;
-    std::cout << lsh.count() << std::endl;
+    auto hyper = duration_cast<milliseconds>(t6 - t5);
+    std::cout << "Loyd  ms: " << loyd.count() << std::endl;
+    std::cout << "LSH   ms: " << lsh.count() << std::endl;
+    std::cout << "Hyper ms: " << hyper.count() << std::endl;
 
     kmeans.displaySilhouette();
     return 0;

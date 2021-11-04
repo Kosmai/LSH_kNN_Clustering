@@ -1,5 +1,6 @@
 #include <cfloat>
 #include <algorithm>
+#include <cmath>
 #include "../inc/kmeans.hpp"
 #include "../inc/randGen.hpp"
 #include "../inc/LSH.hpp"
@@ -45,7 +46,7 @@ int Kmeans::initializeCentroids(std::list<Point *> &points, centroidInitializati
     return 0;
 }
 
-int Kmeans::computeLSH(std::string inputFile, double maxRadius, unsigned int maxIters, centroidInitializationMethod method) {
+int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitializationMethod method) {
 
     int radius = 200;
 
@@ -54,8 +55,6 @@ int Kmeans::computeLSH(std::string inputFile, double maxRadius, unsigned int max
     LSH* lsh = new LSH(128, 1000, 10, 4, 1000); //TODO pass these or read form config etc
 
     std::cout << "Done\n";
-
-    //readDataSet(inputFile, ' ', lsh->;
 
     for(auto point: this->points){
         lsh->addPoint(point);
@@ -191,11 +190,9 @@ int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidIn
 
     std::cout << "Appending points in lsh structure\n";
 
-    Hypercube* hypercube = new Hypercube(128, 1000, 1, 14, 1000); //TODO pass these or read form config etc
+    Hypercube* hypercube = new Hypercube(128, (int)pow(2,14), 1, 14, 1000); //TODO pass these or read form config etc
 
     std::cout << "Done\n";
-
-    //readDataSet(inputFile, ' ', lsh->;
 
     for(auto point: this->points){
         hypercube->addPoint(point);

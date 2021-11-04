@@ -228,7 +228,7 @@ void Hypercube::getNearestByR(double r, int rangeIndex, Cluster* clusters, int c
 
     Point centroid = clusters[currentCluster].getCentroid();
 
-    hyperSearch(centroid, 10, 2);
+    hyperSearch(centroid, r/2, 8000); //TODO play with parameters
 
     std::list<Neighbor*>::iterator it;
 

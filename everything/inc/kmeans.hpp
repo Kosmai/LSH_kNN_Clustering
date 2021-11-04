@@ -31,7 +31,7 @@ public:
 
     int computeLoyd(double iterThreshold, unsigned int maxIters, centroidInitializationMethod);
 
-    int computeLSH(std::string inputFile, double maxRadius, unsigned int maxIters, centroidInitializationMethod);
+    int computeLSH(double maxRadius, unsigned int maxIters, centroidInitializationMethod);
 
     int computeHypercube(double maxRadius, unsigned int maxIters, centroidInitializationMethod);
 
