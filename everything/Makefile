@@ -3,9 +3,9 @@ CFLAGS=-Wall
 OBJ=obj/hashFunctionH.o obj/hashFunctionG.o obj/randGen.o obj/hashTable.o obj/readInput.o obj/point.o obj/LSH.o obj/hamming.o obj/LSH.o obj/kmeans.o obj/cluster.o obj/hypercube.o obj/hashFunctionF.o
 OBJDIR := obj
 
-all: lsh cube cluster
+all: $(OBJDIR) lsh cube cluster
 
-safe: clean lsh cube cluster
+safe: clean $(OBJDIR) lsh cube cluster
 
 obj/%.o: src/%.cpp
 	$(CC) $(CFLAGS) -c -o $@ $^
