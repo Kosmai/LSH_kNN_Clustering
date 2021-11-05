@@ -14,8 +14,31 @@
 
 #define DIMS 128
 #define CLUSTERS 3
+#define MAX_ITERS 50
+#define MAX_RADIUS 55000
+#define MIN_TOLERACE 0.005
 
-int main() {
+int main(int argc, char** argv) {
+
+    int clusters;
+    int L,k,M,d;
+    int probes;
+    int buckets = 1000;
+    int w = 200;
+
+    std::string inputFile, configFile, outputFile, method;
+    bool complete = false;
+    if(readClusterArguments(argc, argv, inputFile, configFile, complete,
+                    outputFile, method) < 0){
+        printf("Δεν εξυπηρετούμε ακόμα\n");
+        return 1;
+    }
+    if(readClusterConfig(configFile, clusters, L, k, M, d, probes) < 0){
+        printf("Error in config file, aborting...\n");
+        return 1;
+    }
+
+
     setRandomSeed(time(NULL));
 
     using std::chrono::high_resolution_clock;
@@ -23,31 +46,35 @@ int main() {
     using std::chrono::duration;
     using std::chrono::milliseconds;
 
-    std::string inputFile = "datasets/input_small_id";
-
-    Kmeans kmeans = Kmeans(DIMS, CLUSTERS);
+    Kmeans kmeans = Kmeans(DIMS, clusters);
 
     readDataSet(inputFile, ' ', kmeans);
 
     auto t1 = high_resolution_clock::now();
-    //kmeans.computeLoyd(0.005, 100, PlusPlus);
     auto t2 = high_resolution_clock::now();
 
-    auto t3 = high_resolution_clock::now();
-    //kmeans.computeLSH(55000, 50, Random);
-    auto t4 = high_resolution_clock::now();
+    if(method == "Classic"){
+        t1 = high_resolution_clock::now();
+        kmeans.computeLoyd(MIN_TOLERACE, MAX_ITERS, Random);
+        t2 = high_resolution_clock::now();
+    }
+    else if(method == "LSH"){
+        t1 = high_resolution_clock::now();
+        kmeans.computeLSH(MAX_RADIUS, MAX_ITERS, Random, buckets, L, k, w);
+        t2 = high_resolution_clock::now();
+    }
+    else if(method == "Hypercube"){
+        t1 = high_resolution_clock::now();
+        kmeans.computeHypercube(MAX_RADIUS, MAX_ITERS, Random, d, w, probes, M);
+        t2 = high_resolution_clock::now();
+    }
+    else{
+        printf("Unknown method. Try \"Classic\" or \"LSH\" or \"Hypercube\" \n");
+        return 2;
+    }
+    auto time = duration_cast<milliseconds>(t2 - t1);
+    std::cout << "Total time in ms: " << time.count() << std::endl;
 
-    auto t5 = high_resolution_clock::now();
-    kmeans.computeHypercube(55000, 50, PlusPlus);
-    auto t6 = high_resolution_clock::now();
-
-    auto loyd = duration_cast<milliseconds>(t2 - t1);
-    auto lsh = duration_cast<milliseconds>(t4 - t3);
-    auto hyper = duration_cast<milliseconds>(t6 - t5);
-    std::cout << "Loyd  ms: " << loyd.count() << std::endl;
-    std::cout << "LSH   ms: " << lsh.count() << std::endl;
-    std::cout << "Hyper ms: " << hyper.count() << std::endl;
-
-    kmeans.displaySilhouette();
+    //kmeans.displaySilhouette();
     return 0;
 }

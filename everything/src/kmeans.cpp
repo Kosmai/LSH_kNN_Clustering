@@ -46,13 +46,14 @@ int Kmeans::initializeCentroids(std::list<Point *> &points, centroidInitializati
     return 0;
 }
 
-int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitializationMethod method) {
+int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitializationMethod method,
+                       int buckets, int L, int k, int w) {
 
     int radius = 200;
 
     std::cout << "Appending points in lsh structure\n";
     
-    LSH* lsh = new LSH(128, 1000, 10, 4, 1000); //TODO pass these or read form config etc
+    LSH* lsh = new LSH(this->dimension, 1000, 10, 4, 1000);
 
     std::cout << "Done\n";
 
@@ -184,13 +185,13 @@ int Kmeans::computeLoyd(double iterThreshold, unsigned int maxIters, centroidIni
     return 0;
 }
 
-int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidInitializationMethod method) {
+int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidInitializationMethod method, int d, int w, int probes, int M) {
 
     int radius = 200;
 
     std::cout << "Appending points in lsh structure\n";
 
-    Hypercube* hypercube = new Hypercube(128, (int)pow(2,14), 1, 14, 1000); //TODO pass these or read form config etc
+    Hypercube* hypercube = new Hypercube(this->dimension, (int)pow(2,d), 1, d, w); //TODO pass these or read form config etc
 
     std::cout << "Done\n";
 
@@ -215,7 +216,7 @@ int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidIn
 
         for(unsigned int i = 0; i < this->numOfClusters; i++){
             //std::cout << "Calculating points for cluster i\n";
-            hypercube->getNearestByR(radius, iter, this->clusters, i);
+            hypercube->getNearestByR(radius, iter, this->clusters, i, probes, M);
         }
 
         //if (sumOfCentroidMoves < iterThreshold)break;

@@ -129,6 +129,7 @@ int Hypercube::hyperSearch(Point &queryPoint, int M, int probes) {
 
         while(probesChecked < probes){
             if(searchFinished){
+                probesChecked++;
                 break;
             }
             currentBucket = gen.getNext() % this->buckets;
@@ -224,11 +225,11 @@ int Hypercube::calculateNN(Point &queryPoint, int M, int probes, unsigned int nu
     return 0;
 }
 
-void Hypercube::getNearestByR(double r, int rangeIndex, Cluster* clusters, int currentCluster){
+void Hypercube::getNearestByR(double r, int rangeIndex, Cluster* clusters, int currentCluster, int probes, int M){
 
     Point centroid = clusters[currentCluster].getCentroid();
 
-    hyperSearch(centroid, r/2, 8000); //TODO play with parameters
+    hyperSearch(centroid, M, probes); //TODO play with parameters
 
     std::list<Neighbor*>::iterator it;
 

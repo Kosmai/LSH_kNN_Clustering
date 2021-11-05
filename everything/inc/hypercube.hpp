@@ -55,6 +55,6 @@ public:
 	//
 	int calculateNN(Point &queryPoint, int M, int probes, unsigned int numOfNN, double r);
 
-    void getNearestByR(double r, int rangeIndex, Cluster* clusters, int currentCluster);
+    void getNearestByR(double r, int rangeIndex, Cluster* clusters, int currentCluster, int probes, int M);
 
 };

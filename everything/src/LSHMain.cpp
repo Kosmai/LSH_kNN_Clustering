@@ -15,64 +15,6 @@
 #define DIMS 128
 #define W 200
 
-int readClArguments(int argc, char **argv, std::string &inputFile, std::string &queryFile, int &k, int &l,
-					std::string &outputFile, int &numOfNearest, double &radius) {
-
-	//keep track of what arguments have been read
-	std::map<std::string, bool> argumentsRed;
-
-	argumentsRed["-i"] = false;
-	argumentsRed["-q"] = false;
-	argumentsRed["-k"] = false;
-	argumentsRed["-L"] = false;
-	argumentsRed["-o"] = false;
-	argumentsRed["-N"] = false;
-	argumentsRed["-R"] = false;
-
-	//read config file first, then overwrite defaults by arguements if needed
-	if(readLshConfig("config/lsh.conf", argumentsRed, inputFile, queryFile, k, l,
-					outputFile, numOfNearest, radius) < 0){
-		std::cout << "Config file contains a malformed value." << std::endl;
-	}
-
-	//read arguments, overwrite anything needed
-	for (int i = 1; i < argc; i += 2) {
-		if (std::string(argv[i]).compare("-i") == 0 && i + 1 < argc) {
-			inputFile = argv[i + 1];
-			argumentsRed["-i"] = true;
-		} else if (std::string(argv[i]).compare("-q") == 0 && i + 1 < argc) {
-			queryFile = argv[i + 1];
-			argumentsRed["-q"] = true;
-		} else if (std::string(argv[i]).compare("-k") == 0 && i + 1 < argc) {
-			k = atoi(argv[i + 1]);
-			argumentsRed["-k"] = true;
-		} else if (std::string(argv[i]).compare("-L") == 0 && i + 1 < argc) {
-			l = atoi(argv[i + 1]);
-			argumentsRed["-L"] = true;
-		} else if (std::string(argv[i]).compare("-o") == 0 && i + 1 < argc) {
-			outputFile = argv[i + 1];
-			argumentsRed["-o"] = true;
-		} else if (std::string(argv[i]).compare("-N") == 0 && i + 1 < argc) {
-			numOfNearest = atoi(argv[i + 1]);
-			argumentsRed["-N"] = true;
-		} else if (std::string(argv[i]).compare("-R") == 0 && i + 1 < argc) {
-			radius = atof(argv[i + 1]);
-			argumentsRed["-R"] = true;
-		} else {            //unknown argument
-			return -1;
-		}
-	}
-
-	//missing arguments/config defaults
-	for (std::pair<std::string, bool> arg: argumentsRed) {
-		if (!arg.second) {
-			return -2;
-		}
-	}
-
-	return 0;
-}
-
 int main(int argc, char **argv) {
 
 	std::string inputFile;
@@ -83,7 +25,7 @@ int main(int argc, char **argv) {
 	int numOfNearest = 0;
 	double radius = 0.0;
 
-	if (readClArguments(argc, argv, inputFile, queryFile, k, l, outputFile, numOfNearest, radius) != 0) {
+	if (readLshArguments(argc, argv, inputFile, queryFile, k, l, outputFile, numOfNearest, radius) != 0) {
 		std::cout << "Δεν εξυπηρετούμε ακόμα" << std::endl;
 		return -1;
 	}

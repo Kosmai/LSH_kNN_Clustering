@@ -31,9 +31,9 @@ public:
 
     int computeLoyd(double iterThreshold, unsigned int maxIters, centroidInitializationMethod);
 
-    int computeLSH(double maxRadius, unsigned int maxIters, centroidInitializationMethod);
+    int computeLSH(double maxRadius, unsigned int maxIters, centroidInitializationMethod, int buckets, int L, int k, int w);
 
-    int computeHypercube(double maxRadius, unsigned int maxIters, centroidInitializationMethod);
+    int computeHypercube(double maxRadius, unsigned int maxIters, centroidInitializationMethod, int d, int w, int probes, int M);
 
     double calculatePointSilhouette(Point *point);
 
