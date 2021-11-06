@@ -42,22 +42,30 @@ int main(int argc, char **argv) {
 	setRandomSeed(seed);
 
 	//queries is filled with all queries in their file
-	std::vector<Point> queries;
+	std::vector<Point*> queries;
+	std::vector<Point*> points;
+
 	queryFile = "datasets/" + queryFile;
+	inputFile = "datasets/" + inputFile;
+
 	if(readDataSet(queryFile, ' ', queries) < 0){
 		std::cout << "Error while reading querry file. Aborting..." << std::endl;
 		return 1;
 	}
-
-	//LSH initialize will all points in inputfile
-	inputFile = "datasets/" + inputFile;
-	LSH lsh = LSH(128, BUCKETS, l, k, W);
-	if(readDataSet(inputFile, ' ', lsh) < 0){
+	if(readDataSet(inputFile, ' ', points) < 0){
 		std::cout << "Error while reading input file. Aborting..." << std::endl;
 		return 1;
 	}
+
+	//LSH initialize will all points in inputfile
+	LSH lsh = LSH(128, BUCKETS, l, k, W);
+
+    for(auto point: points){
+        lsh.addPoint(point);
+    }
+
 	//lsh.printAllHT();
-	lsh.calculateNN(queries[0], 10, 350);
+	lsh.calculateNN(*queries[0], 10, 350);
 
 	return 0;
 }

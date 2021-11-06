@@ -12,7 +12,6 @@
 #include "../inc/kmeans.hpp"
 #include "../inc/LSH.hpp"
 
-#define DIMS 128
 #define CLUSTERS 3
 #define MAX_ITERS 50
 #define MAX_RADIUS 55000
@@ -28,6 +27,9 @@ int main(int argc, char** argv) {
 
     std::string inputFile, configFile, outputFile, method;
     bool complete = false;
+
+    std::vector<Point*> points;
+
     if(readClusterArguments(argc, argv, inputFile, configFile, complete,
                     outputFile, method) < 0){
         printf("Δεν εξυπηρετούμε ακόμα\n");
@@ -38,8 +40,8 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    if(readDataDimensions(inputFile, dims, ' ') < 0){
-        printf("Invalid Data Dimension...\n");
+    if((dims = readDataSet(inputFile, ' ', points)) < 0){
+        printf("Error in reading points\n");
         return 1;
     }
 
@@ -51,25 +53,26 @@ int main(int argc, char** argv) {
     using std::chrono::milliseconds;
 
     Kmeans kmeans = Kmeans(dims, clusters);
-
-    readDataSet(inputFile, ' ', kmeans);
+    for(auto point: points){
+        kmeans.addPoint(point);
+    }
 
     auto t1 = high_resolution_clock::now();
     auto t2 = high_resolution_clock::now();
 
     if(method == "Classic"){
         t1 = high_resolution_clock::now();
-        kmeans.computeLoyd(MIN_TOLERACE, MAX_ITERS, Random);
+        if(kmeans.computeLoyd(MIN_TOLERACE, MAX_ITERS, Random) < 0) return 3;
         t2 = high_resolution_clock::now();
     }
     else if(method == "LSH"){
         t1 = high_resolution_clock::now();
-        kmeans.computeLSH(MAX_RADIUS, MAX_ITERS, Random, buckets, L, k, w);
+        if(kmeans.computeLSH(MAX_RADIUS, MAX_ITERS, Random, buckets, L, k, w) < 0) return 3;
         t2 = high_resolution_clock::now();
     }
     else if(method == "Hypercube"){
         t1 = high_resolution_clock::now();
-        kmeans.computeHypercube(MAX_RADIUS, MAX_ITERS, Random, d, w, probes, M);
+        if(kmeans.computeHypercube(MAX_RADIUS, MAX_ITERS, Random, d, w, probes, M) < 0) return 3;
         t2 = high_resolution_clock::now();
     }
     else{
@@ -79,6 +82,9 @@ int main(int argc, char** argv) {
     auto time = duration_cast<milliseconds>(t2 - t1);
     std::cout << "Total time in ms: " << time.count() << std::endl;
 
+    for(auto point: points){
+        delete point;
+    }
     //kmeans.displaySilhouette();
     return 0;
 }

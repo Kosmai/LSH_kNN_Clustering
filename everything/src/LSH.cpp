@@ -38,9 +38,6 @@ LSH::~LSH() {
     for(auto v : realNeighbors){
         delete v;
     }
-    for(auto v : points){
-        delete v;
-    }
 }
 
 std::list<Point*>& LSH::getPoints(){

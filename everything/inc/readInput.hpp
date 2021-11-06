@@ -13,19 +13,7 @@ class LSH;
 class Hypercube;
 class Point;
 
-int readDataDimensions(std::string& fileName, int& dimension, char delimiter);
-
-int readDataSet(std::string& fileName, char delimiter, Kmeans& kmeans);
-
-int readDataSet(std::string &fileName, char delimiter, LSH &lsh);
-
-int readDataSet(std::string &fileName, char delimiter, Hypercube &hyper);
-
 int readDataSet(std::string& fileName, char delimiter, std::vector<Point*>& points);
-
-int readDataSet(std::string& fileName, char delimiter, std::vector<Point>& queries);
-
-int readQuery(std::string&);
 
 int readLshArguments(int argc, char **argv, std::string &inputFile, std::string &queryFile, int &k, int &l,
                     std::string &outputFile, int &numOfNearest, double &radius);

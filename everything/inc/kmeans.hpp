@@ -16,9 +16,9 @@ private:
 
     int initializeCentroids(std::list<Point *> &points, centroidInitializationMethod method);
 
-    void findRandomCentroids(std::list<Point *> &points, unsigned int k, std::vector<Point *> &centroids);
+    int findRandomCentroids(std::list<Point *> &points, unsigned int k, std::vector<Point *> &centroids);
 
-    void findPlusPlusCentroids(std::list<Point *> &points, unsigned int k, std::vector<Point *> &centroids);
+    int findPlusPlusCentroids(std::list<Point *> &points, unsigned int k, std::vector<Point *> &centroids);
 
 public:
     Kmeans() = delete;

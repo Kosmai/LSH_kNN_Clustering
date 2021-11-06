@@ -5,131 +5,11 @@
 #include "../inc/hypercube.hpp"
 #include "../inc/readInput.hpp"
 
-
-void printVec(std::vector<double> v) {
-    std::cout << "Vector v" << std::endl << "=================" << std::endl;
-    for (auto i: v) {
-        std::cout << "|-- > " << i << std::endl;
-    }
-    std::cout << "=================" << std::endl;
-}
-
-int readDataDimensions(std::string &fileName, int &dimension, char delimiter) {
-    std::string firstLine;
-    std::ifstream dataSetFile(fileName);
-
-    std::getline(dataSetFile, firstLine);
-
-    std::string item_id;
-    std::vector<double> vec;
-
-    std::istringstream lineStream(firstLine);
-    std::getline(lineStream, item_id, delimiter);
-    std::string valueBuffer;
-
-    //read every value of the vector
-    while (std::getline(lineStream, valueBuffer, delimiter)) {
-        //make sure there is a number in valueBuffer
-        if ((valueBuffer[0] < '0' || valueBuffer[0] > '9') && valueBuffer[0] != '-') {
-            continue;
-        }
-        vec.push_back(std::stod(valueBuffer));
-    }
-
-    dimension = vec.size();
-
-    return 0;
-}
-
-int readDataSet(std::string &fileName, char delimiter, Kmeans &kmeans) {
-    std::string lineBuffer;
-    std::ifstream dataSetFile(fileName);
-
-    //read each line
-    while (std::getline(dataSetFile, lineBuffer)) {
-        std::string item_id;
-        std::vector<double> vec;
-
-        std::istringstream lineStream(lineBuffer);
-        std::getline(lineStream, item_id, delimiter);
-        std::string valueBuffer;
-
-        //read every value of the vector
-        while (std::getline(lineStream, valueBuffer, delimiter)) {
-            //make sure there is a number in valueBuffer
-            if ((valueBuffer[0] < '0' || valueBuffer[0] > '9') && valueBuffer[0] != '-') {
-                continue;
-            }
-            vec.push_back(std::stod(valueBuffer));
-        }
-        Point *p = new Point(vec, item_id);
-        kmeans.addPoint(p);
-
-    }
-
-    return 0;
-}
-
-
-int readDataSet(std::string &fileName, char delimiter, LSH &lsh) {
-    std::string lineBuffer;
-    std::ifstream dataSetFile(fileName);
-
-    //read each line
-    while (std::getline(dataSetFile, lineBuffer)) {
-        std::string item_id;
-        std::vector<double> vec;
-
-        std::istringstream lineStream(lineBuffer);
-        std::getline(lineStream, item_id, delimiter);
-        std::string valueBuffer;
-
-        //read every value of the vector
-        while (std::getline(lineStream, valueBuffer, delimiter)) {
-            //make sure there is a number in valueBuffer
-            if ((valueBuffer[0] < '0' || valueBuffer[0] > '9') && valueBuffer[0] != '-') {
-                continue;
-            }
-            vec.push_back(std::stod(valueBuffer));
-        }
-        Point *p = new Point(vec, item_id);
-        lsh.addPoint(p);
-
-    }
-
-    return 0;
-}
-
-int readDataSet(std::string &fileName, char delimiter, Hypercube &hyper) {
-    std::string lineBuffer;
-    std::ifstream dataSetFile(fileName);
-
-    //read each line
-    while (std::getline(dataSetFile, lineBuffer)) {
-        std::string item_id;
-        std::vector<double> vec;
-
-        std::istringstream lineStream(lineBuffer);
-        std::getline(lineStream, item_id, delimiter);
-        std::string valueBuffer;
-
-        //read every value of the vector
-        while (std::getline(lineStream, valueBuffer, delimiter)) {
-            //make sure there is a number in valueBuffer
-            if ((valueBuffer[0] < '0' || valueBuffer[0] > '9') && valueBuffer[0] != '-') {
-                continue;
-            }
-            vec.push_back(std::stod(valueBuffer));
-        }
-        Point *p = new Point(vec, item_id);
-        hyper.addPoint(p);
-
-    }
-
-    return 0;
-}
-
+//Returns dimension if successful, -1 otherwise
 int readDataSet(std::string &fileName, char delimiter, std::vector<Point *> &points) {
+
+    unsigned int dimension = 0;
+
     std::string lineBuffer;
     std::ifstream dataSetFile(fileName);
 
@@ -149,46 +29,20 @@ int readDataSet(std::string &fileName, char delimiter, std::vector<Point *> &poi
                 continue;
             }
             vec.push_back(std::stod(valueBuffer));
+        }
+        if(dimension == 0){
+            dimension = vec.size();
+        }
+        else if(dimension != vec.size()){
+            //Inaccurate point dimension read
+            return -1;
         }
         Point *p = new Point(vec, item_id);
         points.push_back(p);
 
     }
 
-    return 0;
-}
-
-int readDataSet(std::string &fileName, char delimiter, std::vector <Point> &queries) {
-    std::string lineBuffer;
-    std::ifstream dataSetFile(fileName);
-
-    //read each line
-    while (std::getline(dataSetFile, lineBuffer)) {
-        std::string item_id;
-        std::vector<double> vec;
-
-        std::istringstream lineStream(lineBuffer);
-        std::getline(lineStream, item_id, delimiter);
-        std::string valueBuffer;
-
-        //read every value of the vector
-        while (std::getline(lineStream, valueBuffer, delimiter)) {
-            //make sure there is a number in valueBuffer
-            if (valueBuffer[0] < '0' || valueBuffer[0] > '9') {
-                continue;
-            }
-            vec.push_back(std::stod(valueBuffer));
-        }
-        Point p = Point(vec, item_id);
-        queries.push_back(p);
-
-    }
-
-    return 0;
-}
-
-int readQuery(std::string fileName) {
-    return 0;
+    return (int)dimension;
 }
 
 int readLshArguments(int argc, char **argv, std::string &inputFile, std::string &queryFile, int &k, int &l,

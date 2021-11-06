@@ -42,22 +42,27 @@ int main(int argc, char **argv) {
     setRandomSeed(seed);
 
     //queries is filled with all queries in their file
-    std::vector <Point> queries;
+    std::vector <Point*> queries;
+    std::vector <Point*> points;
+    inputFile = "datasets/" + inputFile;
     queryFile = "datasets/" + queryFile;
+
     if (readDataSet(queryFile, ' ', queries) < 0) {
         std::cout << "Error while reading querry file. Aborting..." << std::endl;
         return 1;
     }
-
-    //Hypercube initialize will all points in inputfile
-    inputFile = "datasets/" + inputFile;
-    Hypercube hyper = Hypercube(DIMS, pow(2, k), 1, k, W);
-    if (readDataSet(inputFile, ' ', hyper) < 0) {
+    if (readDataSet(inputFile, ' ', points) < 0) {
        std::cout << "Error while reading input file. Aborting..." << std::endl;
        return 1;
     }
+
+    Hypercube hyper = Hypercube(DIMS, pow(2, k), 1, k, W);
+    for(auto point: points){
+        hyper.addPoint(point);
+    }
+
     //hyper.printAllHT();
-    hyper.calculateNN(queries[0], m, probes, numOfNearest, radius);
+    hyper.calculateNN(*queries[0], m, probes, numOfNearest, radius);
 
     return 0;
 }

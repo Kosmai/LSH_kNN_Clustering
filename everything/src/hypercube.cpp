@@ -41,9 +41,6 @@ Hypercube::~Hypercube() {
     for(auto v : realNeighbors){
         delete v;
     }
-    for(auto v : points){
-        delete v;
-    }
 }
 
 void Hypercube::printHT(int id) {
@@ -85,7 +82,9 @@ static bool compare(Neighbor* a, Neighbor* b) {
 }
 
 static bool equal(Neighbor* a, Neighbor* b) {
-    return a->point == b->point;
+    bool equality = (a->point == b->point);
+    if(equality){delete b;}
+    return equality;
 }
 
 void Hypercube::bruteForceSearch(Point &queryPoint){
