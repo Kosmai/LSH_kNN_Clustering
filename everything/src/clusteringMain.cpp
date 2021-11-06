@@ -21,7 +21,7 @@
 int main(int argc, char** argv) {
 
     int clusters;
-    int L,k,M,d;
+    int L,k,M,d, dims;
     int probes;
     int buckets = 1000;
     int w = 200;
@@ -38,6 +38,10 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    if(readDataDimensions(inputFile, dims, ' ') < 0){
+        printf("Invalid Data Dimension...\n");
+        return 1;
+    }
 
     setRandomSeed(time(NULL));
 
@@ -46,7 +50,7 @@ int main(int argc, char** argv) {
     using std::chrono::duration;
     using std::chrono::milliseconds;
 
-    Kmeans kmeans = Kmeans(DIMS, clusters);
+    Kmeans kmeans = Kmeans(dims, clusters);
 
     readDataSet(inputFile, ' ', kmeans);
 

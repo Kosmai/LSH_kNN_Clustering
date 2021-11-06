@@ -13,6 +13,8 @@ class LSH;
 class Hypercube;
 class Point;
 
+int readDataDimensions(std::string& fileName, int& dimension, char delimiter);
+
 int readDataSet(std::string& fileName, char delimiter, Kmeans& kmeans);
 
 int readDataSet(std::string &fileName, char delimiter, LSH &lsh);
