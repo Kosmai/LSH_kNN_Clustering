@@ -56,13 +56,16 @@ int main(int argc, char **argv) {
        return 1;
     }
 
+    FILE* outfp = fopen(outputFile.c_str(),"w");
+
     Hypercube hyper = Hypercube(DIMS, pow(2, k), 1, k, W);
     for(auto point: points){
         hyper.addPoint(point);
     }
 
     //hyper.printAllHT();
-    hyper.calculateNN(*queries[0], m, probes, numOfNearest, radius);
+    hyper.calculateNN(*queries[0], outfp, m, probes, numOfNearest, radius);
 
+    fclose(outfp);
     return 0;
 }

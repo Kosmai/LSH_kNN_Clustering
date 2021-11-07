@@ -56,6 +56,7 @@ int main(int argc, char **argv) {
 		std::cout << "Error while reading input file. Aborting..." << std::endl;
 		return 1;
 	}
+	FILE* outfp = fopen(outputFile.c_str(),"w");
 
 	//LSH initialize will all points in inputfile
 	LSH lsh = LSH(128, BUCKETS, l, k, W);
@@ -65,7 +66,7 @@ int main(int argc, char **argv) {
     }
 
 	//lsh.printAllHT();
-	lsh.calculateNN(*queries[0], 10, 350);
-
+	lsh.calculateNN(*queries[0], outfp, 10, 350);
+	fclose(outfp);
 	return 0;
 }

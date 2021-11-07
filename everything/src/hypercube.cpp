@@ -159,10 +159,11 @@ int Hypercube::hyperSearch(Point &queryPoint, int M, int probes) {
 }
 
 
-void Hypercube::displayResults(Point &queryPoint, unsigned int numOfNN, double r){
+void Hypercube::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN, double r){
 
     //Print query ID
-    std::cout << "Query: " << queryPoint.getId() << std::endl;
+    fprintf(fp, "Query: %s\n", queryPoint.getId().c_str());
+
 
     //Print K nearest neighbors
     std::list<Neighbor*>::iterator LSHIterator = HyperNeighbors.begin();
@@ -174,10 +175,9 @@ void Hypercube::displayResults(Point &queryPoint, unsigned int numOfNN, double r
             break;
         }
 
-        std::cout << "Nearest Neighbor-" << i+1 << ": " << (*LSHIterator)->point->getId() << std::endl;
-        std::cout << "distanceHypercube: " << (*LSHIterator)->distance << std::endl;
-        std::cout << "distanceTrue: " << (*realIterator)->distance << std::endl;
-        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+        fprintf(fp, "Nearest Neighbor-%d: %s\n", i+1, (*LSHIterator)->point->getId().c_str());
+        fprintf(fp, "distanceHypercube: %lf\n", (double)(*LSHIterator)->distance);
+        fprintf(fp, "distanceTrue: %lf\n", (double)(*realIterator)->distance);
 
         LSHIterator++;
         realIterator++;
@@ -185,7 +185,7 @@ void Hypercube::displayResults(Point &queryPoint, unsigned int numOfNN, double r
 
 }
 
-int Hypercube::calculateNN(Point &queryPoint, int M, int probes, unsigned int numOfNN = 1, double r = -1.0){
+int Hypercube::calculateNN(Point &queryPoint, FILE* fp, int M, int probes, unsigned int numOfNN = 1, double r = -1.0){
 
     using std::chrono::high_resolution_clock;
     using std::chrono::duration_cast;
@@ -203,12 +203,12 @@ int Hypercube::calculateNN(Point &queryPoint, int M, int probes, unsigned int nu
     auto LSH_ms = duration_cast<milliseconds>(LSH_t2 - LSH_t1);
     auto brute_ms = duration_cast<milliseconds>(brute_t2 - brute_t1);
 
-    displayResults(queryPoint, numOfNN, r);
+    displayResults(queryPoint, fp, numOfNN, r);
 
-    std::cout << "tLSH: "  << LSH_ms.count() << "ms" << std::endl;
-    std::cout << "tTrue: " << brute_ms.count() << "ms" << std::endl;
-
-    std::cout << "R-near neighbors:"<< std::endl;
+    fprintf(fp, "tHypercube:  %.3lf\n", (double)LSH_ms.count()/1000);
+    fprintf(fp, "tTrue: %.3lf\n", (double)brute_ms.count()/1000);
+ 
+    fprintf(fp, "R-near neighbors:\n");
 
     std::list<Neighbor*>::iterator it;
 
@@ -218,7 +218,8 @@ int Hypercube::calculateNN(Point &queryPoint, int M, int probes, unsigned int nu
             break;
         }
 
-        std::cout << (*it)->point->getId() << std::endl;
+        fprintf(fp, "%s\n",(*it)->point->getId().c_str());
+
     }
 
     return 0;
@@ -254,6 +255,11 @@ void Hypercube::getNearestByR(double r, int rangeIndex, Cluster* clusters, int c
                         point->setClusterIndex(currentCluster);
                         //clusters[currentCluster].getClusteredPoints().push_back(point);
                     }
+                }
+                else{
+                    //if cluster was assigned at any previous iteration, steal it
+                    point->setRangeIndex(rangeIndex);
+                    point->setClusterIndex(currentCluster);
                 }
             }
         }

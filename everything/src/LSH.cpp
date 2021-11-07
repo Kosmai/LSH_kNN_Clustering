@@ -153,10 +153,10 @@ int LSH::LSHSearch(Point &queryPoint) {
 }
 
 
-void LSH::displayResults(Point &queryPoint, unsigned int numOfNN, double r){
+void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN, double r){
 
     //Print query ID
-    std::cout << "Query: " << queryPoint.getId() << std::endl;
+    fprintf(fp, "Query: %s\n", queryPoint.getId().c_str());
 
     //Print K nearest neighbors
     std::list<Neighbor*>::iterator LSHIterator = LSHNeighbors.begin();
@@ -168,10 +168,9 @@ void LSH::displayResults(Point &queryPoint, unsigned int numOfNN, double r){
             break;
         }
 
-        std::cout << "Nearest Neighbor-" << i+1 << ": " << (*LSHIterator)->point->getId() << std::endl;
-        std::cout << "distanceLSH: " << (*LSHIterator)->distance << std::endl;
-        std::cout << "distanceTrue: " << (*realIterator)->distance << std::endl;
-        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+        fprintf(fp, "Nearest Neighbor-%d: %s\n", i+1, (*LSHIterator)->point->getId().c_str());
+        fprintf(fp, "distanceLSH: %lf\n", (double)(*LSHIterator)->distance);
+        fprintf(fp, "distanceTrue: %lf\n", (double)(*realIterator)->distance);
 
         LSHIterator++;
         realIterator++;
@@ -179,7 +178,7 @@ void LSH::displayResults(Point &queryPoint, unsigned int numOfNN, double r){
 
 }
 
-int LSH::calculateNN(Point &queryPoint, unsigned int numOfNN = 1, double r = -1.0){
+int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, double r = -1.0){
 
     using std::chrono::high_resolution_clock;
     using std::chrono::duration_cast;
@@ -197,12 +196,12 @@ int LSH::calculateNN(Point &queryPoint, unsigned int numOfNN = 1, double r = -1.
     auto LSH_ms = duration_cast<milliseconds>(LSH_t2 - LSH_t1);
     auto brute_ms = duration_cast<milliseconds>(brute_t2 - brute_t1);
 
-    displayResults(queryPoint, numOfNN, r);
+    displayResults(queryPoint, fp, numOfNN, r);
 
-    std::cout << "tLSH: "  << LSH_ms.count() << "ms" << std::endl;
-    std::cout << "tTrue: " << brute_ms.count() << "ms" << std::endl;
+    fprintf(fp, "tLSH:  %.3lf\n", (double)LSH_ms.count()/1000);
+    fprintf(fp, "tTrue: %.3lf\n", (double)brute_ms.count()/1000);
  
-    std::cout << "R-near neighbors:"<< std::endl;
+    fprintf(fp, "R-near neighbors:\n");
 
     std::list<Neighbor*>::iterator it;
 
@@ -212,7 +211,7 @@ int LSH::calculateNN(Point &queryPoint, unsigned int numOfNN = 1, double r = -1.
             break;
         }
 
-        std::cout << (*it)->point->getId() << std::endl;
+        fprintf(fp, "%s\n",(*it)->point->getId().c_str());
     }
     
     return 0;
@@ -248,6 +247,11 @@ void LSH::getNearestByR(double r, int rangeIndex, Cluster* clusters, int current
                         point->setClusterIndex(currentCluster);
                         //clusters[currentCluster].getClusteredPoints().push_back(point);
                     }
+                }
+                else{
+                    //if cluster was assigned at any previous iteration, steal it
+                    point->setRangeIndex(rangeIndex);
+                    point->setClusterIndex(currentCluster);
                 }
             }
         }

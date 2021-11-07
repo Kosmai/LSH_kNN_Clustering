@@ -24,4 +24,4 @@ $(OBJDIR):
 
 .PHONY: clean
 clean:
-	rm -f obj/*.o cube cluster lsh
+	rm -f obj/*.o cube cluster lsh *.txt

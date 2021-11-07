@@ -50,10 +50,10 @@ public:
 	void printAllHT();
 
     //Print the results
-	void displayResults(Point &queryPoint, unsigned int numOfNN, double r);
+	void displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN, double r);
 
 	//
-	int calculateNN(Point &queryPoint, int M, int probes, unsigned int numOfNN, double r);
+	int calculateNN(Point &queryPoint, FILE* fp, int M, int probes, unsigned int numOfNN, double r);
 
     void getNearestByR(double r, int rangeIndex, Cluster* clusters, int currentCluster, int probes, int M);
 

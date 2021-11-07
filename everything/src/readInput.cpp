@@ -166,7 +166,7 @@ readHyperArguments(int argc, char **argv, std::string &inputFile, std::string &q
 }
 
 
-int readClusterArguments(int argc, char **argv, std::string &inputFile, std::string &configFile, bool complete,
+int readClusterArguments(int argc, char **argv, std::string &inputFile, std::string &configFile, bool &complete,
                          std::string &outputFile, std::string &method) {
 
     //keep track of what arguments have been read
@@ -185,7 +185,7 @@ int readClusterArguments(int argc, char **argv, std::string &inputFile, std::str
         } else if (std::string(argv[i]).compare("-c") == 0 && i + 1 < argc) {
             configFile = argv[i + 1];
             argumentsRed["-c"] = true;
-        } else if (std::string(argv[i]).compare("-complete") == 0 && i + 1 < argc) {
+        } else if (std::string(argv[i]).compare("-complete") == 0) {
             complete = true;
             i--;
         } else if (std::string(argv[i]).compare("-o") == 0 && i + 1 < argc) {

@@ -12,7 +12,6 @@
 #include "../inc/kmeans.hpp"
 #include "../inc/LSH.hpp"
 
-#define CLUSTERS 3
 #define MAX_ITERS 50
 #define MAX_RADIUS 55000
 #define MIN_TOLERACE 0.005
@@ -44,6 +43,7 @@ int main(int argc, char** argv) {
         printf("Error in reading points\n");
         return 1;
     }
+    FILE* outfp = fopen(outputFile.c_str(), "w");
 
     setRandomSeed(time(NULL));
 
@@ -61,16 +61,19 @@ int main(int argc, char** argv) {
     auto t2 = high_resolution_clock::now();
 
     if(method == "Classic"){
+        fprintf(outfp, "Algorithm: Lloyds\n");
         t1 = high_resolution_clock::now();
         if(kmeans.computeLoyd(MIN_TOLERACE, MAX_ITERS, Random) < 0) return 3;
         t2 = high_resolution_clock::now();
     }
     else if(method == "LSH"){
+        fprintf(outfp, "Algorithm: Range Search LSH\n");
         t1 = high_resolution_clock::now();
         if(kmeans.computeLSH(MAX_RADIUS, MAX_ITERS, Random, buckets, L, k, w) < 0) return 3;
         t2 = high_resolution_clock::now();
     }
     else if(method == "Hypercube"){
+        fprintf(outfp, "Algorithm: Range Search Hypercube\n");
         t1 = high_resolution_clock::now();
         if(kmeans.computeHypercube(MAX_RADIUS, MAX_ITERS, Random, d, w, probes, M) < 0) return 3;
         t2 = high_resolution_clock::now();
@@ -79,12 +82,25 @@ int main(int argc, char** argv) {
         printf("Unknown method. Try \"Classic\" or \"LSH\" or \"Hypercube\" \n");
         return 2;
     }
+
+    kmeans.printClusters(outfp);
+
     auto time = duration_cast<milliseconds>(t2 - t1);
-    std::cout << "Total time in ms: " << time.count() << std::endl;
+    fprintf(outfp, "Clustering_time: %.3lf\n", (double)time.count()/1000);
+
+    kmeans.displaySilhouette(outfp);
+
+    if(complete){
+        kmeans.printCompleteInfo(outfp);
+    }
+
+
+    fclose(outfp);
+
 
     for(auto point: points){
         delete point;
     }
-    //kmeans.displaySilhouette();
+
     return 0;
 }

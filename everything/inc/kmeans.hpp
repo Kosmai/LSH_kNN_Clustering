@@ -37,5 +37,9 @@ public:
 
     double calculatePointSilhouette(Point *point);
 
-    void displaySilhouette();
+    void displaySilhouette(FILE* fp);
+
+    void printClusters(FILE* fp);
+
+    void printCompleteInfo(FILE* fp);
 };
