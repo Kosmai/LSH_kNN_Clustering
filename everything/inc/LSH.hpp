@@ -1,5 +1,6 @@
 #include <vector>
 #include <list>
+#include <cfloat>
 class HashTable;
 class HashFunctionG;
 class Point;
@@ -22,7 +23,6 @@ private:
 	std::list<Point*> points;
 	std::list<Neighbor*> LSHNeighbors;
 	std::list<Neighbor*> realNeighbors;
-	std::list<Point*> radiusNeighbors;
 
 	//
 	void bruteForceSearch(Point &queryPoint);
@@ -61,4 +61,10 @@ public:
 
 	void getNearestByR(double r, int rangeIndex, Cluster* clusters, int currentCluster);
 
+	static double calculateW(std::vector<Point*> &points);
+
+
+	double averageRatio = 0;
+	double worstDistance = DBL_MIN;
+	int distanceOver2 = 0;
 };

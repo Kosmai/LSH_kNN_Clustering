@@ -10,10 +10,7 @@
 #include "../inc/LSH.hpp"
 #include "../inc/readInput.hpp"
 
-#define MAX_ELEMENTS 10000
-#define BUCKETS 1000 //make dynamic
-#define DIMS 128
-#define W 200
+#define W_MULTIPLIER 0.5
 
 int main(int argc, char **argv) {
 
@@ -21,6 +18,7 @@ int main(int argc, char **argv) {
 	std::string queryFile;
 	int k = 0;
 	int l = 0;
+	int dims;
 	std::string outputFile;
 	int numOfNearest = 0;
 	double radius = 0.0;
@@ -45,28 +43,37 @@ int main(int argc, char **argv) {
 	std::vector<Point*> queries;
 	std::vector<Point*> points;
 
-	queryFile = "datasets/" + queryFile;
-	inputFile = "datasets/" + inputFile;
-
 	if(readDataSet(queryFile, ' ', queries) < 0){
 		std::cout << "Error while reading querry file. Aborting..." << std::endl;
 		return 1;
 	}
-	if(readDataSet(inputFile, ' ', points) < 0){
+	if((dims = readDataSet(inputFile, ' ', points)) < 0){
 		std::cout << "Error while reading input file. Aborting..." << std::endl;
 		return 1;
 	}
+
+	double w = LSH::calculateW(points)*W_MULTIPLIER;
+	int buckets = points.size()/4;
+	std::cout << "W = " << w << std::endl;
+
 	FILE* outfp = fopen(outputFile.c_str(),"w");
 
 	//LSH initialize will all points in inputfile
-	LSH lsh = LSH(128, BUCKETS, l, k, W);
+	LSH lsh = LSH(dims, buckets, l, k, w);
 
     for(auto point: points){
         lsh.addPoint(point);
     }
 
 	//lsh.printAllHT();
-	lsh.calculateNN(*queries[0], outfp, 10, 350);
+	for(unsigned int i = 0; i < queries.size(); i++){
+		lsh.calculateNN(*queries[i], outfp, numOfNearest, radius);
+	}
+
+	std::cout << lsh.averageRatio/queries.size() << std::endl;
+	std::cout << lsh.worstDistance << std::endl;
+	std::cout << lsh.distanceOver2 << std::endl;
+
 	fclose(outfp);
 	return 0;
 }

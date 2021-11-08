@@ -9,10 +9,7 @@
 #include "../inc/readInput.hpp"
 #include "../inc/hypercube.hpp"
 
-#define MAX_ELEMENTS 10000
-#define BUCKETS 1000 //make dynamic
-#define DIMS 128
-#define W 200
+#define W_MULTIPLIER 1
 
 int main(int argc, char **argv) {
 
@@ -21,6 +18,7 @@ int main(int argc, char **argv) {
     int k = 0;
     int m = 0;
     int probes = 0;
+    int dims;
     std::string outputFile;
     int numOfNearest = 0;
     double radius = 0.0;
@@ -44,27 +42,36 @@ int main(int argc, char **argv) {
     //queries is filled with all queries in their file
     std::vector <Point*> queries;
     std::vector <Point*> points;
-    inputFile = "datasets/" + inputFile;
-    queryFile = "datasets/" + queryFile;
 
     if (readDataSet(queryFile, ' ', queries) < 0) {
         std::cout << "Error while reading querry file. Aborting..." << std::endl;
         return 1;
     }
-    if (readDataSet(inputFile, ' ', points) < 0) {
+    if ((dims = readDataSet(inputFile, ' ', points)) < 0) {
        std::cout << "Error while reading input file. Aborting..." << std::endl;
        return 1;
     }
 
+    double w = Hypercube::calculateW(points)*W_MULTIPLIER;
+	std::cout << "W = " << w << std::endl;
+
+
     FILE* outfp = fopen(outputFile.c_str(),"w");
 
-    Hypercube hyper = Hypercube(DIMS, pow(2, k), 1, k, W);
+    Hypercube hyper = Hypercube(dims, pow(2, k), 1, k, w);
     for(auto point: points){
         hyper.addPoint(point);
     }
 
     //hyper.printAllHT();
-    hyper.calculateNN(*queries[0], outfp, m, probes, numOfNearest, radius);
+	for(unsigned int i = 0; i < queries.size(); i++){
+        hyper.calculateNN(*queries[i], outfp, m, probes, numOfNearest, radius);
+    }
+
+	std::cout << hyper.averageRatio/queries.size() << std::endl;
+	std::cout << hyper.worstDistance << std::endl;
+	std::cout << hyper.distanceOver2 << std::endl;
+
 
     fclose(outfp);
     return 0;

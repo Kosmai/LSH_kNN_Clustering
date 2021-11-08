@@ -5,7 +5,7 @@
 #include "../inc/hypercube.hpp"
 #include "../inc/readInput.hpp"
 
-//Returns dimension if successful, -1 otherwise
+//Returns dimension if successful, -1 on error
 int readDataSet(std::string &fileName, char delimiter, std::vector<Point *> &points) {
 
     unsigned int dimension = 0;
@@ -13,6 +13,10 @@ int readDataSet(std::string &fileName, char delimiter, std::vector<Point *> &poi
     std::string lineBuffer;
     std::ifstream dataSetFile(fileName);
 
+    if(dataSetFile.fail()){
+        return -1;
+    }
+    
     //read each line
     while (std::getline(dataSetFile, lineBuffer)) {
         std::string item_id;
@@ -216,6 +220,10 @@ int readLshConfig(const std::string &fileName, std::map<std::string, bool> &argu
     std::string lineBuffer;
     std::ifstream dataSetFile(fileName);
 
+    if(dataSetFile.fail()){
+        return -1;
+    }
+
     //read each line
     while (std::getline(dataSetFile, lineBuffer)) {
         std::string param;
@@ -267,6 +275,10 @@ int readHypercubeConfig(const std::string &fileName, std::map<std::string, bool>
 
     std::string lineBuffer;
     std::ifstream dataSetFile(fileName);
+
+    if(dataSetFile.fail()){
+        return -1;
+    }
 
     //read each line
     while (std::getline(dataSetFile, lineBuffer)) {
@@ -332,6 +344,10 @@ int readClusterConfig(const std::string &fileName, int &clusters, int &L, int &k
 
     std::string lineBuffer;
     std::ifstream dataSetFile(fileName);
+
+    if(dataSetFile.fail()){
+        return -1;
+    }
 
     //read each line
     while (std::getline(dataSetFile, lineBuffer)) {

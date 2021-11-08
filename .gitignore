@@ -1,6 +1,7 @@
 *.txt
 *.o
 lsh/lsh
+.vscode/
 .idea/
 lsh/datasets/
 hypercube/datasets/

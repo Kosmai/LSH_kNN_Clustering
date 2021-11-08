@@ -155,6 +155,9 @@ int LSH::LSHSearch(Point &queryPoint) {
 
 void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN, double r){
 
+    double avgRatio = 0;
+    double dist;
+
     //Print query ID
     fprintf(fp, "Query: %s\n", queryPoint.getId().c_str());
 
@@ -162,7 +165,9 @@ void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN, doub
     std::list<Neighbor*>::iterator LSHIterator = LSHNeighbors.begin();
     std::list<Neighbor*>::iterator realIterator = realNeighbors.begin();
 
-    for(unsigned int i = 0; i < numOfNN; i++){
+    unsigned int i;
+
+    for(i = 0; i < numOfNN; i++){
 
         if(LSHIterator == LSHNeighbors.end() || realIterator == realNeighbors.end()){
             break;
@@ -172,9 +177,21 @@ void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN, doub
         fprintf(fp, "distanceLSH: %lf\n", (double)(*LSHIterator)->distance);
         fprintf(fp, "distanceTrue: %lf\n", (double)(*realIterator)->distance);
 
+        dist = (double)(*LSHIterator)->distance / (double)(*realIterator)->distance;
+        if(dist != 0){
+            if(dist > worstDistance){
+                worstDistance = dist;
+            }
+            if(dist > 2){
+                distanceOver2++;
+            }
+        }
         LSHIterator++;
         realIterator++;
+        avgRatio += dist;
     }
+
+    averageRatio += avgRatio / i;
 
 }
 
@@ -184,6 +201,8 @@ int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, doub
     using std::chrono::duration_cast;
     using std::chrono::duration;
     using std::chrono::milliseconds;
+
+
 
     auto LSH_t1 = high_resolution_clock::now();
     LSHSearch(queryPoint);
@@ -200,6 +219,10 @@ int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, doub
 
     fprintf(fp, "tLSH:  %.3lf\n", (double)LSH_ms.count()/1000);
     fprintf(fp, "tTrue: %.3lf\n", (double)brute_ms.count()/1000);
+
+    std::cout << "tLSH: "  << (double)LSH_ms.count()/1000 << std::endl;
+    std::cout << "tTrue: " << (double)brute_ms.count()/1000 << std::endl;
+
  
     fprintf(fp, "R-near neighbors:\n");
 
@@ -256,4 +279,26 @@ void LSH::getNearestByR(double r, int rangeIndex, Cluster* clusters, int current
             }
         }
     }
+}
+
+double LSH::calculateW(std::vector<Point*> &points){
+    int id;
+	int size = points.size();
+	double totalDist = 0;
+	int i, j;
+	for(i = 0; i < size/128; i++){
+		id = rand() % size;
+		for(j = 0; j < size/128; j++){
+			int otherId = rand() % size;
+			if(otherId == id){
+				j--;
+				continue;
+			}
+			totalDist += points[id]->l2Distance(points[otherId]);
+		}
+	}
+
+	double averageDistance = totalDist /= i*j;
+
+	return averageDistance;
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <list>
+#include <cfloat>
 
 class HashTable;
 class HashFunctionF;
@@ -20,7 +21,6 @@ private:
 	std::list<Point*> points;
 	std::list<Neighbor*> HyperNeighbors;
 	std::list<Neighbor*> realNeighbors;
-	std::list<Neighbor*> radiusNeighbors;
 
 	//
 	void bruteForceSearch(Point &queryPoint);
@@ -57,4 +57,9 @@ public:
 
     void getNearestByR(double r, int rangeIndex, Cluster* clusters, int currentCluster, int probes, int M);
 
+	static double calculateW(std::vector<Point*> &points);
+
+	double averageRatio = 0;
+	double worstDistance = DBL_MIN;
+	int distanceOver2 = 0;
 };

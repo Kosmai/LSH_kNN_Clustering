@@ -101,7 +101,7 @@ void Hypercube::bruteForceSearch(Point &queryPoint){
     }
     realNeighbors.sort(compare);
 
-    int avg = std::accumulate(distances.begin(), distances.end(), 0.0) / distances.size();
+    double avg = std::accumulate(distances.begin(), distances.end(), 0.0) / distances.size();
     std::cout << "Average Distance: " << avg << std::endl;
 
 }
@@ -119,6 +119,15 @@ int Hypercube::hyperSearch(Point &queryPoint, int M, int probes) {
         return -1;
     }
     //queryPoint.print();
+
+    for(auto v : HyperNeighbors){
+        delete v;
+    }
+    for(auto v : realNeighbors){
+        delete v;
+    }
+    this->HyperNeighbors.clear();
+    this->realNeighbors.clear();
 
     //L = 1 always for hypercube, code uses for, for easy expansion to multiple cubes
     for (int i = 0; i < L; i++) {
@@ -158,7 +167,6 @@ int Hypercube::hyperSearch(Point &queryPoint, int M, int probes) {
     return 0;
 }
 
-
 void Hypercube::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN, double r){
 
     //Print query ID
@@ -166,24 +174,39 @@ void Hypercube::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN
 
 
     //Print K nearest neighbors
-    std::list<Neighbor*>::iterator LSHIterator = HyperNeighbors.begin();
+    std::list<Neighbor*>::iterator HyperIterator = HyperNeighbors.begin();
     std::list<Neighbor*>::iterator realIterator = realNeighbors.begin();
+    
+    unsigned int i;
+    double avgRatio = 0;
+    double dist;
 
-    for(unsigned int i = 0; i < numOfNN; i++){
+    for(i = 0; i < numOfNN; i++){
 
-        if(LSHIterator == HyperNeighbors.end() || realIterator == realNeighbors.end()){
+        if(HyperIterator == HyperNeighbors.end() || realIterator == realNeighbors.end()){
             break;
         }
 
-        fprintf(fp, "Nearest Neighbor-%d: %s\n", i+1, (*LSHIterator)->point->getId().c_str());
-        fprintf(fp, "distanceHypercube: %lf\n", (double)(*LSHIterator)->distance);
+        fprintf(fp, "Nearest Neighbor-%d: %s\n", i+1, (*HyperIterator)->point->getId().c_str());
+        fprintf(fp, "distanceHypercube: %lf\n", (double)(*HyperIterator)->distance);
         fprintf(fp, "distanceTrue: %lf\n", (double)(*realIterator)->distance);
 
-        LSHIterator++;
+        dist = (double)(*HyperIterator)->distance / (double)(*realIterator)->distance;
+        if(dist != 0){
+            if(dist > worstDistance){
+                worstDistance = dist;
+            }
+            if(dist > 2){
+                distanceOver2++;
+            }
+        }
+        HyperIterator++;
         realIterator++;
+        avgRatio += dist;
     }
-
+    averageRatio += avgRatio / i;
 }
+
 
 int Hypercube::calculateNN(Point &queryPoint, FILE* fp, int M, int probes, unsigned int numOfNN = 1, double r = -1.0){
 
@@ -192,22 +215,25 @@ int Hypercube::calculateNN(Point &queryPoint, FILE* fp, int M, int probes, unsig
     using std::chrono::duration;
     using std::chrono::milliseconds;
 
-    auto LSH_t1 = high_resolution_clock::now();
+    auto Hyper_t1 = high_resolution_clock::now();
     hyperSearch(queryPoint, M, probes);
-    auto LSH_t2 = high_resolution_clock::now();
+    auto Hyper_t2 = high_resolution_clock::now();
 
     auto brute_t1 = high_resolution_clock::now();
     bruteForceSearch(queryPoint);
     auto brute_t2 = high_resolution_clock::now();
 
-    auto LSH_ms = duration_cast<milliseconds>(LSH_t2 - LSH_t1);
+    auto Hyper_ms = duration_cast<milliseconds>(Hyper_t2 - Hyper_t1);
     auto brute_ms = duration_cast<milliseconds>(brute_t2 - brute_t1);
 
     displayResults(queryPoint, fp, numOfNN, r);
 
-    fprintf(fp, "tHypercube:  %.3lf\n", (double)LSH_ms.count()/1000);
+    fprintf(fp, "tHypercube:  %.3lf\n", (double)Hyper_ms.count()/1000);
     fprintf(fp, "tTrue: %.3lf\n", (double)brute_ms.count()/1000);
- 
+
+    std::cout << "tHyper: "  << (double)Hyper_ms.count()/1000 << std::endl;
+    std::cout << "tTrue: " << (double)brute_ms.count()/1000 << std::endl;
+
     fprintf(fp, "R-near neighbors:\n");
 
     std::list<Neighbor*>::iterator it;
@@ -264,4 +290,26 @@ void Hypercube::getNearestByR(double r, int rangeIndex, Cluster* clusters, int c
             }
         }
     }
+}
+
+double Hypercube::calculateW(std::vector<Point*> &points){
+    int id;
+	int size = points.size();
+	double totalDist = 0;
+	int i, j;
+	for(i = 0; i < size/128; i++){
+		id = rand() % size;
+		for(j = 0; j < size/128; j++){
+			int otherId = rand() % size;
+			if(otherId == id){
+				j--;
+				continue;
+			}
+			totalDist += points[id]->l2Distance(points[otherId]);
+		}
+	}
+
+	double averageDistance = totalDist /= i*j;
+
+	return averageDistance;
 }
