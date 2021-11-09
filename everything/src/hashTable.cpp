@@ -1,5 +1,5 @@
 #include <iostream>
-#include <string>
+
 #include "../inc/hashTable.hpp"
 #include "../inc/point.hpp"
 
@@ -30,38 +30,32 @@ HashTable& HashTable::operator=(const HashTable &copy){
     return *this;
 }
 
-
-
-
-//Looks in bucket for ID==key, if found returns 1, otherwise 0
 int HashTable::search(unsigned int bucket, unsigned int key) const {
-
     if (bucket >= this->numBuckets) {
         return -1;
     }
 
-    for(unsigned int i=0; i<this->numBuckets; i++){
+    //Looks in bucket for ID==key
+    for(unsigned int i = 0; i < this->numBuckets; i++){
         std::list<Item *>::iterator it;
 
         for (it = this->hashArray[i].begin(); it != this->hashArray[i].end(); ++it) {
-            if ((*it)->data->getId() == "1") {
-                std::cout<<i<<std::endl;
+            if ((*it)->key == key) {
                 return 1;
             }
         }
     }
 
-
     return 0;
 }
 
-//Counts the amount of instances in bucket with ID==key
 int HashTable::count(unsigned int bucket, unsigned int key) const {
 
     if (bucket >= this->numBuckets) {
         return -1;
     }
 
+    //Counts the amount of instances in bucket with ID==key
     unsigned int count = 0;
 
     std::list<Item *>::iterator it;
@@ -76,7 +70,6 @@ int HashTable::count(unsigned int bucket, unsigned int key) const {
 
 //Creates a new entry in bucket with ID=key and a ptr to the data
 int HashTable::insert(unsigned int bucket, unsigned int key, ITEM_TYPE *data) {
-
     if (bucket >= this->numBuckets) {
         return -1;
     }
@@ -90,12 +83,12 @@ int HashTable::insert(unsigned int bucket, unsigned int key, ITEM_TYPE *data) {
     return 0;
 }
 
-//Removes only the first instance of key in bucket
 int HashTable::remove(unsigned int bucket, unsigned int key) {
-
     if (bucket >= this->numBuckets) {
         return -1;
     }
+
+    //Removes only the first instance of key in bucket
 
     std::list<Item *>::iterator it;
 
@@ -111,17 +104,8 @@ int HashTable::remove(unsigned int bucket, unsigned int key) {
 }
 
 std::list<Item *>& HashTable::getBucket(unsigned int bucket){
-
-    //cannot return NULL, maybe return pointer to list?
-    //    if(bucket >= this->numBuckets){
-    //        return NULL;
-    //    }
-
-//    else{
-        return this->hashArray[bucket];
-//    }
+    return this->hashArray[bucket];
 }
-
 
 void HashTable::print() const {
 

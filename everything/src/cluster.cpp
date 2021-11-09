@@ -1,12 +1,10 @@
 #include <iostream>
+
 #include "../inc/cluster.hpp"
+#include "../inc/point.hpp"
 
 Cluster::Cluster(int dimension) {
     this->dimension = dimension;
-}
-
-Cluster::~Cluster() {
-
 }
 
 Cluster &Cluster::operator=(const Cluster &copy) {
@@ -18,6 +16,9 @@ Cluster &Cluster::operator=(const Cluster &copy) {
 }
 
 int Cluster::insertPoint(Point *point) {
+    if (point->getDimension() != this->dimension){
+        return -1;
+    }
     clusteredPoints.push_back(point);
     return 0;
 }
@@ -28,6 +29,9 @@ int Cluster::clearList() {
 }
 
 int Cluster::setCentroid(Point *centroid) {
+    if(centroid->getDimension() != this->dimension){
+        return -1;
+    }
     this->centroid = *centroid;
     return 0;
 }

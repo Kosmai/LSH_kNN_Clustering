@@ -7,6 +7,8 @@
 #include "../inc/LSH.hpp"
 #include "../inc/hypercube.hpp"
 #include "../inc/readInput.hpp"
+#include "../inc/point.hpp"
+#include "../inc/cluster.hpp"
 
 Kmeans::Kmeans(unsigned int dimension, unsigned int numOfClusters) : dimension(dimension),
                                                                      numOfClusters(numOfClusters) {

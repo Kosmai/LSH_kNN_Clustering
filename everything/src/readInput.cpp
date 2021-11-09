@@ -67,7 +67,7 @@ int readLshArguments(int argc, char **argv, std::string &inputFile, std::string 
     argumentsRed["-R"] = false;
 
     //TODO remove this
-    //read config file first, then overwrite defaults by arguements if needed
+    //read config file first, then overwrite defaults by arguments if needed
     if (readLshConfig("config/lsh.conf", argumentsRed, inputFile, queryFile, k, l,
                       outputFile, numOfNearest, radius) < 0) {
         std::cout << "Config file contains a malformed value." << std::endl;
@@ -128,7 +128,7 @@ int readHyperArguments(int argc, char **argv, std::string &inputFile, std::strin
     argumentsRed["-R"] = false;
 
     //TODO remove this
-    //read config file first, then overwrite defaults by arguements if needed
+    //read config file first, then overwrite defaults by arguments if needed
     if (readHypercubeConfig("config/hypercube.conf", argumentsRed, inputFile, queryFile, k, m, probes,
                             outputFile, numOfNearest, radius) < 0) {
         std::cout << "Config file contains a malformed value." << std::endl;

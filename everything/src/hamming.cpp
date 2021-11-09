@@ -1,29 +1,36 @@
 #include <iostream>
 #include <bitset>
+
 #include "../inc/hamming.hpp"
 
 
-// Returns factorial of n
-int factorial(int n){
+//Returns factorial of n
+static int factorial(int n){
     int res = 1;
     for (int i = 2; i <= n; i++)
         res = res * i;
     return res;
 }
 
-int partFactorial(int max, int min){
+//Returns max * (max - 1) * ... * (min + 1)
+static int partFactorial(int max, int min){
     int res = 1;
     for (int i = max; i > min; i--)
         res = res * i;
     return res;
 }
 
-int nCr(int n, int r){
-
+//returns n choose r
+static int nCr(int n, int r){
     return partFactorial(n, n-r) / factorial(r);
 }
 
 void Hamming::fillHammingMasks(int hammingDistance){
+
+    //preforming bit operations to generate all hamming masks
+    //that will later be used to get new hamming permutations
+    //of the base number.
+
     int dist = hammingDistance;
     unsigned int v = 0b0;
     while(dist-- > 0){
@@ -48,6 +55,7 @@ void Hamming::nextDistance(){
 }
 
 Hamming::Hamming(unsigned int base, int k) : base(base), k(k), currentDist(0){
+    //base number will be permuted using hamming
     masks.push_back(0b0);
 }
 
@@ -59,9 +67,14 @@ void Hamming::printMaskList(){
 
 unsigned int Hamming::getNext(){
     unsigned int next;
+
+    //if there are no more masks, generate more
+    //at a bigger distance
     if(masks.empty()){
         nextDistance();
     }
+
+    //XOR the base number with a mask, then delete it
     next = masks.front() ^ base;
     masks.pop_front();
     return next;

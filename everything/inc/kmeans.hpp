@@ -1,11 +1,14 @@
 #pragma once
 
-#include "../inc/cluster.hpp"
 #include <vector>
+#include <list>
 
 enum centroidInitializationMethod {
     Random = 0, PlusPlus
 };
+
+class Cluster;
+class Point;
 
 class Kmeans {
 private:
