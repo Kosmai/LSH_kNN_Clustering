@@ -1,8 +1,11 @@
 
-//Only call this once with any seed
+/*This module is responsible for all random number generations
+that are required for any non-deterministic parts of the
+algorithms. setRandomSeed MUST be called to initialize the 
+seed before any of the other functions are called. */
+
+//Only call this once
 void setRandomSeed(unsigned int seed);
-
-
 
 //Returns a normal distribution random double in [0,1]
 double getNormalRandom();

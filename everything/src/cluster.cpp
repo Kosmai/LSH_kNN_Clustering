@@ -1,5 +1,5 @@
-#include "../inc/cluster.hpp"
 #include <iostream>
+#include "../inc/cluster.hpp"
 
 Cluster::Cluster(int dimension) {
     this->dimension = dimension;

@@ -1,3 +1,4 @@
+#include <iostream>
 #include <cmath>
 #include "../inc/point.hpp"
 
@@ -8,14 +9,16 @@ Point::Point() {
 }
 
 Point::Point(std::vector<double> &vec, const std::string &id) {
-    this->vec = vec; //copy construct
+    //copy constructor
+    this->vec = vec;
     this->id = id;
     this->clusterIndex = -1;
     this->rangeIndex = -1;
 }
 
 Point &Point::operator=(const Point &copy) {
-    this->vec = copy.vec; //copy construct
+    //copy constructor
+    this->vec = copy.vec;
     this->id = copy.id;
     this->clusterIndex = copy.clusterIndex;
     this->rangeIndex = copy.rangeIndex;
@@ -25,13 +28,11 @@ Point &Point::operator=(const Point &copy) {
 
 int Point::setId(std::string &id) {
     this->id = id;
-
     return 0;
 }
 
 int Point::setVector(std::vector<double> &vec) {
-    this->vec = vec; //copy construct
-
+    this->vec = vec;
     return 0;
 }
 
@@ -70,10 +71,12 @@ bool Point::operator==(Point &p) {
 }
 
 double Point::l2Distance(Point *otherPoint) {
+    //check if dimensions differ
     if (otherPoint->getDimension() != this->getDimension()) {
         return -1;
     }
 
+    //calculate L2 distance (euclidean)
     double sum = 0;
     for (int i = 0; i < this->getDimension(); i++) {
         sum += (this->vec[i] - otherPoint->getVector()[i]) * (this->vec[i] - otherPoint->getVector()[i]);
@@ -82,10 +85,12 @@ double Point::l2Distance(Point *otherPoint) {
 }
 
 double Point::l2Distance(std::vector<double> &otherVector) {
+    //check if dimensions differ
     if ((int) otherVector.size() != this->getDimension()) {
         return -1;
     }
 
+    //calculate L2 distance (euclidean)
     double sum = 0;
     for (int i = 0; i < this->getDimension(); i++) {
         sum += (this->vec[i] - otherVector[i]) * (this->vec[i] - otherVector[i]);

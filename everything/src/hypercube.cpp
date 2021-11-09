@@ -1,3 +1,4 @@
+#include <iostream>
 #include <chrono>
 #include <numeric>
 #include "../inc/hashFunctionF.hpp"
@@ -69,7 +70,7 @@ int Hypercube::addPoint(Point* p) {
 
     //add it's address in each hashtable
     for (int i = 0; i < L; i++) {
-        unsigned int ID = fFunctions[i].computeID(p->getVector());
+        unsigned int ID = fFunctions[i].computeF(p->getVector());
         unsigned int bucketID = ID % buckets;
         if (hashTables[i].insert(bucketID, ID, p) != 0) return -1;
     }
@@ -131,7 +132,7 @@ int Hypercube::hyperSearch(Point &queryPoint, int M, int probes) {
 
     //L = 1 always for hypercube, code uses for, for easy expansion to multiple cubes
     for (int i = 0; i < L; i++) {
-        unsigned int bucketID = fFunctions[i].computeID(queryPoint.getVector());
+        unsigned int bucketID = fFunctions[i].computeF(queryPoint.getVector());
 
         Hamming gen = Hamming(bucketID, k);
 

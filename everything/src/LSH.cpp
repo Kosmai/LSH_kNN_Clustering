@@ -1,3 +1,4 @@
+#include <iostream>
 #include <chrono>
 #include "../inc/hashFunctionG.hpp"
 #include "../inc/hashTable.hpp"
@@ -72,7 +73,7 @@ int LSH::addPoint(Point* p) {
 
     //add it's address in each hashtable
     for (int i = 0; i < L; i++) {
-        unsigned int ID = gFunctions[i].computeID(p->getVector());
+        unsigned int ID = gFunctions[i].computeG(p->getVector());
         unsigned int bucketID = ID % buckets;
         if (hashTables[i].insert(bucketID, ID, p) != 0) return -1;
     }
@@ -123,7 +124,7 @@ int LSH::LSHSearch(Point &queryPoint) {
 
     //search each hashtable for candidate neighbors
     for (int i = 0; i < L; i++) {
-        unsigned int ID = gFunctions[i].computeID(queryPoint.getVector());
+        unsigned int ID = gFunctions[i].computeG(queryPoint.getVector());
         unsigned int bucketID = ID % buckets;
 
         std::list <Item *> bucket = this->hashTables[i].getBucket(bucketID);

@@ -1,11 +1,11 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
 #include <algorithm>
 #include "../inc/point.hpp"
-#include "../inc/LSH.hpp"
-#include "../inc/kmeans.hpp"
-#include "../inc/hypercube.hpp"
 #include "../inc/readInput.hpp"
 
-//Returns dimension if successful, -1 on error
+
 int readDataSet(std::string &fileName, char delimiter, std::vector<Point *> &points) {
 
     unsigned int dimension = 0;
@@ -13,6 +13,7 @@ int readDataSet(std::string &fileName, char delimiter, std::vector<Point *> &poi
     std::string lineBuffer;
     std::ifstream dataSetFile(fileName);
 
+    //check if stream was successfully created
     if(dataSetFile.fail()){
         return -1;
     }
@@ -29,18 +30,20 @@ int readDataSet(std::string &fileName, char delimiter, std::vector<Point *> &poi
         //read every value of the vector
         while (std::getline(lineStream, valueBuffer, delimiter)) {
             //make sure there is a number in valueBuffer
-            if (valueBuffer[0] < '0' || valueBuffer[0] > '9') {
-                continue;
+            if ((valueBuffer[0] < '0' || valueBuffer[0] > '9') && valueBuffer[0] != '-') {
+                return -1;
             }
             vec.push_back(std::stod(valueBuffer));
         }
         if(dimension == 0){
+            //initialize dimension the first time
             dimension = vec.size();
         }
         else if(dimension != vec.size()){
-            //Inaccurate point dimension read
+            //inaccurate point dimension read
             return -1;
         }
+        //add point in vector
         Point *p = new Point(vec, item_id);
         points.push_back(p);
 
@@ -63,13 +66,14 @@ int readLshArguments(int argc, char **argv, std::string &inputFile, std::string 
     argumentsRed["-N"] = false;
     argumentsRed["-R"] = false;
 
+    //TODO remove this
     //read config file first, then overwrite defaults by arguements if needed
     if (readLshConfig("config/lsh.conf", argumentsRed, inputFile, queryFile, k, l,
                       outputFile, numOfNearest, radius) < 0) {
         std::cout << "Config file contains a malformed value." << std::endl;
     }
 
-    //read arguments, overwrite anything needed
+    //read arguments
     for (int i = 1; i < argc; i += 2) {
         if (std::string(argv[i]).compare("-i") == 0 && i + 1 < argc) {
             inputFile = argv[i + 1];
@@ -92,11 +96,13 @@ int readLshArguments(int argc, char **argv, std::string &inputFile, std::string 
         } else if (std::string(argv[i]).compare("-R") == 0 && i + 1 < argc) {
             radius = atof(argv[i + 1]);
             argumentsRed["-R"] = true;
-        } else {            //unknown argument
+        } else {
+            //unknown argument
             return -1;
         }
     }
 
+    //check for missing required arguments
     for (std::pair<std::string, bool> arg: argumentsRed) {
         if (!arg.second) {
             return -2;
@@ -106,8 +112,7 @@ int readLshArguments(int argc, char **argv, std::string &inputFile, std::string 
     return 0;
 }
 
-int
-readHyperArguments(int argc, char **argv, std::string &inputFile, std::string &queryFile, int &k, int &m, int &probes,
+int readHyperArguments(int argc, char **argv, std::string &inputFile, std::string &queryFile, int &k, int &m, int &probes,
                    std::string &outputFile, int &numOfNearest, double &radius) {
 
     //keep track of what arguments have been read
@@ -122,13 +127,14 @@ readHyperArguments(int argc, char **argv, std::string &inputFile, std::string &q
     argumentsRed["-N"] = false;
     argumentsRed["-R"] = false;
 
+    //TODO remove this
     //read config file first, then overwrite defaults by arguements if needed
     if (readHypercubeConfig("config/hypercube.conf", argumentsRed, inputFile, queryFile, k, m, probes,
                             outputFile, numOfNearest, radius) < 0) {
         std::cout << "Config file contains a malformed value." << std::endl;
     }
 
-    //read arguments, overwrite anything needed
+    //read arguments
     for (int i = 1; i < argc; i += 2) {
         if (std::string(argv[i]).compare("-i") == 0 && i + 1 < argc) {
             inputFile = argv[i + 1];
@@ -154,12 +160,13 @@ readHyperArguments(int argc, char **argv, std::string &inputFile, std::string &q
         } else if (std::string(argv[i]).compare("-R") == 0 && i + 1 < argc) {
             radius = atof(argv[i + 1]);
             argumentsRed["-R"] = true;
-        } else {            //unknown argument
+        } else {
+            //unknown argument
             return -1;
         }
     }
 
-    //missing arguments/config defaults
+    //check for missing required arguments
     for (std::pair<std::string, bool> arg: argumentsRed) {
         if (!arg.second) {
             return -2;
@@ -198,12 +205,13 @@ int readClusterArguments(int argc, char **argv, std::string &inputFile, std::str
         } else if (std::string(argv[i]).compare("-m") == 0 && i + 1 < argc) {
             method = argv[i + 1];
             argumentsRed["-m"] = true;
-        } else {            //unknown argument
+        } else {
+            //unknown argument
             return -1;
         }
     }
 
-    //missing arguments/config defaults
+    //check for missing required arguments
     for (std::pair<std::string, bool> arg: argumentsRed) {
         if (!arg.second) {
             return -2;
@@ -213,6 +221,7 @@ int readClusterArguments(int argc, char **argv, std::string &inputFile, std::str
     return 0;
 }
 
+//TODO remove this
 int readLshConfig(const std::string &fileName, std::map<std::string, bool> &argumentsRed, std::string &inputFile,
                   std::string &queryFile, int &k, int &l,
                   std::string &outputFile, int &numOfNearest, double &radius) {
@@ -269,6 +278,7 @@ int readLshConfig(const std::string &fileName, std::map<std::string, bool> &argu
     return 0;
 }
 
+//TODO remove this
 int readHypercubeConfig(const std::string &fileName, std::map<std::string, bool> &argumentsRed, std::string &inputFile,
                         std::string &queryFile, int &k, int &m, int &probes,
                         std::string &outputFile, int &numOfNearest, double &radius) {
@@ -345,6 +355,7 @@ int readClusterConfig(const std::string &fileName, int &clusters, int &L, int &k
     std::string lineBuffer;
     std::ifstream dataSetFile(fileName);
 
+    //check if stream was successfully created
     if(dataSetFile.fail()){
         return -1;
     }
@@ -362,7 +373,8 @@ int readClusterConfig(const std::string &fileName, int &clusters, int &L, int &k
         end_pos = std::remove(value.begin(), value.end(), '\n');
         value.erase(end_pos, value.end());
         if (value[0] == 0) {
-            continue; //no value assigned in config file (only spaces)
+            //no value assigned in config file, skip this
+            continue;
         }
 
         //read arguments
@@ -389,7 +401,7 @@ int readClusterConfig(const std::string &fileName, int &clusters, int &L, int &k
         }
     }
 
-    //missing arguments
+    //check for missing required arguments
     for (std::pair<std::string, bool> arg: argumentsRed) {
         if (!arg.second) {
             return -2;
