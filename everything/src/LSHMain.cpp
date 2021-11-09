@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 
 	double w = LSH::calculateW(points)*W_MULTIPLIER;
 	int buckets = points.size()/4;
-	std::cout << "W = " << w << std::endl;
+	std::cout << "w = " << w << std::endl;
 
 	FILE* outfp = fopen(outputFile.c_str(),"w");
 
@@ -65,7 +65,6 @@ int main(int argc, char **argv) {
         lsh.addPoint(point);
     }
 
-	//lsh.printAllHT();
 	for(unsigned int i = 0; i < queries.size(); i++){
 		lsh.calculateNN(*queries[i], outfp, numOfNearest, radius);
 	}
@@ -74,6 +73,12 @@ int main(int argc, char **argv) {
 	std::cout << lsh.worstDistance << std::endl;
 	std::cout << lsh.distanceOver2 << std::endl;
 
+	for(auto point: points){
+		delete point;
+	}
+	for(auto point: queries){
+		delete point;
+	}
 	fclose(outfp);
 	return 0;
 }

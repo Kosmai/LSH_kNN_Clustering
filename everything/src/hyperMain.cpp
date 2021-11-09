@@ -52,8 +52,8 @@ int main(int argc, char **argv) {
        return 1;
     }
 
-    double w = Hypercube::calculateW(points)*W_MULTIPLIER;
-	std::cout << "W = " << w << std::endl;
+    double w = Hypercube::calculateW(points) * W_MULTIPLIER;
+	std::cout << "w = " << w << std::endl;
 
 
     FILE* outfp = fopen(outputFile.c_str(),"w");
@@ -63,7 +63,6 @@ int main(int argc, char **argv) {
         hyper.addPoint(point);
     }
 
-    //hyper.printAllHT();
 	for(unsigned int i = 0; i < queries.size(); i++){
         hyper.calculateNN(*queries[i], outfp, m, probes, numOfNearest, radius);
     }
@@ -73,6 +72,12 @@ int main(int argc, char **argv) {
 	std::cout << hyper.distanceOver2 << std::endl;
 
 
+	for(auto point: points){
+		delete point;
+	}
+	for(auto point: queries){
+		delete point;
+	}
     fclose(outfp);
     return 0;
 }

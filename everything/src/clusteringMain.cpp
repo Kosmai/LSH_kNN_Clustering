@@ -88,7 +88,7 @@ int main(int argc, char** argv) {
     auto time = duration_cast<milliseconds>(t2 - t1);
     fprintf(outfp, "Clustering_time: %.3lf\n", (double)time.count()/1000);
 
-    kmeans.displaySilhouette(outfp);
+    //kmeans.displaySilhouette(outfp);
 
     if(complete){
         kmeans.printCompleteInfo(outfp);

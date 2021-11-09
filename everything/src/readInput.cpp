@@ -31,7 +31,7 @@ int readDataSet(std::string &fileName, char delimiter, std::vector<Point *> &poi
         while (std::getline(lineStream, valueBuffer, delimiter)) {
             //make sure there is a number in valueBuffer
             if ((valueBuffer[0] < '0' || valueBuffer[0] > '9') && valueBuffer[0] != '-') {
-                return -1;
+                continue;
             }
             vec.push_back(std::stod(valueBuffer));
         }
