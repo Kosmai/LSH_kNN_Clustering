@@ -15,7 +15,7 @@ private:
 	void fillHammingMasks(int hammingDistance);
 
     //calls fill hamming masks with increased by one distance
-	void nextDistance();
+	int nextDistance();
 public:
 
 	//make sure k is the number of bits "base" needs to be represented
@@ -25,5 +25,5 @@ public:
     void printMaskList();
 
     //returns the next closest hamming permutation
-    unsigned int getNext();
+    int getNext();
 };

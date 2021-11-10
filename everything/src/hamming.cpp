@@ -50,8 +50,12 @@ void Hamming::fillHammingMasks(int hammingDistance){
 
 }
 
-void Hamming::nextDistance(){
+int Hamming::nextDistance(){
+    if(currentDist+1 > k){
+        return -1;
+    }
     fillHammingMasks(++currentDist);
+    return 0;
 }
 
 Hamming::Hamming(unsigned int base, int k) : base(base), k(k), currentDist(0){
@@ -65,17 +69,19 @@ void Hamming::printMaskList(){
         std::cout << std::bitset<32>(v) << std::endl;
 }
 
-unsigned int Hamming::getNext(){
-    unsigned int next;
+int Hamming::getNext(){
+    int next;
 
     //if there are no more masks, generate more
     //at a bigger distance
     if(masks.empty()){
-        nextDistance();
+        if(nextDistance() < 0){
+            return -1;
+        }
     }
 
     //XOR the base number with a mask, then delete it
-    next = masks.front() ^ base;
+    next = (int) (masks.front() ^ base);
     masks.pop_front();
     return next;
 }

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <chrono>
 #include <numeric>
+
 #include "../inc/hashFunctionF.hpp"
 #include "../inc/hashTable.hpp"
 #include "../inc/point.hpp"
@@ -59,6 +60,10 @@ void Hypercube::printAllHT() {
     }
 }
 
+std::list<Point*>& Hypercube::getPoints(){
+    return this->points;
+}
+
 int Hypercube::addPoint(Point* p) {
     //make sure the point is valid
     if (p->getDimension() != this->dims) {
@@ -78,10 +83,12 @@ int Hypercube::addPoint(Point* p) {
     return 0;
 }
 
+//Used when sorting the lists
 static bool compare(Neighbor* a, Neighbor* b) {
     return a->distance < b->distance;
 }
 
+//Used when removing duplicates of items in lists
 static bool equal(Neighbor* a, Neighbor* b) {
     bool equality = (a->point == b->point);
     if(equality){delete b;}
@@ -110,17 +117,19 @@ void Hypercube::bruteForceSearch(Point &queryPoint){
 
 int Hypercube::hyperSearch(Point &queryPoint, int M, int probes) {
 
+    std::cout << M << ", probes: " << probes << std::endl;
+
     int pointsChecked = 0;
     int probesChecked = 0;
     bool searchFinished = false;
-    unsigned int currentBucket;
+    int currentBucket;
 
     //make sure the query point is valid
     if (queryPoint.getDimension() != this->dims) {
         return -1;
     }
-    //queryPoint.print();
 
+    //clear neighbors from previous queries (if any)
     for(auto v : HyperNeighbors){
         delete v;
     }
@@ -131,6 +140,7 @@ int Hypercube::hyperSearch(Point &queryPoint, int M, int probes) {
     this->realNeighbors.clear();
 
     //L = 1 always for hypercube, code uses for, for easy expansion to multiple cubes
+    //search each hashtable for candidate neighbors
     for (int i = 0; i < L; i++) {
         unsigned int bucketID = fFunctions[i].computeF(queryPoint.getVector());
 
@@ -138,11 +148,13 @@ int Hypercube::hyperSearch(Point &queryPoint, int M, int probes) {
 
         while(probesChecked < probes){
             if(searchFinished){
-                probesChecked++;
                 break;
             }
             currentBucket = gen.getNext() % this->buckets;
-            //gen.printMaskList();
+            if(currentBucket < 0){
+                break;
+            }
+
             std::list<Item *> bucket = this->hashTables[i].getBucket(currentBucket);
             std::list<Item *>::iterator it;
 
@@ -173,7 +185,6 @@ void Hypercube::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN
     //Print query ID
     fprintf(fp, "Query: %s\n", queryPoint.getId().c_str());
 
-
     //Print K nearest neighbors
     std::list<Neighbor*>::iterator HyperIterator = HyperNeighbors.begin();
     std::list<Neighbor*>::iterator realIterator = realNeighbors.begin();
@@ -184,6 +195,7 @@ void Hypercube::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN
 
     for(i = 0; i < numOfNN; i++){
 
+        //while there are more points
         if(HyperIterator == HyperNeighbors.end() || realIterator == realNeighbors.end()){
             break;
         }
@@ -192,20 +204,22 @@ void Hypercube::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN
         fprintf(fp, "distanceHypercube: %lf\n", (double)(*HyperIterator)->distance);
         fprintf(fp, "distanceTrue: %lf\n", (double)(*realIterator)->distance);
 
+        //used for debugging purposes
         dist = (double)(*HyperIterator)->distance / (double)(*realIterator)->distance;
         if(dist != 0){
             if(dist > worstDistance){
                 worstDistance = dist;
             }
-            if(dist > 2){
-                distanceOver2++;
-            }
         }
+        avgRatio += dist;
+
+        //increment counters
         HyperIterator++;
         realIterator++;
-        avgRatio += dist;
     }
+
     averageRatio += avgRatio / i;
+
 }
 
 
@@ -252,11 +266,12 @@ int Hypercube::calculateNN(Point &queryPoint, FILE* fp, int M, int probes, unsig
     return 0;
 }
 
+//TODO fix bugs
 void Hypercube::getNearestByR(double r, int rangeIndex, Cluster* clusters, int currentCluster, int probes, int M){
 
     Point centroid = clusters[currentCluster].getCentroid();
 
-    hyperSearch(centroid, M, probes); //TODO play with parameters
+    hyperSearch(centroid, M, probes);
 
     std::list<Neighbor*>::iterator it;
 
@@ -284,9 +299,14 @@ void Hypercube::getNearestByR(double r, int rangeIndex, Cluster* clusters, int c
                     }
                 }
                 else{
+                    if(point->l2Distance(&centroid) < point->l2Distance(&clusters[pointCluster].getCentroid())){
+                        point->setRangeIndex(rangeIndex);
+                        point->setClusterIndex(currentCluster);
+                        //clusters[currentCluster].getClusteredPoints().push_back(point);
+                    }
                     //if cluster was assigned at any previous iteration, steal it
-                    point->setRangeIndex(rangeIndex);
-                    point->setClusterIndex(currentCluster);
+                    // point->setRangeIndex(rangeIndex);
+                    // point->setClusterIndex(currentCluster);
                 }
             }
         }
@@ -298,9 +318,18 @@ double Hypercube::calculateW(std::vector<Point*> &points){
 	int size = points.size();
 	double totalDist = 0;
 	int i, j;
-	for(i = 0; i < size/128; i++){
+    
+    //uses only a fraction of the points
+    int iterSize = size/128;
+    //if points are < 128, just use them all
+    if(iterSize < 1){
+        iterSize = size;
+    }
+
+    //calculate distances between random points
+	for(i = 0; i < iterSize; i++){
 		id = rand() % size;
-		for(j = 0; j < size/128; j++){
+		for(j = 0; j < iterSize; j++){
 			int otherId = rand() % size;
 			if(otherId == id){
 				j--;
@@ -310,6 +339,7 @@ double Hypercube::calculateW(std::vector<Point*> &points){
 		}
 	}
 
+    //take the average of the distances found
 	double averageDistance = totalDist /= i*j;
 
 	return averageDistance;

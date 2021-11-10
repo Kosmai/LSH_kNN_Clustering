@@ -71,7 +71,6 @@ int main(int argc, char **argv) {
 
 	std::cout << lsh.averageRatio/queries.size() << std::endl;
 	std::cout << lsh.worstDistance << std::endl;
-	std::cout << lsh.distanceOver2 << std::endl;
 
 	for(auto point: points){
 		delete point;

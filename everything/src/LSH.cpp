@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+
 #include "../inc/hashFunctionG.hpp"
 #include "../inc/hashTable.hpp"
 #include "../inc/point.hpp"
@@ -45,7 +46,6 @@ std::list<Point*>& LSH::getPoints(){
     return this->points;
 }
 
-
 void LSH::printHT(int id) {
     if (id >= L || id < 0) {
         std::cout << "Out of range ID of hashTable" << std::endl;
@@ -81,10 +81,12 @@ int LSH::addPoint(Point* p) {
     return 0;
 }
 
+//Used when sorting the lists
 static bool compare(Neighbor* a, Neighbor* b) {
     return a->distance < b->distance;
 }
 
+//Used when removing duplicates of items in lists
 static bool equal(Neighbor* a, Neighbor* b) {
     bool equality = (a->point == b->point);
     if(equality){delete b;}
@@ -102,7 +104,6 @@ void LSH::bruteForceSearch(Point &queryPoint){
         realNeighbors.push_back(candidate);
     }
     realNeighbors.sort(compare);
-
 }
 
 int LSH::LSHSearch(Point &queryPoint) {
@@ -111,8 +112,8 @@ int LSH::LSHSearch(Point &queryPoint) {
     if (queryPoint.getDimension() != this->dims) {
         return -1;
     }
-    //queryPoint.print();
 
+    //clear neighbors from previous queries (if any)
     for(auto v : LSHNeighbors){
         delete v;
     }
@@ -128,19 +129,17 @@ int LSH::LSHSearch(Point &queryPoint) {
         unsigned int bucketID = ID % buckets;
 
         std::list <Item *> bucket = this->hashTables[i].getBucket(bucketID);
-
         std::list<Item *>::iterator it;
-        //std::cout << "L " << i << std::endl;
-        for (it = bucket.begin(); it != bucket.end(); ++it) {
 
+        //check appropriate bucket
+        for (it = bucket.begin(); it != bucket.end(); ++it) {
+            //make sure items have the same ID as the algorithm requires
             if ((*it)->key == ID) {
                 Neighbor* candidate = new Neighbor;
                 candidate->point = (*it)->data;
                 candidate->distance = queryPoint.l2Distance((*it)->data);
 
                 LSHNeighbors.push_back(candidate);
-                //if(queryPoint.l2Distance((*it)->data) < 350){
-                //std::cout << "\tDis "<< queryPoint.l2Distance((*it)->data) << std::endl;}
             }
         }
     }
@@ -148,16 +147,15 @@ int LSH::LSHSearch(Point &queryPoint) {
     LSHNeighbors.sort(compare);   //sort by distances
     LSHNeighbors.unique(equal);   //remove duplicates
 
-
-
     return 0;
 }
 
 
-void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN, double r){
+void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN){
 
     double avgRatio = 0;
     double dist;
+    unsigned int i;
 
     //Print query ID
     fprintf(fp, "Query: %s\n", queryPoint.getId().c_str());
@@ -166,10 +164,9 @@ void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN, doub
     std::list<Neighbor*>::iterator LSHIterator = LSHNeighbors.begin();
     std::list<Neighbor*>::iterator realIterator = realNeighbors.begin();
 
-    unsigned int i;
-
     for(i = 0; i < numOfNN; i++){
 
+        //while there are more points
         if(LSHIterator == LSHNeighbors.end() || realIterator == realNeighbors.end()){
             break;
         }
@@ -178,18 +175,18 @@ void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN, doub
         fprintf(fp, "distanceLSH: %lf\n", (double)(*LSHIterator)->distance);
         fprintf(fp, "distanceTrue: %lf\n", (double)(*realIterator)->distance);
 
+        //used for debugging purposes
         dist = (double)(*LSHIterator)->distance / (double)(*realIterator)->distance;
         if(dist != 0){
             if(dist > worstDistance){
                 worstDistance = dist;
             }
-            if(dist > 2){
-                distanceOver2++;
-            }
         }
+        avgRatio += dist;
+        
+        //increment counters
         LSHIterator++;
         realIterator++;
-        avgRatio += dist;
     }
 
     averageRatio += avgRatio / i;
@@ -203,8 +200,6 @@ int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, doub
     using std::chrono::duration;
     using std::chrono::milliseconds;
 
-
-
     auto LSH_t1 = high_resolution_clock::now();
     LSHSearch(queryPoint);
     auto LSH_t2 = high_resolution_clock::now();
@@ -216,7 +211,7 @@ int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, doub
     auto LSH_ms = duration_cast<milliseconds>(LSH_t2 - LSH_t1);
     auto brute_ms = duration_cast<milliseconds>(brute_t2 - brute_t1);
 
-    displayResults(queryPoint, fp, numOfNN, r);
+    displayResults(queryPoint, fp, numOfNN);
 
     fprintf(fp, "tLSH:  %.3lf\n", (double)LSH_ms.count()/1000);
     fprintf(fp, "tTrue: %.3lf\n", (double)brute_ms.count()/1000);
@@ -241,6 +236,7 @@ int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, doub
     return 0;
 }
 
+//TODO make sure it works fine and add comments
 void LSH::getNearestByR(double r, int rangeIndex, Cluster* clusters, int currentCluster){
 
     Point centroid = clusters[currentCluster].getCentroid();
@@ -287,9 +283,18 @@ double LSH::calculateW(std::vector<Point*> &points){
 	int size = points.size();
 	double totalDist = 0;
 	int i, j;
-	for(i = 0; i < size/128; i++){
+    
+    //uses only a fraction of the points
+    int iterSize = size/128;
+    //if points are < 128, just use them all
+    if(iterSize < 1){
+        iterSize = size;
+    }
+
+    //calculate distances between random points
+	for(i = 0; i < iterSize; i++){
 		id = rand() % size;
-		for(j = 0; j < size/128; j++){
+		for(j = 0; j < iterSize; j++){
 			int otherId = rand() % size;
 			if(otherId == id){
 				j--;
@@ -299,6 +304,7 @@ double LSH::calculateW(std::vector<Point*> &points){
 		}
 	}
 
+    //take the average of the distances found
 	double averageDistance = totalDist /= i*j;
 
 	return averageDistance;

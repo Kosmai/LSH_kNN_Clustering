@@ -69,7 +69,6 @@ int main(int argc, char **argv) {
 
 	std::cout << hyper.averageRatio/queries.size() << std::endl;
 	std::cout << hyper.worstDistance << std::endl;
-	std::cout << hyper.distanceOver2 << std::endl;
 
 
 	for(auto point: points){

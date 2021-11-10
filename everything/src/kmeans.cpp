@@ -111,7 +111,7 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
     double distance;
     int minIndex;
 
-    LSH* lsh = new LSH(this->dimension, 1000, 10, 4, 1000);
+    LSH* lsh = new LSH(this->dimension, buckets, L, k, w);
 
     for(auto point: this->points){
         lsh->addPoint(point);
@@ -145,22 +145,9 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
                 this->clusters[idx].insertPoint(p);
             }
             else{
-                minDistance = DBL_MAX;
-                minIndex = -1;
 
-                for(unsigned int i = 0; i < this->numOfClusters; i++){
-                    distance = p->l2Distance(this->clusters[i].getCentroid().getVector());
-                    if(distance <= minDistance){
-                        minDistance = distance;
-                        minIndex = i;
-                    }
-                }   
-                p->setClusterIndex(minIndex);
-                this->clusters[minIndex].insertPoint(p);
             }
         }
-
-
 
         //if (sumOfCentroidMoves < iterThreshold)break;
         sumOfCentroidMoves = 0;
@@ -174,6 +161,28 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
         if(radius >= maxRadius)break;
         std::cout << radius << std::endl;
 
+    }
+    int unassignedPoints = 0;
+    for(auto p : lsh->getPoints()){
+        if(p->getClusterIndex() == -1){
+            unassignedPoints++;
+            minDistance = DBL_MAX;
+            minIndex = -1;
+
+            for(unsigned int i = 0; i < this->numOfClusters; i++){
+                distance = p->l2Distance(this->clusters[i].getCentroid().getVector());
+                if(distance <= minDistance){
+                    minDistance = distance;
+                    minIndex = i;
+                }
+            }   
+            p->setClusterIndex(minIndex);
+            this->clusters[minIndex].insertPoint(p);
+        }
+    }
+    std::cout << "-->" <<  unassignedPoints << std::endl;
+    for (unsigned int i = 0; i < this->numOfClusters; i++) {
+        sumOfCentroidMoves += this->clusters[i].recenter();
     }
 
 
@@ -195,14 +204,15 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
 
 
 
-int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidInitializationMethod method, int d, int w, int probes, int M) {
+int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidInitializationMethod method,
+                             int d, int w, int probes, int M) {
 
     int radius = 200;
     double minDistance;
     double distance;
     int minIndex;
 
-    Hypercube* hypercube = new Hypercube(this->dimension, (int)pow(2,d), 1, d, w); //TODO pass these or read form config etc
+    Hypercube* hypercube = new Hypercube(this->dimension, (int)pow(2,d), 1, d, w);
 
     for(auto point: this->points){
         hypercube->addPoint(point);
@@ -236,18 +246,7 @@ int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidIn
                 this->clusters[idx].insertPoint(p);
             }
             else{
-                minDistance = DBL_MAX;
-                minIndex = -1;
 
-                for(unsigned int i = 0; i < this->numOfClusters; i++){
-                    distance = p->l2Distance(this->clusters[i].getCentroid().getVector());
-                    if(distance <= minDistance){
-                        minDistance = distance;
-                        minIndex = i;
-                    }
-                }
-                p->setClusterIndex(minIndex);
-                this->clusters[minIndex].insertPoint(p);
             }
         }
 
@@ -262,6 +261,29 @@ int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidIn
         if(radius >= maxRadius)break;
         std::cout << radius << std::endl;
 
+    }
+
+    int unassignedPoints = 0;
+    for(auto p : hypercube->getPoints()){
+        if(p->getClusterIndex() == -1){
+            unassignedPoints++;
+            minDistance = DBL_MAX;
+            minIndex = -1;
+
+            for(unsigned int i = 0; i < this->numOfClusters; i++){
+                distance = p->l2Distance(this->clusters[i].getCentroid().getVector());
+                if(distance <= minDistance){
+                    minDistance = distance;
+                    minIndex = i;
+                }
+            }   
+            p->setClusterIndex(minIndex);
+            this->clusters[minIndex].insertPoint(p);
+        }
+    }
+    std::cout << "-->" <<  unassignedPoints << std::endl;
+    for (unsigned int i = 0; i < this->numOfClusters; i++) {
+        sumOfCentroidMoves += this->clusters[i].recenter();
     }
 
     unsigned int pointsAssigned = 0;
