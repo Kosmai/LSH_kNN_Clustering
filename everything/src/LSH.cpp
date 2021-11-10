@@ -168,6 +168,7 @@ void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN){
 
         //while there are more points
         if(LSHIterator == LSHNeighbors.end() || realIterator == realNeighbors.end()){
+            i++;
             break;
         }
 
