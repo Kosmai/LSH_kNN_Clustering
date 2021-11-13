@@ -218,8 +218,10 @@ void Hypercube::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN
         realIterator++;
     }
 
-    averageRatio += avgRatio / i;
-
+    if(i != 0){
+        successfulQueries++;
+        averageRatio += avgRatio / i;
+    }
 }
 
 
@@ -343,4 +345,10 @@ double Hypercube::calculateW(std::vector<Point*> &points){
 	double averageDistance = totalDist /= i*j;
 
 	return averageDistance;
+}
+
+void Hypercube::resetStatistics(){
+   	averageRatio = 0;
+	worstDistance = DBL_MIN;
+    successfulQueries = 0;
 }

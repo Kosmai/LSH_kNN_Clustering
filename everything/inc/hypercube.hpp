@@ -69,6 +69,10 @@ public:
 	//print all HashTables
 	void printAllHT();
 	
-	double averageRatio = 0;
-	double worstDistance = DBL_MIN;
+	//resets the statistics below
+	void resetStatistics();
+
+	double averageRatio   = 0;
+	double worstDistance  = DBL_MIN;
+	int successfulQueries = 0;
 };

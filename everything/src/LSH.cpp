@@ -190,8 +190,10 @@ void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN){
         realIterator++;
     }
 
-    averageRatio += avgRatio / i;
-
+    if(i != 0){
+        successfulQueries++;
+        averageRatio += avgRatio / i;
+    }
 }
 
 int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, double r = -1.0){
@@ -309,4 +311,10 @@ double LSH::calculateW(std::vector<Point*> &points){
 	double averageDistance = totalDist /= i*j;
 
 	return averageDistance;
+}
+
+void LSH::resetStatistics(){
+   	averageRatio = 0;
+	worstDistance = DBL_MIN;
+    successfulQueries = 0;
 }
