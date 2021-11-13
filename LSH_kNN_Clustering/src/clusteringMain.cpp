@@ -67,6 +67,9 @@ int main(int argc, char** argv) {
 	int buckets = points.size() >= BUCKET_DIVISOR ? points.size()/BUCKET_DIVISOR : 1;
 
     //print all parameters
+    std::cout << "--------------------------------------------------" << std::endl;
+    std::cout << "Parameters" << std::endl;
+    std::cout << "--------------------------------------------------" << std::endl;
     std::cout << "k: " << k << std::endl;
     std::cout << "L: " << L << std::endl;
     std::cout << "M: " << M << std::endl;
@@ -76,6 +79,9 @@ int main(int argc, char** argv) {
     std::cout << "clusters: " << clusters << std::endl;
     std::cout << "inputFile: " << inputFile << std::endl;
     std::cout << "outputFile: " << outputFile << std::endl;
+    std::cout << "--------------------------------------------------" << std::endl;
+    std::cout << "Results" << std::endl;
+    std::cout << "--------------------------------------------------" << std::endl;
 
     //open output file
     FILE* outfp = fopen(outputFile.c_str(), "w");

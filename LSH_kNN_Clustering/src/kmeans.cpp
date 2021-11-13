@@ -36,7 +36,7 @@ int Kmeans::initializeCentroids(std::list<Point *> &points, centroidInitializati
 
     std::vector <Point *> centroids;
 
-    std::cout << "Attempting to find centroids\n";
+    std::cout << "Centroid intialization...";
 
     if (method == Random) {
         if(this->findRandomCentroids(points, this->numOfClusters, centroids) < 0) return -1;
@@ -45,7 +45,7 @@ int Kmeans::initializeCentroids(std::list<Point *> &points, centroidInitializati
     } else {
         return -1;
     }
-    std::cout << "Found centroids\n";
+    std::cout << "done\n";
 
     for (unsigned int i = 0; i < this->numOfClusters; i++) {
         this->clusters[i].setCentroid(centroids[i]);
@@ -89,15 +89,15 @@ int Kmeans::computeLoyd(double iterThreshold, unsigned int maxIters, centroidIni
             sumOfCentroidMoves += this->clusters[i].recenter();
         }
 
-        std::cout << sumOfCentroidMoves << std::endl;
+        std::cout << "Total centroid movement: " << sumOfCentroidMoves << std::endl;
 
     }
 
+    std::cout << "--------------------------------------------------" << std::endl;
     std::cout << "Total Iterations: " << iter << std::endl;
 
     for (unsigned int i = 0; i < this->numOfClusters; i++) {
         std::cout << "Items in cluster " << i << ": " << clusters[i].count() << std::endl;
-        //clusters[i].print();
     }
 
     return 0;
@@ -109,6 +109,7 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
     double minDistance;
     double distance;
     int minIndex;
+    int centroidMove;
 
     LSH* lsh = new LSH(this->dimension, buckets, L, k, w);
 
@@ -119,7 +120,6 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
     if(initializeCentroids(this->points, method) < 0) return -1;
 
     int radius = calculateInitialRadius();
-    std::cout << "RAD = " << radius << std::endl;
 
     unsigned int iter;
     double sumOfCentroidMoves = DBL_MAX;
@@ -146,22 +146,23 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
             if(idx != -1){
                 this->clusters[idx].insertPoint(p);
             }
-            else{
-
-            }
         }
 
         //if (sumOfCentroidMoves < iterThreshold)break;
         sumOfCentroidMoves = 0;
 
         for (unsigned int i = 0; i < this->numOfClusters; i++) {
-            sumOfCentroidMoves += this->clusters[i].recenter();
-            std::cout << sumOfCentroidMoves << std::endl;
+            centroidMove = this->clusters[i].recenter();
+            if(centroidMove == -1){
+                centroidMove = 0;
+            }
+            sumOfCentroidMoves += centroidMove;
         }
+        std::cout << "Total centroid movement: " << sumOfCentroidMoves << std::endl;
 
         radius *= 2;
         if(radius >= maxRadius)break;
-        std::cout << radius << std::endl;
+        std::cout << "Max radius: " << radius << std::endl;
 
     }
     int unassignedPoints = 0;
@@ -182,7 +183,9 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
             this->clusters[minIndex].insertPoint(p);
         }
     }
-    std::cout << "-->" <<  unassignedPoints << std::endl;
+
+    std::cout << "--------------------------------------------------" << std::endl;
+    std::cout << "Unassigned points using LSH: " <<  unassignedPoints << std::endl;
     for (unsigned int i = 0; i < this->numOfClusters; i++) {
         sumOfCentroidMoves += this->clusters[i].recenter();
     }
@@ -198,8 +201,6 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
         pointsAssigned += clusterPoints; 
     }
 
-    std::cout << "Total points assigned: " << pointsAssigned << std::endl;
-
     delete lsh;
     return 0;
 }
@@ -212,6 +213,7 @@ int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidIn
     double minDistance;
     double distance;
     int minIndex;
+    int centroidMove;
 
     Hypercube* hypercube = new Hypercube(this->dimension, (int)pow(2,d), 1, d, w);
 
@@ -248,21 +250,24 @@ int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidIn
             if(idx != -1){
                 this->clusters[idx].insertPoint(p);
             }
-            else{
-
-            }
         }
 
         //if (sumOfCentroidMoves < iterThreshold)break;
         sumOfCentroidMoves = 0;
 
         for (unsigned int i = 0; i < this->numOfClusters; i++) {
-            sumOfCentroidMoves += this->clusters[i].recenter();
+            centroidMove = this->clusters[i].recenter();
+            if(centroidMove == -1){
+                centroidMove = 0;
+            }
+            sumOfCentroidMoves += centroidMove;
         }
+
+        std::cout << "Total centroid movement: " << sumOfCentroidMoves << std::endl;
 
         radius *= 2;
         if(radius >= maxRadius)break;
-        std::cout << radius << std::endl;
+        std::cout << "Max radius: " << radius << std::endl;
 
     }
 
@@ -284,7 +289,9 @@ int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidIn
             this->clusters[minIndex].insertPoint(p);
         }
     }
-    std::cout << "-->" <<  unassignedPoints << std::endl;
+
+    std::cout << "--------------------------------------------------" << std::endl;
+    std::cout << "Unassigned points using Hypercube: " <<  unassignedPoints << std::endl;
     for (unsigned int i = 0; i < this->numOfClusters; i++) {
         sumOfCentroidMoves += this->clusters[i].recenter();
     }
@@ -298,8 +305,6 @@ int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidIn
         std::cout << "Items in cluster " << i << ": " << clusterPoints << std::endl;
         pointsAssigned += clusterPoints;
     }
-
-    std::cout << "Total points assigned: " << pointsAssigned << std::endl;
 
     delete hypercube;
     return 0;
@@ -455,9 +460,10 @@ double Kmeans::calculatePointSilhouette(Point *point) {
 }
 
 void Kmeans::displaySilhouette(FILE* fp) {
-    std::cout << std::endl << "-----------------------------------------------" << std::endl;
-    std::cout << "                SILHOUETTES                    " << std::endl;
-    std::cout << "-----------------------------------------------" << std::endl;
+    std::cout << "--------------------------------------------------" << std::endl;
+    std::cout << "Silhouette" << std::endl;
+    std::cout << "--------------------------------------------------" << std::endl;
+    std::cout << "Calculating silhouette - This may take a long time..." << std::endl;
 
     if(this->numOfClusters == 1){
         std::cout << "Only 1 cluster - Silhouette value cannot be computed" << std::endl;
@@ -479,7 +485,7 @@ void Kmeans::displaySilhouette(FILE* fp) {
     for (auto p: this->points) {
         if(p->getClusterIndex() == -1)continue;
         sil = this->calculatePointSilhouette(p);
-        std::cout << "Silhouette: " << sil << std::endl;
+        //std::cout << "Silhouette: " << sil << std::endl;
         averageTotalSilhouette += sil;
         averageSilhouettes[p->getClusterIndex()] += sil;
     }
@@ -533,5 +539,5 @@ double Kmeans::calculateInitialRadius(){
             }
         }
     }
-    return minDistance/2;
+    return minDistance>2 ? minDistance/2 : 2;
 }

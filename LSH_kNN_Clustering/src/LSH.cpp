@@ -201,7 +201,7 @@ int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, doub
     using std::chrono::high_resolution_clock;
     using std::chrono::duration_cast;
     using std::chrono::duration;
-    using std::chrono::milliseconds;
+    using std::chrono::microseconds;
 
     auto LSH_t1 = high_resolution_clock::now();
     LSHSearch(queryPoint);
@@ -211,16 +211,17 @@ int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, doub
     bruteForceSearch(queryPoint);
     auto brute_t2 = high_resolution_clock::now();
 
-    auto LSH_ms = duration_cast<milliseconds>(LSH_t2 - LSH_t1);
-    auto brute_ms = duration_cast<milliseconds>(brute_t2 - brute_t1);
+    auto LSH_us = duration_cast<microseconds>(LSH_t2 - LSH_t1);
+    auto brute_us = duration_cast<microseconds>(brute_t2 - brute_t1);
 
     displayResults(queryPoint, fp, numOfNN);
 
-    fprintf(fp, "tLSH:  %.3lf\n", (double)LSH_ms.count()/1000);
-    fprintf(fp, "tTrue: %.3lf\n", (double)brute_ms.count()/1000);
+    fprintf(fp, "tLSH : %.6lf\n", (double)LSH_us.count()/1000000);
+    fprintf(fp, "tTrue: %.6lf\n", (double)brute_us.count()/1000000);
 
-    std::cout << "tLSH: "  << (double)LSH_ms.count()/1000 << std::endl;
-    std::cout << "tTrue: " << (double)brute_ms.count()/1000 << std::endl;
+    printf("tLSH : %.6lf\n", (double)LSH_us.count()/1000000);
+    printf("tTrue: %.6lf\n", (double)brute_us.count()/1000000);
+    printf("---------------\n");
 
  
     fprintf(fp, "R-near neighbors:\n");

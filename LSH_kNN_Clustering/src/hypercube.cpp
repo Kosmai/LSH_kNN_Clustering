@@ -109,15 +109,15 @@ void Hypercube::bruteForceSearch(Point &queryPoint){
     }
     realNeighbors.sort(compare);
 
-    double avg = std::accumulate(distances.begin(), distances.end(), 0.0) / distances.size();
-    std::cout << "Average Distance: " << avg << std::endl;
+    //double avg = std::accumulate(distances.begin(), distances.end(), 0.0) / distances.size();
+    //std::cout << "Average Distance: " << avg << std::endl;
 
 }
 
 
 int Hypercube::hyperSearch(Point &queryPoint, int M, int probes) {
 
-    std::cout << M << ", probes: " << probes << std::endl;
+    //std::cout << M << ", probes: " << probes << std::endl;
 
     int pointsChecked = 0;
     int probesChecked = 0;
@@ -172,7 +172,7 @@ int Hypercube::hyperSearch(Point &queryPoint, int M, int probes) {
             probesChecked++;
         }
     }
-    std::cout << "Found " << pointsChecked << " points in " << probesChecked << " vertices" << std::endl;
+    //std::cout << "Found " << pointsChecked << " points in " << probesChecked << " vertices" << std::endl;
 
     HyperNeighbors.sort(compare);   //sort by distances
     HyperNeighbors.unique(equal);   //remove duplicates
@@ -230,7 +230,7 @@ int Hypercube::calculateNN(Point &queryPoint, FILE* fp, int M, int probes, unsig
     using std::chrono::high_resolution_clock;
     using std::chrono::duration_cast;
     using std::chrono::duration;
-    using std::chrono::milliseconds;
+    using std::chrono::microseconds;
 
     auto Hyper_t1 = high_resolution_clock::now();
     hyperSearch(queryPoint, M, probes);
@@ -240,16 +240,17 @@ int Hypercube::calculateNN(Point &queryPoint, FILE* fp, int M, int probes, unsig
     bruteForceSearch(queryPoint);
     auto brute_t2 = high_resolution_clock::now();
 
-    auto Hyper_ms = duration_cast<milliseconds>(Hyper_t2 - Hyper_t1);
-    auto brute_ms = duration_cast<milliseconds>(brute_t2 - brute_t1);
+    auto Hyper_us = duration_cast<microseconds>(Hyper_t2 - Hyper_t1);
+    auto brute_us = duration_cast<microseconds>(brute_t2 - brute_t1);
 
     displayResults(queryPoint, fp, numOfNN, r);
 
-    fprintf(fp, "tHypercube:  %.3lf\n", (double)Hyper_ms.count()/1000);
-    fprintf(fp, "tTrue: %.3lf\n", (double)brute_ms.count()/1000);
+    fprintf(fp, "tHypercube:  %.6lf\n", (double)Hyper_us.count()/1000000);
+    fprintf(fp, "tTrue: %.6lf\n", (double)brute_us.count()/1000000);
 
-    std::cout << "tHyper: "  << (double)Hyper_ms.count()/1000 << std::endl;
-    std::cout << "tTrue: " << (double)brute_ms.count()/1000 << std::endl;
+    printf("tHyper: %.6lf\n", (double)Hyper_us.count()/1000000);
+    printf("tTrue : %.6lf\n", (double)brute_us.count()/1000000);
+    printf("----------------\n");
 
     fprintf(fp, "R-near neighbors:\n");
 

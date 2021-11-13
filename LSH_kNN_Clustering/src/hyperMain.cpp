@@ -70,6 +70,9 @@ int main(int argc, char **argv) {
 		}
 
         //print all parameters
+        std::cout << "--------------------------------------------------" << std::endl;
+		std::cout << "Parameters" << std::endl;
+		std::cout << "--------------------------------------------------" << std::endl;
         std::cout << "inputFile: " << inputFile << std::endl;
         std::cout << "queryFile: " << queryFile << std::endl;
         std::cout << "k: " << k << std::endl;
@@ -78,6 +81,9 @@ int main(int argc, char **argv) {
         std::cout << "outputFile: " << outputFile << std::endl;
         std::cout << "numOfNearest: " << numOfNearest << std::endl;
         std::cout << "radius: " << radius << std::endl;
+		std::cout << "--------------------------------------------------" << std::endl;
+		std::cout << "Results" << std::endl;
+		std::cout << "--------------------------------------------------" << std::endl;
 
         //read query file
         if (readDataSet(queryFile, ' ', queries) < 0) {
@@ -98,8 +104,12 @@ int main(int argc, char **argv) {
         }
 
 		//statistics
+        std::cout << "Statistics" << std::endl;
+		std::cout << "--------------------------------------------------" << std::endl;
 		std::cout << "Average predicted/true distance ratio: " << hyper.averageRatio/hyper.successfulQueries << std::endl;
 		std::cout << "Worst   predicted/true distance ratio: " << hyper.worstDistance << std::endl;
+		std::cout << "--------------------------------------------------" << std::endl;
+
 
 		//cleanup - reset
         for(auto point: queries){
