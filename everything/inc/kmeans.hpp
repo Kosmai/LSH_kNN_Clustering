@@ -23,6 +23,8 @@ private:
 
     int findPlusPlusCentroids(std::list<Point *> &points, unsigned int k, std::vector<Point *> &centroids);
 
+    double calculateInitialRadius();
+    
 public:
     Kmeans() = delete;
 

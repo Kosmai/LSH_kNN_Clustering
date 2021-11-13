@@ -268,8 +268,7 @@ int Hypercube::calculateNN(Point &queryPoint, FILE* fp, int M, int probes, unsig
     return 0;
 }
 
-//TODO fix bugs
-void Hypercube::getNearestByR(double r, int rangeIndex, Cluster* clusters, int currentCluster, int probes, int M){
+void Hypercube::getNearestByR(double r, Cluster* clusters, int currentCluster, int probes, int M){
 
     Point centroid = clusters[currentCluster].getCentroid();
 
@@ -282,33 +281,16 @@ void Hypercube::getNearestByR(double r, int rangeIndex, Cluster* clusters, int c
         if((*it)->distance < r){
             Point* point = (*it)->point;
 
-            int pointRangeIndex = point->getRangeIndex();
             int pointCluster    = point->getClusterIndex();
 
-            //if unassigned cluster for this point
+            //if no cluster has been assigned
             if(pointCluster == -1){
-                point->setRangeIndex(rangeIndex);
                 point->setClusterIndex(currentCluster);
-                //clusters[currentCluster].getClusteredPoints().push_back(point);
             }
-            else{
-                //if cluster was assigned at this iteration of the algorithm
-                if(pointRangeIndex == rangeIndex){
-                    //if its closer to this cluster, assign the point to it
-                    if(point->l2Distance(&centroid) < point->l2Distance(&clusters[pointCluster].getCentroid())){
-                        point->setClusterIndex(currentCluster);
-                        //clusters[currentCluster].getClusteredPoints().push_back(point);
-                    }
-                }
-                else{
-                    if(point->l2Distance(&centroid) < point->l2Distance(&clusters[pointCluster].getCentroid())){
-                        point->setRangeIndex(rangeIndex);
-                        point->setClusterIndex(currentCluster);
-                        //clusters[currentCluster].getClusteredPoints().push_back(point);
-                    }
-                    //if cluster was assigned at any previous iteration, steal it
-                    // point->setRangeIndex(rangeIndex);
-                    // point->setClusterIndex(currentCluster);
+            //if another cluster has been assigned, compare distances
+            else if(pointCluster != currentCluster){
+                if(point->l2Distance(&centroid) < point->l2Distance(&clusters[pointCluster].getCentroid())){
+                    point->setClusterIndex(currentCluster);
                 }
             }
         }

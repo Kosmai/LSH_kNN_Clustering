@@ -159,17 +159,6 @@ int readClusterArguments(int argc, char **argv, std::string &inputFile, std::str
 int readClusterConfig(const std::string &fileName, int &clusters, int &L, int &k,
                       int &M, int &d, int &probes) {
 
-
-    //keep track of what arguments have been read
-    std::map<std::string, bool> argumentsRed;
-
-    argumentsRed["number_of_clusters"] = false;
-    argumentsRed["number_of_vector_hash_tables"] = false;
-    argumentsRed["number_of_vector_hash_functions"] = false;
-    argumentsRed["max_number_M_hypercube"] = false;
-    argumentsRed["number_of_hypercube_dimensions"] = false;
-    argumentsRed["number_of_probes"] = false;
-
     std::string lineBuffer;
     std::ifstream dataSetFile(fileName);
 
@@ -198,31 +187,18 @@ int readClusterConfig(const std::string &fileName, int &clusters, int &L, int &k
         //read arguments
         if (std::string(param).compare("number_of_clusters") == 0) {
             if ((clusters = atoi(value.c_str())) == 0) return -1;
-            argumentsRed["number_of_clusters"] = true;
         } else if (std::string(param).compare("number_of_vector_hash_tables") == 0) {
             if ((L = atoi(value.c_str())) == 0) return -1;
-            argumentsRed["number_of_vector_hash_tables"] = true;
         } else if (std::string(param).compare("number_of_vector_hash_functions") == 0) {
             if ((k = atoi(value.c_str())) == 0) return -1;
-            argumentsRed["number_of_vector_hash_functions"] = true;
         } else if (std::string(param).compare("max_number_M_hypercube") == 0) {
             if ((M = atoi(value.c_str())) == 0) return -1;
-            argumentsRed["max_number_M_hypercube"] = true;
         } else if (std::string(param).compare("number_of_hypercube_dimensions") == 0) {
             if ((d = atoi(value.c_str())) == 0) return -1;
-            argumentsRed["number_of_hypercube_dimensions"] = true;
         } else if (std::string(param).compare("number_of_probes") == 0) {
             if ((probes = atoi(value.c_str())) == 0) return -1;
-            argumentsRed["number_of_probes"] = true;
         } else {
             std::cout << "Invalid parameter (" << param << ") in config file. Ignored." << std::endl;
-        }
-    }
-
-    //check for missing required arguments
-    for (std::pair<std::string, bool> arg: argumentsRed) {
-        if (!arg.second) {
-            return -2;
         }
     }
 

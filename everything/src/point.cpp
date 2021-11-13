@@ -5,7 +5,6 @@
 Point::Point() {
     this->id = "Uninitialized";
     this->clusterIndex = -1;
-    this->rangeIndex = -1;
 }
 
 Point::Point(std::vector<double> &vec, const std::string &id) {
@@ -13,7 +12,6 @@ Point::Point(std::vector<double> &vec, const std::string &id) {
     this->vec = vec;
     this->id = id;
     this->clusterIndex = -1;
-    this->rangeIndex = -1;
 }
 
 Point &Point::operator=(const Point &copy) {
@@ -21,7 +19,6 @@ Point &Point::operator=(const Point &copy) {
     this->vec = copy.vec;
     this->id = copy.id;
     this->clusterIndex = copy.clusterIndex;
-    this->rangeIndex = copy.rangeIndex;
 
     return *this;
 }
@@ -41,11 +38,6 @@ int Point::setClusterIndex(int clusterIndex) {
     return 0;
 }
 
-int Point::setRangeIndex(int rangeIndex) {
-    this->rangeIndex = rangeIndex;
-    return 0;
-}
-
 std::string Point::getId() {
     return this->id;
 }
@@ -56,10 +48,6 @@ std::vector<double> &Point::getVector() {
 
 int Point::getClusterIndex() {
     return this->clusterIndex;
-}
-
-int Point::getRangeIndex() {
-    return this->rangeIndex;
 }
 
 int Point::getDimension() {
@@ -109,6 +97,5 @@ void Point::print() {
 void Point::printInfo() {
     std::cout << "Point " << this->id << std::endl;
     std::cout << "  Cluster: " << this->clusterIndex << std::endl;
-    std::cout << "  Range: " << this->rangeIndex << std::endl;
 
 }

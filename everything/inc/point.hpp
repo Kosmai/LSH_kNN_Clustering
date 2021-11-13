@@ -13,7 +13,7 @@ private:
 
     //used in clustering
     int clusterIndex;
-    int rangeIndex;
+
 public:
     //Constructors-Destructors
     Point();
@@ -26,13 +26,11 @@ public:
     int setId(std::string &id);
     int setVector(std::vector<double> &);
     int setClusterIndex(int clusterIndex);
-    int setRangeIndex(int rangeIndex);
 
     //getters
     std::string getId();
     std::vector<double> &getVector();
     int getClusterIndex();
-    int getRangeIndex();
     int getDimension();
 
     //checks if two points have the same id

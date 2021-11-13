@@ -106,7 +106,6 @@ int Kmeans::computeLoyd(double iterThreshold, unsigned int maxIters, centroidIni
 int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitializationMethod method,
                        int buckets, int L, int k, int w) {
 
-    int radius = 200;
     double minDistance;
     double distance;
     int minIndex;
@@ -119,6 +118,9 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
 
     if(initializeCentroids(this->points, method) < 0) return -1;
 
+    int radius = calculateInitialRadius();
+    std::cout << "RAD = " << radius << std::endl;
+
     unsigned int iter;
     double sumOfCentroidMoves = DBL_MAX;
 
@@ -130,7 +132,7 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
 
         for(unsigned int i = 0; i < this->numOfClusters; i++){
             //std::cout << "Calculating points for cluster i\n";
-            lsh->getNearestByR(radius, iter, this->clusters, i);
+            lsh->getNearestByR(radius, this->clusters, i);
         }
 
         //clear all points in clusters
@@ -207,7 +209,6 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
 int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidInitializationMethod method,
                              int d, int w, int probes, int M) {
 
-    int radius = 200;
     double minDistance;
     double distance;
     int minIndex;
@@ -220,6 +221,8 @@ int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidIn
 
     if(initializeCentroids(this->points, method) < 0) return -1;
 
+    int radius = calculateInitialRadius();
+
     unsigned int iter;
     double sumOfCentroidMoves = DBL_MAX;
 
@@ -231,7 +234,7 @@ int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidIn
 
         for(unsigned int i = 0; i < this->numOfClusters; i++){
             //std::cout << "Calculating points for cluster i\n";
-            hypercube->getNearestByR(radius, iter, this->clusters, i, probes, M);
+            hypercube->getNearestByR(radius, this->clusters, i, probes, M);
         }
 
         //clear all points in clusters
@@ -343,8 +346,7 @@ int Kmeans::findPlusPlusCentroids(std::list<Point *> &points, unsigned int k, st
             for (auto centroid: centroids) {
 
                 dist = point->l2Distance(centroid);
-
-                //square dist TODO
+                
                 dist = dist * dist;
 
                 if (dist < distances[id]) {
@@ -517,4 +519,19 @@ void Kmeans::printCompleteInfo(FILE* fp){
         fseek(fp, -2, SEEK_CUR);
         fprintf(fp,"] \n");
     }
+}
+
+double Kmeans::calculateInitialRadius(){
+    double minDistance = DBL_MAX;
+    double tempDistance;
+    for(unsigned int i  = 0; i < numOfClusters; i++){
+        for(unsigned int j = 0; j < numOfClusters; j++){
+            if(i==j)continue;
+            tempDistance = clusters[j].getCentroid().l2Distance(clusters[i].getCentroid().getVector());
+            if(tempDistance < minDistance){
+                minDistance = tempDistance;
+            }
+        }
+    }
+    return minDistance/2;
 }

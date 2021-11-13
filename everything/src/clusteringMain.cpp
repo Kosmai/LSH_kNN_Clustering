@@ -14,57 +14,83 @@
 
 #define MAX_ITERS 50
 #define MAX_RADIUS 55000
-#define MIN_TOLERACE 0.005
+#define MIN_TOLERACE 0.05
 #define W_MULTIPLIER_LSH 1.5
 #define W_MULTIPLIER_HYPER 0.5
+#define BUCKET_DIVISOR 4
 
 int main(int argc, char** argv) {
 
-    int clusters;
-    int L,k,M,d, dims;
-    int probes;
-
-    std::string inputFile, configFile, outputFile, method;
-    bool complete = false;
-
-    std::vector<Point*> points;
-
-    if(readClusterArguments(argc, argv, inputFile, configFile, complete,
-                    outputFile, method) < 0){
-        printf("Δεν εξυπηρετούμε ακόμα\n");
-        return 1;
-    }
-    if(readClusterConfig(configFile, clusters, L, k, M, d, probes) < 0){
-        printf("Error in config file, aborting...\n");
-        return 1;
-    }
-
-    if((dims = readDataSet(inputFile, ' ', points)) < 0){
-        printf("Error in reading points\n");
-        return 1;
-    }
-
-    double w = LSH::calculateW(points);
-	int buckets = points.size()/4;
-	std::cout << "w = " << w << std::endl;
-
-    FILE* outfp = fopen(outputFile.c_str(), "w");
-
-    setRandomSeed(time(NULL));
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	setRandomSeed(seed);
 
     using std::chrono::high_resolution_clock;
     using std::chrono::duration_cast;
     using std::chrono::duration;
     using std::chrono::milliseconds;
 
+    auto t1 = high_resolution_clock::now();
+    auto t2 = high_resolution_clock::now();
+
+    bool complete = false;
+    int clusters = 2;
+    int probes = 2;
+    int L = 3;
+    int k = 4;
+    int M = 10;
+    int d = 3;
+    int dims;
+
+    std::string inputFile, configFile, outputFile, method;
+
+    std::vector<Point*> points;
+
+    //read cli arguments
+    if(readClusterArguments(argc, argv, inputFile, configFile, complete,
+                    outputFile, method) < 0){
+        std::cout << "Error in reading arguments! Aborting..." << std::endl;
+        return 1;
+    }
+    //read config file and overwrite any default value needed
+    if(readClusterConfig(configFile, clusters, L, k, M, d, probes) < 0){
+        std::cout << "Error in config file! Aborting..." << std::endl;
+        return 1;
+    }
+    //read all points from inputFile
+    if((dims = readDataSet(inputFile, ' ', points)) < 0){
+        std::cout << "Error in reading points. Aborting..." << std::endl;
+        return 1;
+    }
+
+	//initialize buckets and w
+	double w = LSH::calculateW(points);
+	int buckets = points.size() >= BUCKET_DIVISOR ? points.size()/BUCKET_DIVISOR : 1;
+
+    //print all parameters
+    std::cout << "k: " << k << std::endl;
+    std::cout << "L: " << L << std::endl;
+    std::cout << "M: " << M << std::endl;
+    std::cout << "d: " << d << std::endl;
+    std::cout << "base w: " << w << std::endl;
+    std::cout << "probes: " << probes << std::endl;
+    std::cout << "clusters: " << clusters << std::endl;
+    std::cout << "inputFile: " << inputFile << std::endl;
+    std::cout << "outputFile: " << outputFile << std::endl;
+
+    //open output file
+    FILE* outfp = fopen(outputFile.c_str(), "w");
+    if(outfp == nullptr){
+        std::cout << "Could not open output file. Aborting..." << std::endl;
+        return 2;
+    }
+
+    //initialize kmeans structure and add all points
     Kmeans kmeans = Kmeans(dims, clusters);
     for(auto point: points){
         kmeans.addPoint(point);
     }
 
-    auto t1 = high_resolution_clock::now();
-    auto t2 = high_resolution_clock::now();
-
+    //select the method given by the user
     if(method == "Classic"){
         fprintf(outfp, "Algorithm: Lloyds\n");
         t1 = high_resolution_clock::now();
@@ -95,17 +121,14 @@ int main(int argc, char** argv) {
 
     kmeans.displaySilhouette(outfp);
 
+    //if the complete argument was given, print additional info
     if(complete){
         kmeans.printCompleteInfo(outfp);
     }
 
-
-    fclose(outfp);
-
-
     for(auto point: points){
         delete point;
     }
-
+    fclose(outfp);
     return 0;
 }
