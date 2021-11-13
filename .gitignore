@@ -8,7 +8,7 @@ hypercube/datasets/
 hypercube/cube
 k-means/datasets/
 k-means/kmeans
-everything/datasets/
-everything/lsh
-everything/cube
-everything/cluster
+LSH_kNN_Clustering/datasets/
+LSH_kNN_Clustering/lsh
+LSH_kNN_Clustering/cube
+LSH_kNN_Clustering/cluster
