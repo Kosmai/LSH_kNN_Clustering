@@ -125,6 +125,16 @@ int main(int argc, char** argv) {
     auto time = duration_cast<milliseconds>(t2 - t1);
     fprintf(outfp, "Clustering_time: %.3lf\n", (double)time.count()/1000);
 
+    //close file (avoid waiting for silhouette calculation to see already printed results)
+    fclose(outfp);
+
+    //open file again to print silhouette and complete info
+    outfp = fopen(outputFile.c_str(), "a");
+    if(outfp == nullptr){
+        std::cout << "Could not open output file. Aborting..." << std::endl;
+        return 2;
+    }
+
     kmeans.displaySilhouette(outfp);
 
     //if the complete argument was given, print additional info
