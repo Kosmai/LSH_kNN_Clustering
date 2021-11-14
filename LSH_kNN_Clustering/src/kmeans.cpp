@@ -353,27 +353,25 @@ int Kmeans::findPlusPlusCentroids(std::list<Point *> &points, unsigned int k, st
     shuffledPoints.erase(shuffledPoints.begin());
     k--;
 
-    int id;
     double dist;
-    double distances[size];
+    std::map<std::string,double> distances;
 
     while (k > 0) {
         //initialize distances to INF
-        for (int i = 0; i < size; i++) {
-            distances[i] = DBL_MAX;
+        for(auto point: points){
+            distances[point->getId()] = DBL_MAX;
         }
 
         //loop through all points and find distance to closest centroid for each one
         for (auto point: shuffledPoints) {
-            id = stoi(point->getId());
             for (auto centroid: centroids) {
 
                 dist = point->l2Distance(centroid);
                 
                 dist = dist * dist;
 
-                if (dist < distances[id]) {
-                    distances[id] = dist;
+                if (dist < distances[point->getId()]) {
+                    distances[point->getId()] = dist;
                 }
 
             }
@@ -381,38 +379,46 @@ int Kmeans::findPlusPlusCentroids(std::list<Point *> &points, unsigned int k, st
 
         //add all closest distances together
         double totalDists = 0;
-        for (int i = 0; i < size; i++) {
-            if (distances[i] != DBL_MAX) {
-                totalDists += distances[i];
+        for (auto point: points) {
+            if (distances[point->getId()] != DBL_MAX) {
+                totalDists += distances[point->getId()];
             }
         }
 
         //Choose a random float from 0-1
-        int idx = 0;
         float chosen = getUniformRandomFloat();
 
         //reduce it by dist[point]/totalDists (normalized probability)
         //this way, when the number becomes negative we stop, and we
         //have randomly selected a point with the required probability
-        while (chosen > 0) {
-            if (distances[idx] != DBL_MAX) {
-                chosen -= distances[idx] / totalDists;
+
+        std::string chosenId;
+        Point* chosenPoint;
+
+        for (auto distance: distances){
+            if (distance.second != DBL_MAX) {
+                chosen -= distance.second / totalDists;
+                if(chosen <= 0){
+                    chosenId = distance.first;
+                    break;
+                }
             }
-            idx++;
         }
 
-        idx--;
-
-        //get the id of the point so we can delete it from the list
-        std::string targetId = shuffledPoints[idx]->getId();
+        for(auto point: shuffledPoints){
+            if(point->getId() == chosenId){
+                chosenPoint = point;
+                break;
+            }
+        }
 
         //add it to the centroids list
-        centroids.push_back(shuffledPoints[idx]);
+        centroids.push_back(chosenPoint);
 
         //delete it from the points list
         std::vector<Point *>::iterator it;
         for (it = shuffledPoints.begin(); it != shuffledPoints.end(); it++) {
-            if ((*it)->getId() == targetId) {
+            if ((*it)->getId() == chosenId) {
                 shuffledPoints.erase(it);
                 break;
             }
