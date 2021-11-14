@@ -1,6 +1,7 @@
 #include <iostream>
 #include <chrono>
 #include <numeric>
+#include <cmath>
 
 #include "../inc/hashFunctionF.hpp"
 #include "../inc/hashTable.hpp"
@@ -305,8 +306,8 @@ double Hypercube::calculateW(std::vector<Point*> &points){
 	int i, j;
     
     //uses only a fraction of the points
-    int iterSize = size/128;
-    //if points are < 128, just use them all
+    int iterSize = sqrt(size);
+    //if points are < sqrt(size), just use them all
     if(iterSize < 1){
         iterSize = size;
     }

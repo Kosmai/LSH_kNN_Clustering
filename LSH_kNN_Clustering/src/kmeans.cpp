@@ -2,6 +2,7 @@
 #include <cfloat>
 #include <algorithm>
 #include <cmath>
+
 #include "../inc/kmeans.hpp"
 #include "../inc/randGen.hpp"
 #include "../inc/LSH.hpp"
@@ -30,6 +31,7 @@ int Kmeans::addPoint(Point *point) {
 
 int Kmeans::initializeCentroids(std::list<Point *> &points, centroidInitializationMethod method){
 
+    //make sure there are less clusters than points
     if(this->numOfClusters > points.size() || this->numOfClusters <= 0){
         return -1;
     }
@@ -38,6 +40,7 @@ int Kmeans::initializeCentroids(std::list<Point *> &points, centroidInitializati
 
     std::cout << "Centroid intialization...";
 
+    //determine which initialization method will be used
     if (method == Random) {
         if(this->findRandomCentroids(points, this->numOfClusters, centroids) < 0) return -1;
     } else if (method == PlusPlus) {
@@ -47,6 +50,7 @@ int Kmeans::initializeCentroids(std::list<Point *> &points, centroidInitializati
     }
     std::cout << "done\n";
 
+    //assign each cluster a centroid
     for (unsigned int i = 0; i < this->numOfClusters; i++) {
         this->clusters[i].setCentroid(centroids[i]);
     }
@@ -65,10 +69,12 @@ int Kmeans::computeLoyd(double iterThreshold, unsigned int maxIters, centroidIni
 
     for (iter = 0; iter < maxIters; iter++) {
 
+        //clears any previously assigned points in clusters
         for (unsigned int i = 0; i < this->numOfClusters; i++) {
             this->clusters[i].clearList();
         }
 
+        //compute closest centroid for every point
         for (auto point: points) {
             minDist = DBL_MAX;
             minIndex = -1;
@@ -85,6 +91,7 @@ int Kmeans::computeLoyd(double iterThreshold, unsigned int maxIters, centroidIni
         if (sumOfCentroidMoves < iterThreshold)break;
         sumOfCentroidMoves = 0;
 
+        //recenter the centroids based on the average distance from their points
         for (unsigned int i = 0; i < this->numOfClusters; i++) {
             sumOfCentroidMoves += this->clusters[i].recenter();
         }
@@ -111,6 +118,7 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
     int minIndex;
     int centroidMove;
 
+    //initialize lsh structure
     LSH* lsh = new LSH(this->dimension, buckets, L, k, w);
 
     for(auto point: this->points){
@@ -124,14 +132,15 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
     unsigned int iter;
     double sumOfCentroidMoves = DBL_MAX;
 
+    //clears any previously assigned points in clusters
     for (unsigned int i = 0; i < this->numOfClusters; i++) {
         this->clusters[i].clearList();
     }
 
     for (iter = 0; iter < maxIters; iter++) {
 
+        //for every centroid find near neighbor points
         for(unsigned int i = 0; i < this->numOfClusters; i++){
-            //std::cout << "Calculating points for cluster i\n";
             lsh->getNearestByR(radius, this->clusters, i);
         }
 
@@ -148,9 +157,9 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
             }
         }
 
-        //if (sumOfCentroidMoves < iterThreshold)break;
         sumOfCentroidMoves = 0;
 
+        //recenter centroids
         for (unsigned int i = 0; i < this->numOfClusters; i++) {
             centroidMove = this->clusters[i].recenter();
             if(centroidMove == -1){
@@ -166,6 +175,8 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
 
     }
     int unassignedPoints = 0;
+
+    //assign unassigned points using brute force
     for(auto p : lsh->getPoints()){
         if(p->getClusterIndex() == -1){
             unassignedPoints++;
@@ -186,6 +197,8 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
 
     std::cout << "--------------------------------------------------" << std::endl;
     std::cout << "Unassigned points using LSH: " <<  unassignedPoints << std::endl;
+
+    //final recenter
     for (unsigned int i = 0; i < this->numOfClusters; i++) {
         sumOfCentroidMoves += this->clusters[i].recenter();
     }
@@ -215,6 +228,7 @@ int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidIn
     int minIndex;
     int centroidMove;
 
+    //initialize hypercube structure
     Hypercube* hypercube = new Hypercube(this->dimension, (int)pow(2,d), 1, d, w);
 
     for(auto point: this->points){
@@ -228,14 +242,14 @@ int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidIn
     unsigned int iter;
     double sumOfCentroidMoves = DBL_MAX;
 
+    //clear cluster points
     for (unsigned int i = 0; i < this->numOfClusters; i++) {
         this->clusters[i].clearList();
     }
 
     for (iter = 0; iter < maxIters; iter++) {
-
+        //for every centroid find near neighbor points
         for(unsigned int i = 0; i < this->numOfClusters; i++){
-            //std::cout << "Calculating points for cluster i\n";
             hypercube->getNearestByR(radius, this->clusters, i, probes, M);
         }
 
@@ -252,9 +266,9 @@ int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidIn
             }
         }
 
-        //if (sumOfCentroidMoves < iterThreshold)break;
         sumOfCentroidMoves = 0;
-
+        
+        //recenter centroids
         for (unsigned int i = 0; i < this->numOfClusters; i++) {
             centroidMove = this->clusters[i].recenter();
             if(centroidMove == -1){
@@ -272,6 +286,8 @@ int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidIn
     }
 
     int unassignedPoints = 0;
+
+    //assign unassigned points using brute force
     for(auto p : hypercube->getPoints()){
         if(p->getClusterIndex() == -1){
             unassignedPoints++;
@@ -292,6 +308,8 @@ int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidIn
 
     std::cout << "--------------------------------------------------" << std::endl;
     std::cout << "Unassigned points using Hypercube: " <<  unassignedPoints << std::endl;
+
+    //final recenter
     for (unsigned int i = 0; i < this->numOfClusters; i++) {
         sumOfCentroidMoves += this->clusters[i].recenter();
     }
@@ -378,7 +396,6 @@ int Kmeans::findPlusPlusCentroids(std::list<Point *> &points, unsigned int k, st
         //have randomly selected a point with the required probability
         while (chosen > 0) {
             if (distances[idx] != DBL_MAX) {
-                //std::cout << chosen << std::endl;
                 chosen -= distances[idx] / totalDists;
             }
             idx++;
@@ -411,8 +428,6 @@ double Kmeans::calculatePointSilhouette(Point *point) {
 
 
     //calculate average distance from other points of the same cluster
-    //std::cout<<point->getClusterIndex();
-
     for (auto p: clusters[point->getClusterIndex()].getClusteredPoints()) {
         if (p->getId() == point->getId())continue;
         a += point->l2Distance(p);
@@ -530,6 +545,8 @@ void Kmeans::printCompleteInfo(FILE* fp){
 double Kmeans::calculateInitialRadius(){
     double minDistance = DBL_MAX;
     double tempDistance;
+
+    //calculate min distance of all clusters
     for(unsigned int i  = 0; i < numOfClusters; i++){
         for(unsigned int j = 0; j < numOfClusters; j++){
             if(i==j)continue;
@@ -539,5 +556,7 @@ double Kmeans::calculateInitialRadius(){
             }
         }
     }
+
+    //return minDistance/2 if possible
     return minDistance>2 ? minDistance/2 : 2;
 }

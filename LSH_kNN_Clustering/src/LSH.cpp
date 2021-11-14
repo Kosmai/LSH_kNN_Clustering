@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+#include <cmath>
 
 #include "../inc/hashFunctionG.hpp"
 #include "../inc/hashTable.hpp"
@@ -168,7 +169,6 @@ void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN){
 
         //while there are more points
         if(LSHIterator == LSHNeighbors.end() || realIterator == realNeighbors.end()){
-            i++;
             break;
         }
 
@@ -276,8 +276,8 @@ double LSH::calculateW(std::vector<Point*> &points){
 	int i, j;
     
     //uses only a fraction of the points
-    int iterSize = size/128;
-    //if points are < 128, just use them all
+    int iterSize = sqrt(size);
+    //if points are < sqrt(size), just use them all
     if(iterSize < 1){
         iterSize = size;
     }

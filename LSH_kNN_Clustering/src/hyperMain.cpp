@@ -41,19 +41,27 @@ int main(int argc, char **argv) {
 		std::cin >> inputFile;
 	}
 	
+    std::cout << "Reading and analyzing input file...";
+	fflush(stdout);
     if ((dims = readDataSet(inputFile, ' ', points)) < 0) {
        std::cout << "Error while reading input file. Aborting..." << std::endl;
        return 1;
     }
+    std::cout << "done" << std::endl;
 
     //initialize w
+    std::cout << "Calculating optimal w...";
     double w = Hypercube::calculateW(points) * W_MULTIPLIER;
+    std::cout << "done" << std::endl;
 
     //Hypercube initialize will all points in inputfile
+    std::cout << "Generating required structures...";
+	fflush(stdout);
     Hypercube hyper = Hypercube(dims, pow(2, k), 1, k, w);
     for(auto point: points){
         hyper.addPoint(point);
     }
+    std::cout << "done" << std::endl;
 
     while(true){
 
@@ -104,12 +112,13 @@ int main(int argc, char **argv) {
         }
 
 		//statistics
-        std::cout << "Statistics" << std::endl;
-		std::cout << "--------------------------------------------------" << std::endl;
-		std::cout << "Average predicted/true distance ratio: " << hyper.averageRatio/hyper.successfulQueries << std::endl;
-		std::cout << "Worst   predicted/true distance ratio: " << hyper.worstDistance << std::endl;
-		std::cout << "--------------------------------------------------" << std::endl;
-
+        if(hyper.successfulQueries > 0){
+            std::cout << "Statistics" << std::endl;
+            std::cout << "--------------------------------------------------" << std::endl;
+            std::cout << "Average predicted/true distance ratio: " << hyper.averageRatio/hyper.successfulQueries << std::endl;
+            std::cout << "Worst   predicted/true distance ratio: " << hyper.worstDistance << std::endl;
+		    std::cout << "--------------------------------------------------" << std::endl;
+        }
 
 		//cleanup - reset
         for(auto point: queries){

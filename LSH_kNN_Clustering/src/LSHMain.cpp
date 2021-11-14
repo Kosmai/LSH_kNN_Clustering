@@ -42,20 +42,29 @@ int main(int argc, char **argv) {
 		std::cin >> inputFile;
 	}
 	
+	std::cout << "Reading and analyzing input file...";
+	fflush(stdout);
 	if((dims = readDataSet(inputFile, ' ', points)) < 0){
 		std::cout << "Error while reading input file. Aborting..." << std::endl;
 		return 1;
 	}
+	std::cout << "done" << std::endl;
 
 	//initialize buckets and w
+	std::cout << "Calculating optimal w...";
+	fflush(stdout);
 	double w = LSH::calculateW(points)*W_MULTIPLIER;
 	int buckets = points.size() >= BUCKET_DIVISOR ? points.size()/BUCKET_DIVISOR : 1;
+	std::cout << "done" << std::endl;
 
 	//LSH initialize will all points in inputfile
+	std::cout << "Generating required structures...";
+	fflush(stdout);
 	LSH lsh = LSH(dims, buckets, l, k, w);
     for(auto point: points){
         lsh.addPoint(point);
     }
+	std::cout << "done" << std::endl;
 
 	//main program loop
 	while(true){
@@ -106,12 +115,14 @@ int main(int argc, char **argv) {
 		}
 
 		//statistics
-		std::cout << "Statistics" << std::endl;
-		std::cout << "--------------------------------------------------" << std::endl;
-		std::cout << "Average predicted/true distance ratio: " << lsh.averageRatio/lsh.successfulQueries << std::endl;
-		std::cout << "Worst   predicted/true distance ratio: " << lsh.worstDistance << std::endl;
-		std::cout << "--------------------------------------------------" << std::endl;
-
+		if(lsh.successfulQueries > 0){
+			std::cout << "Statistics" << std::endl;
+			std::cout << "--------------------------------------------------" << std::endl;
+			std::cout << "Average predicted/true distance ratio: " << lsh.averageRatio/lsh.successfulQueries << std::endl;
+			std::cout << "Worst   predicted/true distance ratio: " << lsh.worstDistance << std::endl;
+			std::cout << "--------------------------------------------------" << std::endl;
+		}
+		
 		//cleanup - reset
 		for(auto point: queries){
 			delete point;
