@@ -1,14 +1,9 @@
 *.txt
 *.o
-lsh/lsh
 .vscode/
 .idea/
-lsh/datasets/
-hypercube/datasets/
-hypercube/cube
-k-means/datasets/
-k-means/kmeans
 LSH_kNN_Clustering/datasets/
 LSH_kNN_Clustering/lsh
 LSH_kNN_Clustering/cube
 LSH_kNN_Clustering/cluster
+Time_Series_kNN_Clustering/datasets/
