@@ -8,6 +8,7 @@
 #include "../inc/LSH.hpp"
 #include "../inc/hypercube.hpp"
 #include "../inc/searchUtils.hpp"
+#include "../inc/timeSeries.hpp"
 
 int main(int argc, char **argv) {
 
@@ -19,13 +20,13 @@ int main(int argc, char **argv) {
 	std::string outputFile = "out.txt";
 
 	int dims;
-	int k = 4;
-	int l = 5;
-	int m = 1000;
-    int probes = 500;
-	int numOfNearest = 5;
-	double radius = 0.0;
-	double w;
+	// int k = 4;
+	// int l = 5;
+	// int m = 1000;
+    // int probes = 500;
+	// int numOfNearest = 5;
+	// double radius = 0.0;
+	// double w;
 
 	LSH* lsh = nullptr;
 	Hypercube* cube = nullptr;
@@ -34,13 +35,29 @@ int main(int argc, char **argv) {
 
 	initializeInput(inputFile, dims, points);
 
-	lsh = initializeLSH(dims, l, k, w, points);
-	cube = initializeHypercube(dims, k, w, points);
+	// lsh = initializeLSH(dims, l, k, w, points);
+	// cube = initializeHypercube(dims, k, w, points);
 
-	printParameters(k, l, numOfNearest, radius, w);
+	// printParameters(k, l, numOfNearest, radius, w);
 
-	if(searchLoop(*lsh, queryFile, outputFile, numOfNearest, radius) < 0) return 2;
-	if(searchLoop(*cube, queryFile, outputFile, m, probes, numOfNearest, radius) < 0) return 2;
+	// if(searchLoop(*lsh, queryFile, outputFile, numOfNearest, radius) < 0) return 2;
+	// if(searchLoop(*cube, queryFile, outputFile, m, probes, numOfNearest, radius) < 0) return 2;
+
+	TimeSeries t1(points[0]);
+	t1.print();
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	//free all memory
 	for(auto point: points){
