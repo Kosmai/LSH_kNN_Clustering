@@ -1,22 +1,16 @@
 CC=g++
 CFLAGS=-Wall
-OBJ=obj/hashFunctionH.o obj/hashFunctionG.o obj/randGen.o obj/hashTable.o obj/readInput.o obj/point.o obj/LSH.o obj/hamming.o obj/LSH.o obj/kmeans.o obj/cluster.o obj/hypercube.o obj/hashFunctionF.o
+OBJ=obj/hashFunctionH.o obj/hashFunctionG.o obj/randGen.o obj/hashTable.o obj/readInput.o obj/point.o obj/LSH.o obj/hamming.o obj/LSH.o obj/kmeans.o obj/cluster.o obj/hypercube.o obj/hashFunctionF.o obj/searchUtils.o
 OBJDIR := obj
 
-all: $(OBJDIR) lsh cube cluster
+all: $(OBJDIR) search
 
-safe: clean $(OBJDIR) lsh cube cluster
+safe: clean $(OBJDIR) search
 
 obj/%.o: src/%.cpp
 	$(CC) $(CFLAGS) -c -o $@ $^
 
-cube: obj/hyperMain.o $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $^
-
-cluster: obj/clusteringMain.o $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $^
-
-lsh: obj/LSHMain.o $(OBJ)
+search: obj/search.o $(OBJ)
 	$(CC) $(CFLAGS) -o $@ $^
 
 $(OBJDIR):
@@ -24,4 +18,4 @@ $(OBJDIR):
 
 .PHONY: clean
 clean:
-	rm -f obj/*.o cube cluster lsh *.txt
+	rm -f obj/*.o search *.txt
