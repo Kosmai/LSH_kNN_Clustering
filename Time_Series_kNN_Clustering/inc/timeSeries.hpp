@@ -16,4 +16,5 @@ public:
     TimeSeries(Point* point);
     ~TimeSeries() = default;
     void print();
+    Point* snapToGrid(double dx, double dy);
 };

@@ -45,6 +45,8 @@ int main(int argc, char **argv) {
 
 	TimeSeries t1(points[0]);
 	t1.print();
+	t1.snapToGrid(1,1);
+
 
 
 
