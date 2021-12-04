@@ -16,4 +16,9 @@ public:
     TimeSeries(Point* point);
     ~TimeSeries() = default;
     void print();
+
+    std::vector<Observation>& getVector();
+
+    double discreteFrechetDistance(TimeSeries*);
+    double discreteFrechetDistance(std::vector<Observation>&);
 };
