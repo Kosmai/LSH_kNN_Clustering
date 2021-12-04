@@ -108,8 +108,8 @@ double TimeSeries::discreteFrechetDistance(std::vector <Observation> & otherObse
         std::cout<<std::endl<<std::endl;
     }
 
-    std::cout<<frechetArray[2][2]<<std::endl;
+    std::cout<<frechetArray[ts1_size-1][ts2_size-1]<<std::endl;
 
-    return 0;
+    return frechetArray[ts1_size-1][ts2_size-1];
 }
 

@@ -6,6 +6,8 @@
 the Point class and provides basic functionality, s.a. calculating the
 distance between two points, assigning cluster index to point etc */
 
+class TimeSeries;
+
 class Point {
 private:
     std::string id;
@@ -13,6 +15,11 @@ private:
 
     //used in clustering
     int clusterIndex;
+
+    //used if point represents a time series
+    TimeSeries* timeSeries;
+
+
 
 public:
     //Constructors-Destructors
@@ -26,12 +33,14 @@ public:
     int setId(std::string &id);
     int setVector(std::vector<double> &);
     int setClusterIndex(int clusterIndex);
+    int setTimeSeries(TimeSeries* timeSeries);
 
     //getters
     std::string getId();
     std::vector<double> &getVector();
     int getClusterIndex();
     int getDimension();
+    TimeSeries* getTimeSeries();
 
     //checks if two points have the same id
     bool operator==(Point &p);

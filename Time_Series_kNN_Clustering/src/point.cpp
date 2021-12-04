@@ -12,6 +12,7 @@ Point::Point(std::vector<double> &vec, const std::string &id) {
     this->vec = vec;
     this->id = id;
     this->clusterIndex = -1;
+    this->timeSeries = nullptr;
 }
 
 Point &Point::operator=(const Point &copy) {
@@ -19,6 +20,7 @@ Point &Point::operator=(const Point &copy) {
     this->vec = copy.vec;
     this->id = copy.id;
     this->clusterIndex = copy.clusterIndex;
+    this->timeSeries = copy.timeSeries;
 
     return *this;
 }
@@ -38,6 +40,17 @@ int Point::setClusterIndex(int clusterIndex) {
     return 0;
 }
 
+int Point::setTimeSeries(TimeSeries *timeSeries) {
+
+    if(timeSeries == nullptr){
+        return -1;
+    }
+
+    this->timeSeries = timeSeries;
+
+    return 0;
+}
+
 std::string Point::getId() {
     return this->id;
 }
@@ -52,6 +65,10 @@ int Point::getClusterIndex() {
 
 int Point::getDimension() {
     return this->vec.size();
+}
+
+TimeSeries* Point::getTimeSeries() {
+    return this->timeSeries;
 }
 
 bool Point::operator==(Point &p) {
