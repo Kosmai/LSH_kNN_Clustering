@@ -7,6 +7,7 @@
 #include "../inc/point.hpp"
 #include "../inc/LSH.hpp"
 #include "../inc/cluster.hpp"
+#include "../inc/timeSeries.hpp"
 
 LSH::LSH() {
     std::cout << "Default LSH ctr implicitly called" << std::endl;
@@ -82,6 +83,12 @@ int LSH::addPoint(Point* p) {
     return 0;
 }
 
+int LSH::addTimeSeries(TimeSeries* t, double dx, double dy){
+   Point* p = t->snapToGrid(dx, dy);
+   addPoint(p);
+   return 0;
+}
+
 //Used when sorting the lists
 static bool compare(Neighbor* a, Neighbor* b) {
     return a->distance < b->distance;
@@ -94,20 +101,25 @@ static bool equal(Neighbor* a, Neighbor* b) {
     return equality;
 }
 
-void LSH::bruteForceSearch(Point &queryPoint){
+void LSH::bruteForceSearch(Point &queryPoint, int metric = 0){
     std::list<Point*>::iterator it;
     for (it = points.begin(); it != points.end(); ++it) {
 
         Neighbor* candidate = new Neighbor;
         candidate->point = (Point*)(*it);
-        candidate->distance = queryPoint.l2Distance((Point*)(*it));
+        if(metric == 0){
+            candidate->distance = queryPoint.l2Distance((Point*)(*it));
+        }
+        else if(metric == 1){
+            candidate->distance = queryPoint.getTimeSeries()->discreteFrechetDistance(candidate->point->getTimeSeries());
+        }
 
         realNeighbors.push_back(candidate);
     }
     realNeighbors.sort(compare);
 }
 
-int LSH::LSHSearch(Point &queryPoint) {
+int LSH::LSHSearch(Point &queryPoint, int metric = 0) {
 
     //make sure the query point is valid
     if (queryPoint.getDimension() != this->dims) {
@@ -138,7 +150,12 @@ int LSH::LSHSearch(Point &queryPoint) {
             if ((*it)->key == ID) {
                 Neighbor* candidate = new Neighbor;
                 candidate->point = (*it)->data;
-                candidate->distance = queryPoint.l2Distance((*it)->data);
+                if(metric == 0){
+                    candidate->distance = queryPoint.l2Distance((*it)->data);
+                }
+                else if(metric == 1){
+                    candidate->distance = queryPoint.getTimeSeries()->discreteFrechetDistance((*it)->data->getTimeSeries());
+                }
 
                 LSHNeighbors.push_back(candidate);
             }
@@ -196,7 +213,7 @@ void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN){
     }
 }
 
-int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, double r = -1.0){
+int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, double r = -1.0, int metric = 0){
 
     using std::chrono::high_resolution_clock;
     using std::chrono::duration_cast;
@@ -204,11 +221,11 @@ int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, doub
     using std::chrono::microseconds;
 
     auto LSH_t1 = high_resolution_clock::now();
-    LSHSearch(queryPoint);
+    LSHSearch(queryPoint, metric);
     auto LSH_t2 = high_resolution_clock::now();
 
     auto brute_t1 = high_resolution_clock::now();
-    bruteForceSearch(queryPoint);
+    bruteForceSearch(queryPoint, metric);
     auto brute_t2 = high_resolution_clock::now();
 
     auto LSH_us = duration_cast<microseconds>(LSH_t2 - LSH_t1);

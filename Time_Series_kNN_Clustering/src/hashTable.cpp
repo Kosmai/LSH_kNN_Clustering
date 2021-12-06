@@ -116,7 +116,7 @@ void HashTable::print() const {
         std::cout << "BUCKET " << bucket << " : ";
         for (it = this->hashArray[bucket].begin(); it != this->hashArray[bucket].end(); ++it) {
             std::cout << (*it)->key << " -> ";
-            //(*it)->data->print();
+            //std::cout << (*it)->data->getId() << "->";
         }
         std::cout << std::endl;
     }

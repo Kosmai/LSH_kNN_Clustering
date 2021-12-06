@@ -11,6 +11,7 @@
 #include "../inc/hypercube.hpp"
 #include "../inc/readInput.hpp"
 #include "../inc/searchUtils.hpp"
+#include "../inc/timeSeries.hpp"
 
 #define W_LSH_MULTIPLIER 0.1
 #define W_CUBE_MULTIPLIER 0.2
@@ -53,6 +54,25 @@ LSH* initializeLSH(int dims, int l, int k, double &w, std::vector<Point*> &point
 	return lsh;
 }
 
+LSH* initializeLSH(int dims, int l, int k, double &w, std::vector<TimeSeries*> &ts, double dx, double dy){
+	//initialize buckets and w
+	std::cout << "Calculating optimal w...";
+	fflush(stdout);
+	//w = LSH::calculateW(points)*W_LSH_MULTIPLIER;
+	int buckets = ts.size() >= BUCKET_DIVISOR ? ts.size()/BUCKET_DIVISOR : 1;
+	std::cout << "done" << std::endl;
+
+	//LSH initialize will all timeSeries in inputfile
+	std::cout << "Generating required structures...";
+	fflush(stdout);
+	LSH* lsh = new LSH(2*dims, buckets, l, k, w);
+    for(auto t: ts){
+        lsh->addTimeSeries(t, dx, dy);
+    }
+	std::cout << "done" << std::endl;
+	return lsh;
+}
+
 int initializeInput(std::string &inputFile, int &dims, std::vector<Point*> &points){
 
 	//read cli arguments
@@ -89,7 +109,7 @@ void printParameters(int k, int l, int numOfNearest, double radius, int w){
 	return;
 }
 
-int searchLoop(LSH& lsh, std::string queryFile, std::string outputFile, int numOfNearest, double radius){
+int searchLoop(LSH& lsh, std::string queryFile, std::string outputFile, int numOfNearest, double radius, int metric){
 
 	std::vector<Point*> queries;
 
@@ -132,7 +152,14 @@ int searchLoop(LSH& lsh, std::string queryFile, std::string outputFile, int numO
 
 		//run the algorithm
 		for(unsigned int i = 0; i < queries.size(); i++){
-			lsh.calculateNN(*queries[i], outfp, numOfNearest, radius);
+			if(metric == 0){
+				lsh.calculateNN(*queries[i], outfp, numOfNearest, radius, metric);
+			}
+			if(metric == 1){
+				TimeSeries t1(queries[i]);
+				Point* p = t1.snapToGrid(1, 1);
+				lsh.calculateNN(*p, outfp, numOfNearest, radius, metric);
+			}
 		}
 
 		//statistics

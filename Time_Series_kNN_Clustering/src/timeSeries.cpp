@@ -3,8 +3,9 @@
 #include "../inc/point.hpp"
 #include "../inc/timeSeries.hpp"
 
-TimeSeries::TimeSeries(Point* point) : id(point->getId()){
+TimeSeries::TimeSeries(Point* point){
     int i = 0;
+    this->id = point->getId();
     for(auto coord : point->getVector()){
         Observation observation;
         observation.x = ++i;
@@ -33,7 +34,8 @@ Point* TimeSeries::snapToGrid(double dx, double dy){
 
     Point* snapped = new Point(elements, this->id);
 
-    snapped->print();
+    snapped->setTimeSeries(this);
+
     return snapped;
 }
 
@@ -98,7 +100,7 @@ double TimeSeries::discreteFrechetDistance(std::vector <Observation> & otherObse
             frechetArray[i][j] = std::max(minPrevDistance, observationDistance(this->observations[i], otherObservations[j]));
         }
     }
-
+/*
     for (i = 0; i < ts1_size; i++){
         for(j = 0; j < ts2_size; j++){
 
@@ -109,7 +111,7 @@ double TimeSeries::discreteFrechetDistance(std::vector <Observation> & otherObse
     }
 
     std::cout<<frechetArray[ts1_size-1][ts2_size-1]<<std::endl;
-
+*/
     return frechetArray[ts1_size-1][ts2_size-1];
 }
 
