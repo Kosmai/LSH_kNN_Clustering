@@ -58,7 +58,9 @@ int main(int argc, char **argv) {
 	lsh_ts = initializeLSH(dims, l, k, w, timeSeries, 1, 1);
 	//lsh_ts->printAllHT();
 
-	if(searchLoop(*lsh_ts, queryFile, outputFile, numOfNearest, radius, DISC_FRECHET) < 0) return 2;
+	//if(searchLoop(*lsh_ts, queryFile, outputFile, numOfNearest, radius, DISC_FRECHET) < 0) return 2;
+
+//    timeSeries[0]->filter(3);
 
 	//free all memory
 	for(auto point: points){

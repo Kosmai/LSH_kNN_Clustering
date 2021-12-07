@@ -17,6 +17,7 @@ public:
     ~TimeSeries() = default;
     void print();
     Point* snapToGrid(double dx, double dy);
+    Point* filter(double e, bool consecutiveErases = false);
 
     std::vector<Observation>& getVector();
 
