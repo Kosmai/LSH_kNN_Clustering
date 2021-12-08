@@ -127,14 +127,16 @@ double TimeSeries::discreteFrechetDistance(TimeSeries* otherTs) {
 }
 
 double TimeSeries::discreteFrechetDistance(std::vector <Observation> & otherObservations) {
+    double distance;
+    meanCurve(this->observations, otherObservations, distance);
+    return distance;
+}
 
+std::vector<Observation> meanCurve(std::vector<Observation> obs1, std::vector<Observation> obs2, double& frechetDistance){
+  
     // amount of observations in each time series
-    unsigned int ts1_size = this->observations.size();
-    unsigned int ts2_size = otherObservations.size();
-
-    if(ts1_size <= 0 || ts2_size <= 0){
-        return -1;
-    }
+    unsigned int ts1_size = obs1.size();
+    unsigned int ts2_size = obs2.size();
 
     // dynamic programming 2d array
     double** frechetArray = new double*[ts1_size];
@@ -149,17 +151,17 @@ double TimeSeries::discreteFrechetDistance(std::vector <Observation> & otherObse
     }
 
     // fill
-    frechetArray[0][0] = observationDistance(this->observations[0], otherObservations[0]);
+    frechetArray[0][0] = observationDistance(obs1[0], obs2[0]);
 
     // fill first column
     for(unsigned int i = 1; i < ts1_size; i++) {
         frechetArray[i][0] = std::max(frechetArray[i - 1][0],
-                                      observationDistance(this->observations[i], otherObservations[0]));
+                                      observationDistance(obs1[i], obs2[0]));
     }
 
     // fill first row
     for(unsigned int j = 1; j < ts2_size; j++){
-        frechetArray[0][j] = std::max(frechetArray[0][j-1], observationDistance(this->observations[0], otherObservations[j]));
+        frechetArray[0][j] = std::max(frechetArray[0][j-1], observationDistance(obs1[0], obs2[j]));
     }
 
     // fill rest positions
@@ -171,7 +173,7 @@ double TimeSeries::discreteFrechetDistance(std::vector <Observation> & otherObse
                 continue;
             }
             double minPrevDistance = std::min(std::min(frechetArray[i-1][j], frechetArray[i][j-1]), frechetArray[i-1][j-1]);
-            frechetArray[i][j] = std::max(minPrevDistance, observationDistance(this->observations[i], otherObservations[j]));
+            frechetArray[i][j] = std::max(minPrevDistance, observationDistance(obs1[i], obs2[j]));
         }
     }
 /*
@@ -234,25 +236,70 @@ double TimeSeries::discreteFrechetDistance(std::vector <Observation> & otherObse
 
     for(auto v: optimalTraversal){
         Observation observation;
-        observation.x = (this->observations[v.i].x + otherObservations[v.j].x)/2;
-        observation.y = (this->observations[v.i].y + otherObservations[v.j].y)/2;
+        observation.x = (obs1[v.i].x + obs2[v.j].x)/2;
+        observation.y = (obs1[v.i].y + obs2[v.j].y)/2;
         meanCurve.push_back(observation);
     }
 
     // std::cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"<<std::endl;
-    // for(auto obs: this->observations){
+    // for(auto obs: obs1){
     //     std:: cout << "(" << obs.x << ", " << obs.y << ") -> ";
     // }
     // std::cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"<<std::endl;
-    // for(auto obs: otherObservations){
+    // for(auto obs: obs2){
     //     std:: cout << "(" << obs.x << ", " << obs.y << ") -> ";
     // }
     // std::cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"<<std::endl;
+
+    std::cout << "PRINTING" << std::endl;
 
     // for(auto obs: meanCurve){
     //     std:: cout << "(" << obs.x << ", " << obs.y << ") -> ";
     // }
 
-    return frechetArray[ts1_size-1][ts2_size-1];
+
+    //sampling 
+    std::vector<Observation> sampledCurve;
+    std::cout << "MEAN: " << meanCurve.size() << std::endl;
+    std::cout << "OBS : " << obs1.size() << std::endl;
+    int sampleFrequency = std::ceil((double)meanCurve.size() / obs1.size());
+    std::cout << "Ceil: " << sampleFrequency << std::endl;
+    for(unsigned int i = 0; i < meanCurve.size(); i+=sampleFrequency){
+        sampledCurve.push_back(meanCurve[i]);
+    }
+
+    for(unsigned int i = sampledCurve.size(); i < 120; i++){
+        Observation ob;
+        ob.x = i+1;
+        ob.y = 0;
+        sampledCurve.push_back(ob);
+    }
+
+    std::cout << std::endl;
+    std::cout << std::endl;
+
+    // for(auto obs: sampledCurve){
+    //     std:: cout << "(" << obs.x << ", " << obs.y << ") -> ";
+    // }
+    std::cout << "SAMP: " << sampledCurve.size() << std::endl;
+    std::cout << std::endl;
+
+    frechetDistance = frechetArray[ts1_size-1][ts2_size-1];
+
+    return sampledCurve;  
 }
 
+std::vector<Observation> meanCurve(std::vector<std::vector<Observation>>& obs){
+    std::vector<std::vector<Observation>> array = obs;
+    unsigned int inc = 1;
+    double dist;
+    while(inc < array.size()){
+        for(unsigned int i = 0; i < array.size(); i+=(inc*2)){
+            if(i+inc < array.size()){
+                array[i] = meanCurve(array[i],array[i+inc], dist);
+            }
+        }
+        inc*=2;
+    }
+    return array[0];
+}

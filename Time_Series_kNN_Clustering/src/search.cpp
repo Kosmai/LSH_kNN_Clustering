@@ -58,15 +58,29 @@ int main(int argc, char **argv) {
 	double dy = 1;
 	double e = -1;
 	printParameters(k, l, numOfNearest, radius, w);
-	lsh_ts = initializeLSH(dims, l, k, w, timeSeries, dx, dy, e);
+	//lsh_ts = initializeLSH(dims, l, k, w, timeSeries, dx, dy, e);
 	// //lsh_ts->printAllHT();
 
-	if(searchLoop(*lsh_ts, queryFile, outputFile, numOfNearest, radius, DISC_FRECHET, dx, dy, e) < 0) return 2;
+	//if(searchLoop(*lsh_ts, queryFile, outputFile, numOfNearest, radius, DISC_FRECHET, dx, dy, e) < 0) return 2;
 
 	//timeSeries[0]->snapToGrid(3,1)->print();
 	//timeSeries[0]->filter(3);
 
-	timeSeries[0]->discreteFrechetDistance(timeSeries[1]->getVector());
+	//timeSeries[0]->discreteFrechetDistance(timeSeries[1]->getVector());
+
+	std::vector<std::vector<Observation>> boo;
+
+	std::vector<Observation> slightlyDifferent = timeSeries[0]->getVector();
+	slightlyDifferent[0].y++;
+
+	boo.push_back(timeSeries[0]->getVector());
+	boo.push_back(slightlyDifferent);
+	boo.push_back(timeSeries[0]->getVector());
+
+	std::vector<Observation> foo = meanCurve(boo);
+	for(auto ob : foo){
+		std::cout << "(" << ob.x << ", " << ob.y << ")" << std::endl;
+	}
 
 	//free all memory
 	for(auto point: points){
