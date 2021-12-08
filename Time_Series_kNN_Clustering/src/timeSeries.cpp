@@ -24,13 +24,37 @@ Point* TimeSeries::snapToGrid(double dx, double dy){
     std::vector<double> elements;
     int x;
     double y;
+    bool exists = false;
 
     for(auto obs : this->observations){
         x = (int)((obs.x / dx) + 0.5);
         y = (int)((obs.y / dy) + 0.5);
-        elements.push_back(x);
-        elements.push_back(y);
+
+        for(int i = elements.size()-2; i > 0; i-=2){
+            if(elements[i] == x){
+                if(elements[i+1] == y){
+                    exists = true;
+                    break;
+                }
+            }
+            else{
+                break;
+            }
+        }
+        if(!exists){
+            elements.push_back(x);
+            elements.push_back(y);
+        }
+        exists = false;
     }
+
+
+    for(int i = elements.size(); i < (int)observations.size()*2; i+=2){
+        elements.push_back(0);
+        elements.push_back(0);
+    }
+
+    //std::cout << elements.size()/2 << std::endl;
 
     Point* snapped = new Point(elements, this->id);
 
@@ -46,9 +70,7 @@ Point* TimeSeries::filter(double e, bool consecutiveErases){
         filtered.push_back(observation.y);
     }
 
-
-
-    std::cout<<std::endl<<std::endl;
+    //std::cout<<std::endl<<std::endl;
 
     double a, b, c;
 
@@ -63,22 +85,33 @@ Point* TimeSeries::filter(double e, bool consecutiveErases){
         b = filtered[i+1];
         c = filtered[i+2];
 
-        std::cout<< "a: "<< a <<" b: " << b << " c: " << c << std::endl;
+        //std::cout<< "a: "<< a <<" b: " << b << " c: " << c << std::endl;
 
         if((std::abs(a - b) < e) && (std::abs(b - c) < e)){
-            std::cout<<"deleted :" << filtered[i+1]<<std::endl;
+            //std::cout<<"deleted :" << filtered[i+1]<<std::endl;
             filtered.erase(filtered.begin() + i + 1);
             consecutiveErases ? i-- : i;
         }
     }
 
+    for(unsigned int i = filtered.size(); i < observations.size(); i++){
+        filtered.push_back(0);
+    }
+
+    /*
     for(unsigned int i=0; i<filtered.size(); i++){
         std::cout<<filtered[i]<<"->";
     }
-
+    std::cout << std::endl;
+    std::cout << filtered.size() << std::endl;
+   
     std::cout<<std::endl;
 
-    return nullptr;
+    */
+    Point* snapped = new Point(filtered, this->id);
+    snapped->setTimeSeries(this);
+
+    return snapped;
 }
 
 std::vector<Observation>& TimeSeries::getVector(){
@@ -153,6 +186,73 @@ double TimeSeries::discreteFrechetDistance(std::vector <Observation> & otherObse
 
     std::cout<<frechetArray[ts1_size-1][ts2_size-1]<<std::endl;
 */
+
+    std::vector<struct Leash> optimalTraversal;
+
+    i = ts1_size-1;
+    j = ts2_size-1;
+
+    struct Leash leash;
+    leash.i = i;
+    leash.j = j;
+
+    optimalTraversal.push_back(leash);
+
+    while(i > 0 || j > 0){
+        double min;
+        if(i == 0){
+            min = frechetArray[i][j-1];
+        }
+        
+        else if(j == 0){
+            min = frechetArray[i-1][j];
+        }
+
+        else{
+            min = std::min(std::min(frechetArray[i-1][j], frechetArray[i][j-1]), frechetArray[i-1][j-1]);    
+        }
+
+        if(i > 0 && frechetArray[i-1][j] == min){
+            i -= 1;
+        }
+        else if(j > 0 && frechetArray[i][j-1] == min){
+            j -= 1;
+        }
+        else{
+            i -= 1;
+            j -= 1;
+        }
+
+        leash.i = i;
+        leash.j = j;
+
+        optimalTraversal.insert(optimalTraversal.begin(), leash);
+
+    }
+
+    std::vector<Observation> meanCurve;
+
+    for(auto v: optimalTraversal){
+        Observation observation;
+        observation.x = (this->observations[v.i].x + otherObservations[v.j].x)/2;
+        observation.y = (this->observations[v.i].y + otherObservations[v.j].y)/2;
+        meanCurve.push_back(observation);
+    }
+
+    // std::cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"<<std::endl;
+    // for(auto obs: this->observations){
+    //     std:: cout << "(" << obs.x << ", " << obs.y << ") -> ";
+    // }
+    // std::cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"<<std::endl;
+    // for(auto obs: otherObservations){
+    //     std:: cout << "(" << obs.x << ", " << obs.y << ") -> ";
+    // }
+    // std::cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"<<std::endl;
+
+    // for(auto obs: meanCurve){
+    //     std:: cout << "(" << obs.x << ", " << obs.y << ") -> ";
+    // }
+
     return frechetArray[ts1_size-1][ts2_size-1];
 }
 

@@ -83,8 +83,16 @@ int LSH::addPoint(Point* p) {
     return 0;
 }
 
-int LSH::addTimeSeries(TimeSeries* t, double dx, double dy){
-   Point* p = t->snapToGrid(dx, dy);
+int LSH::addTimeSeries(TimeSeries* t, double dx, double dy, double filter_e){
+   Point* p;
+   if(filter_e < 0){
+       p = t->snapToGrid(dx, dy);
+   }
+
+   else{
+       p = t->filter(filter_e);
+   }
+
    addPoint(p);
    return 0;
 }
@@ -110,7 +118,7 @@ void LSH::bruteForceSearch(Point &queryPoint, int metric = 0){
         if(metric == 0){
             candidate->distance = queryPoint.l2Distance((Point*)(*it));
         }
-        else if(metric == 1){
+        else if(metric == 1 || metric == 2){
             candidate->distance = queryPoint.getTimeSeries()->discreteFrechetDistance(candidate->point->getTimeSeries());
         }
 
@@ -153,7 +161,7 @@ int LSH::LSHSearch(Point &queryPoint, int metric = 0) {
                 if(metric == 0){
                     candidate->distance = queryPoint.l2Distance((*it)->data);
                 }
-                else if(metric == 1){
+                else if(metric == 1 || metric == 2){
                     candidate->distance = queryPoint.getTimeSeries()->discreteFrechetDistance((*it)->data->getTimeSeries());
                 }
 

@@ -4,8 +4,13 @@
 class Point;
 
 struct Observation{
-    int x;
+    double x;
     double y;
+};
+
+struct Leash{
+    int i;
+    int j;
 };
 
 class TimeSeries{

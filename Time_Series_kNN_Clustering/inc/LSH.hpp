@@ -54,7 +54,7 @@ public:
 	int addPoint(Point* p);
 
 	//add a time series to the LSH class (as grid-mapped point)
-	int addTimeSeries(TimeSeries* t, double dx, double dy);
+	int addTimeSeries(TimeSeries* t, double dx, double dy, double filter_e = -1.0);
 
 	//returns the list of points stored in the class
 	std::list<Point*>& getPoints();

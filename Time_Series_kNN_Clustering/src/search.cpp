@@ -54,13 +54,19 @@ int main(int argc, char **argv) {
 		timeSeries.push_back(t);
 	}
 	w = 100;
+	double dx = 1;
+	double dy = 1;
+	double e = -1;
 	printParameters(k, l, numOfNearest, radius, w);
-	lsh_ts = initializeLSH(dims, l, k, w, timeSeries, 1, 1);
-	//lsh_ts->printAllHT();
+	lsh_ts = initializeLSH(dims, l, k, w, timeSeries, dx, dy, e);
+	// //lsh_ts->printAllHT();
 
-	//if(searchLoop(*lsh_ts, queryFile, outputFile, numOfNearest, radius, DISC_FRECHET) < 0) return 2;
+	if(searchLoop(*lsh_ts, queryFile, outputFile, numOfNearest, radius, DISC_FRECHET, dx, dy, e) < 0) return 2;
 
-//    timeSeries[0]->filter(3);
+	//timeSeries[0]->snapToGrid(3,1)->print();
+	//timeSeries[0]->filter(3);
+
+	timeSeries[0]->discreteFrechetDistance(timeSeries[1]->getVector());
 
 	//free all memory
 	for(auto point: points){

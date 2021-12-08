@@ -54,7 +54,7 @@ LSH* initializeLSH(int dims, int l, int k, double &w, std::vector<Point*> &point
 	return lsh;
 }
 
-LSH* initializeLSH(int dims, int l, int k, double &w, std::vector<TimeSeries*> &ts, double dx, double dy){
+LSH* initializeLSH(int dims, int l, int k, double &w, std::vector<TimeSeries*> &ts, double dx, double dy, double filter_e){
 	//initialize buckets and w
 	std::cout << "Calculating optimal w...";
 	fflush(stdout);
@@ -64,11 +64,21 @@ LSH* initializeLSH(int dims, int l, int k, double &w, std::vector<TimeSeries*> &
 
 	//LSH initialize will all timeSeries in inputfile
 	std::cout << "Generating required structures...";
+	LSH* lsh;
 	fflush(stdout);
-	LSH* lsh = new LSH(2*dims, buckets, l, k, w);
-    for(auto t: ts){
-        lsh->addTimeSeries(t, dx, dy);
-    }
+	if(filter_e < 0){
+		lsh = new LSH(2*dims, buckets, l, k, w);
+		for(auto t: ts){
+			lsh->addTimeSeries(t, dx, dy);
+		}
+	}
+	else{
+		lsh = new LSH(dims, buckets, l, k, w);
+		for(auto t: ts){
+			lsh->addTimeSeries(t, dx, dy, filter_e);
+		}
+	}
+
 	std::cout << "done" << std::endl;
 	return lsh;
 }
@@ -109,7 +119,7 @@ void printParameters(int k, int l, int numOfNearest, double radius, int w){
 	return;
 }
 
-int searchLoop(LSH& lsh, std::string queryFile, std::string outputFile, int numOfNearest, double radius, int metric){
+int searchLoop(LSH& lsh, std::string queryFile, std::string outputFile, int numOfNearest, double radius, int metric, double dx, double dy, double filter_e){
 
 	std::vector<Point*> queries;
 
@@ -157,7 +167,12 @@ int searchLoop(LSH& lsh, std::string queryFile, std::string outputFile, int numO
 			}
 			if(metric == 1){
 				TimeSeries t1(queries[i]);
-				Point* p = t1.snapToGrid(1, 1);
+				Point* p = t1.snapToGrid(dx, dy);
+				lsh.calculateNN(*p, outfp, numOfNearest, radius, metric);
+			}
+			if(metric == 2){
+				TimeSeries t1(queries[i]);
+				Point* p = t1.filter(filter_e);
 				lsh.calculateNN(*p, outfp, numOfNearest, radius, metric);
 			}
 		}
