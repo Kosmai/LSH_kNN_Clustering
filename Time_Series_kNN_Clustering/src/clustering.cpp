@@ -11,8 +11,9 @@
 #include "../inc/cluster.hpp"
 #include "../inc/kmeans.hpp"
 #include "../inc/LSH.hpp"
+#include "../inc/timeSeries.hpp"
 
-#define MAX_ITERS 50
+#define MAX_ITERS 5
 #define MAX_RADIUS 55000
 #define MIN_TOLERACE 0.05
 #define W_MULTIPLIER_LSH 1.5
@@ -23,6 +24,11 @@ int main(int argc, char** argv) {
 
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	setRandomSeed(seed);
+
+    std::string inputFile  = "datasets/nasdaq2017_LQ.csv";
+    inputFile = "datasets/our_input.csv";
+	std::string configFile  = "config/cluster.conf";
+	std::string outputFile = "out.txt";
 
     using std::chrono::high_resolution_clock;
     using std::chrono::duration_cast;
@@ -41,9 +47,10 @@ int main(int argc, char** argv) {
     int d = 3;
     int dims;
 
-    std::string inputFile, configFile, outputFile, method;
+    std::string method;
 
     std::vector<Point*> points;
+    std::vector<TimeSeries*> timeSeries;
 
     //read cli arguments
     if(readClusterArguments(argc, argv, inputFile, configFile, complete,
@@ -57,10 +64,16 @@ int main(int argc, char** argv) {
         return 1;
     }
     //read all points from inputFile
-    if((dims = readDataSet(inputFile, ' ', points)) < 0){
+    if((dims = readDataSet(inputFile, '\t', points)) < 0){
         std::cout << "Error in reading points. Aborting..." << std::endl;
         return 1;
     }
+
+    for(auto point : points){
+		TimeSeries* t = new TimeSeries(point);
+        point->setTimeSeries(t);
+		timeSeries.push_back(t);
+	}
 
 	//initialize buckets and w
 	double w = LSH::calculateW(points);
@@ -100,13 +113,13 @@ int main(int argc, char** argv) {
     if(method == "Classic"){
         fprintf(outfp, "Algorithm: Lloyds\n");
         t1 = high_resolution_clock::now();
-        if(kmeans.computeLoyd(MIN_TOLERACE, MAX_ITERS, PlusPlus) < 0) return 3;
+        if(kmeans.computeLoyd(MIN_TOLERACE, MAX_ITERS, Random, 1) < 0) return 3;
         t2 = high_resolution_clock::now();
     }
     else if(method == "LSH"){
         fprintf(outfp, "Algorithm: Range Search LSH\n");
         t1 = high_resolution_clock::now();
-        if(kmeans.computeLSH(MAX_RADIUS, MAX_ITERS, PlusPlus, buckets, L, k, w*W_MULTIPLIER_LSH) < 0) return 3;
+        if(kmeans.computeLSH(MAX_RADIUS, MAX_ITERS, PlusPlus, buckets, L, k, w*W_MULTIPLIER_LSH, 1) < 0) return 3;
         t2 = high_resolution_clock::now();
     }
     else if(method == "Hypercube"){
@@ -135,7 +148,7 @@ int main(int argc, char** argv) {
         return 2;
     }
 
-    kmeans.displaySilhouette(outfp);
+    //kmeans.displaySilhouette(outfp);
 
     //if the complete argument was given, print additional info
     if(complete){

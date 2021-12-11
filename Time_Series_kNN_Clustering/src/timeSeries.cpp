@@ -256,8 +256,6 @@ std::vector<Observation> meanCurve(std::vector<Observation> obs1, std::vector<Ob
     // }
     // std::cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"<<std::endl;
 
-    std::cout << "PRINTING" << std::endl;
-
     // for(auto obs: meanCurve){
     //     std:: cout << "(" << obs.x << ", " << obs.y << ") -> ";
     // }
@@ -265,10 +263,7 @@ std::vector<Observation> meanCurve(std::vector<Observation> obs1, std::vector<Ob
 
     //sampling 
     std::vector<Observation> sampledCurve;
-    std::cout << "MEAN: " << meanCurve.size() << std::endl;
-    std::cout << "OBS : " << obs1.size() << std::endl;
     int sampleFrequency = std::ceil((double)meanCurve.size() / obs1.size());
-    std::cout << "Ceil: " << sampleFrequency << std::endl;
     for(unsigned int i = 0; i < meanCurve.size(); i+=sampleFrequency){
         sampledCurve.push_back(meanCurve[i]);
     }
@@ -280,16 +275,16 @@ std::vector<Observation> meanCurve(std::vector<Observation> obs1, std::vector<Ob
         sampledCurve.push_back(ob);
     }
 
-    std::cout << std::endl;
-    std::cout << std::endl;
-
     // for(auto obs: sampledCurve){
     //     std:: cout << "(" << obs.x << ", " << obs.y << ") -> ";
     // }
-    std::cout << "SAMP: " << sampledCurve.size() << std::endl;
-    std::cout << std::endl;
 
     frechetDistance = frechetArray[ts1_size-1][ts2_size-1];
+
+    for (unsigned int i = 0; i < ts1_size; i++){
+        delete[] frechetArray[i];
+    }
+    delete[] frechetArray;
 
     return sampledCurve;  
 }

@@ -17,9 +17,6 @@ Cluster &Cluster::operator=(const Cluster &copy) {
 }
 
 int Cluster::insertPoint(Point *point) {
-    if (point->getDimension() != this->dimension){
-        return -1;
-    }
     clusteredPoints.push_back(point);
     return 0;
 }
@@ -34,6 +31,8 @@ int Cluster::setCentroid(Point *centroid) {
         return -1;
     }
     this->centroid = *centroid;
+    TimeSeries* ts = new TimeSeries(centroid);
+    this->centroid.setTimeSeries(ts);
     return 0;
 }
 

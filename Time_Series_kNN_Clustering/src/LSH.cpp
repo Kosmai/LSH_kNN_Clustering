@@ -265,11 +265,11 @@ int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, doub
     return 0;
 }
 
-void LSH::getNearestByR(double r, Cluster* clusters, int currentCluster){
+void LSH::getNearestByR(double r, Cluster* clusters, int currentCluster, int metric){
 
-    Point centroid = clusters[currentCluster].getCentroid();
+    Point centroid = *(clusters[currentCluster].getCentroid().getTimeSeries()->snapToGrid(1,1));
 
-    LSHSearch(centroid);
+    LSHSearch(centroid, metric);
 
     std::list<Neighbor*>::iterator it;
 
@@ -286,8 +286,15 @@ void LSH::getNearestByR(double r, Cluster* clusters, int currentCluster){
             }
             //if another cluster has been assigned, compare distances
             else if(pointCluster != currentCluster){
-                if(point->l2Distance(&centroid) < point->l2Distance(&clusters[pointCluster].getCentroid())){
-                    point->setClusterIndex(currentCluster);
+                if(metric == 0){
+                    if(point->l2Distance(&centroid) < point->l2Distance(&clusters[pointCluster].getCentroid())){
+                        point->setClusterIndex(currentCluster);
+                    }
+                }
+                else if(metric == 1){
+                    if(point->getTimeSeries()->discreteFrechetDistance(centroid.getTimeSeries()) < point->getTimeSeries()->discreteFrechetDistance(clusters[pointCluster].getCentroid().getTimeSeries())){
+                        point->setClusterIndex(currentCluster);
+                    }
                 }
             }
         }

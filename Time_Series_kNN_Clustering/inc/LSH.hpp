@@ -64,7 +64,7 @@ public:
 	int calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN, double r, int metric);
 
 	//used for clustering
-	void getNearestByR(double r , Cluster* clusters, int currentCluster);
+	void getNearestByR(double r , Cluster* clusters, int currentCluster, int metric = 0);
 
 	//dynamic calculation of the w parameter
 	static double calculateW(std::vector<Point*> &points);

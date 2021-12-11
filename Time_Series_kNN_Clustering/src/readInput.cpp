@@ -149,7 +149,7 @@ int readClusterArguments(int argc, char **argv, std::string &inputFile, std::str
     //check for missing required arguments
     for (std::pair<std::string, bool> arg: argumentsRed) {
         if (!arg.second) {
-            return -2;
+            //return -2;
         }
     }
 
