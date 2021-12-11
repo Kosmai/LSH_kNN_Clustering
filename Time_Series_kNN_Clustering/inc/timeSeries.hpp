@@ -25,6 +25,7 @@ public:
     Point* filter(double e, bool consecutiveErases = false);
 
     std::vector<Observation>& getVector();
+    int setVector(std::vector<Observation> observations);
 
     double discreteFrechetDistance(TimeSeries*);
     double discreteFrechetDistance(std::vector<Observation>&);

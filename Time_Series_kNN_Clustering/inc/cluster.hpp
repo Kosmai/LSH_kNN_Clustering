@@ -34,7 +34,7 @@ public:
 
     //sets centroid as the average of cluster's
     //points and returns how much it moved
-    double recenter();
+    double recenter(int metric = 0);
 
     //used for testing purposes
     int count();

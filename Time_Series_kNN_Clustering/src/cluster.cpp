@@ -2,6 +2,7 @@
 
 #include "../inc/cluster.hpp"
 #include "../inc/point.hpp"
+#include "../inc/timeSeries.hpp"
 
 Cluster::Cluster(int dimension) {
     this->dimension = dimension;
@@ -48,28 +49,38 @@ std::list<Point *>& Cluster::getClusteredPoints(){
     return this->clusteredPoints;
 }
 
-double Cluster::recenter() {
+double Cluster::recenter(int metric) {
 
     //if cluster has no points return -1
     if (!this->clusteredPoints.size()) {
         return -1;
     }
-
-    //calculate average vector/point and set it as new centroid
-    std::vector<double> average(this->dimension, 0);
-    for (auto v: this->clusteredPoints) {
-        for (int i = 0; i < this->dimension; i++) {
-            average[i] += v->getVector()[i];
+    double moved;
+    if(metric == 0){
+        //calculate average vector/point and set it as new centroid
+        std::vector<double> average(this->dimension, 0);
+        for (auto v: this->clusteredPoints) {
+            for (int i = 0; i < this->dimension; i++) {
+                average[i] += v->getVector()[i];
+            }
         }
+
+        for (int i = 0; i < this->dimension; i++) {
+            average[i] /= this->clusteredPoints.size();
+        }
+
+        moved = this->centroid.l2Distance(average);
+        this->centroid.setVector(average);
     }
-
-    for (int i = 0; i < this->dimension; i++) {
-        average[i] /= this->clusteredPoints.size();
+    else if(metric == 1){
+        std::vector<std::vector<Observation>> clusterCurves;
+        for (auto point: this->clusteredPoints) {
+            clusterCurves.push_back(point->getTimeSeries()->getVector());
+        }
+        std::vector<Observation> updatedCurve = meanCurve(clusterCurves);
+        moved = this->getCentroid().getTimeSeries()->discreteFrechetDistance(updatedCurve);
+        this->getCentroid().getTimeSeries()->setVector(updatedCurve);
     }
-
-    double moved = this->centroid.l2Distance(average);
-    this->centroid.setVector(average);
-
     return moved;
 }
 

@@ -10,6 +10,7 @@
 #include "../inc/readInput.hpp"
 #include "../inc/point.hpp"
 #include "../inc/cluster.hpp"
+#include "../inc/timeSeries.hpp"
 
 Kmeans::Kmeans(unsigned int dimension, unsigned int numOfClusters) : dimension(dimension),
                                                                      numOfClusters(numOfClusters) {
@@ -29,7 +30,7 @@ int Kmeans::addPoint(Point *point) {
     return 0;
 }
 
-int Kmeans::initializeCentroids(std::list<Point *> &points, centroidInitializationMethod method){
+int Kmeans::initializeCentroids(std::list<Point *> &points, centroidInitializationMethod method, int metric){
 
     //make sure there are less clusters than points
     if(this->numOfClusters > points.size() || this->numOfClusters <= 0){
@@ -44,7 +45,7 @@ int Kmeans::initializeCentroids(std::list<Point *> &points, centroidInitializati
     if (method == Random) {
         if(this->findRandomCentroids(points, this->numOfClusters, centroids) < 0) return -1;
     } else if (method == PlusPlus) {
-        if(this->findPlusPlusCentroids(points, this->numOfClusters, centroids) < 0) return -1;
+        if(this->findPlusPlusCentroids(points, this->numOfClusters, centroids, metric) < 0) return -1;
     } else {
         return -1;
     }
@@ -57,9 +58,9 @@ int Kmeans::initializeCentroids(std::list<Point *> &points, centroidInitializati
     return 0;
 }
 
-int Kmeans::computeLoyd(double iterThreshold, unsigned int maxIters, centroidInitializationMethod method) {
+int Kmeans::computeLoyd(double iterThreshold, unsigned int maxIters, centroidInitializationMethod method, int metric) {
 
-    if(initializeCentroids(this->points, method) < 0) return -1;
+    if(initializeCentroids(this->points, method, metric) < 0) return -1;
 
     double dist, minDist;
     unsigned int minIndex;
@@ -79,7 +80,12 @@ int Kmeans::computeLoyd(double iterThreshold, unsigned int maxIters, centroidIni
             minDist = DBL_MAX;
             minIndex = -1;
             for (unsigned i = 0; i < this->numOfClusters; i++) {
-                dist = clusters[i].getCentroid().l2Distance(point);
+                if(metric == 0){
+                    dist = clusters[i].getCentroid().l2Distance(point);
+                }
+                else if(metric == 1){
+                    dist = clusters[i].getCentroid().getTimeSeries()->discreteFrechetDistance(point->getTimeSeries());
+                }
                 if (dist <= minDist) {
                     minDist = dist;
                     minIndex = i;
@@ -93,7 +99,7 @@ int Kmeans::computeLoyd(double iterThreshold, unsigned int maxIters, centroidIni
 
         //recenter the centroids based on the average distance from their points
         for (unsigned int i = 0; i < this->numOfClusters; i++) {
-            sumOfCentroidMoves += this->clusters[i].recenter();
+            sumOfCentroidMoves += this->clusters[i].recenter(metric);
         }
 
         std::cout << "Total centroid movement: " << sumOfCentroidMoves << std::endl;
@@ -111,7 +117,7 @@ int Kmeans::computeLoyd(double iterThreshold, unsigned int maxIters, centroidIni
 }
 
 int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitializationMethod method,
-                       int buckets, int L, int k, int w) {
+                       int buckets, int L, int k, int w, int metric) {
 
     double minDistance;
     double distance;
@@ -337,11 +343,13 @@ int Kmeans::findRandomCentroids(std::list<Point *> &points, unsigned int k, std:
     std::random_shuffle(std::begin(shuffledPoints), std::end(shuffledPoints));
     for (unsigned int i = 0; i < k; i++) {
         centroids.push_back(shuffledPoints[i]);
+        TimeSeries* ts = new TimeSeries(shuffledPoints[i]);
+        centroids[centroids.size()-1]->setTimeSeries(ts);
     }
     return 0;
 }
 
-int Kmeans::findPlusPlusCentroids(std::list<Point *> &points, unsigned int k, std::vector<Point *> &centroids) {
+int Kmeans::findPlusPlusCentroids(std::list<Point *> &points, unsigned int k, std::vector<Point *> &centroids, int metric) {
     int size = points.size();
     if(size <= 0){
         return -1;
@@ -350,6 +358,8 @@ int Kmeans::findPlusPlusCentroids(std::list<Point *> &points, unsigned int k, st
     std::vector <Point *> shuffledPoints(points.begin(), points.end());
     std::random_shuffle(std::begin(shuffledPoints), std::end(shuffledPoints));
     centroids.push_back(shuffledPoints[0]); //assign 1 centroid at random
+    TimeSeries* ts = new TimeSeries(shuffledPoints[0]);
+    centroids[0]->setTimeSeries(ts);
     shuffledPoints.erase(shuffledPoints.begin());
     k--;
 
@@ -366,7 +376,12 @@ int Kmeans::findPlusPlusCentroids(std::list<Point *> &points, unsigned int k, st
         for (auto point: shuffledPoints) {
             for (auto centroid: centroids) {
 
-                dist = point->l2Distance(centroid);
+                if(metric == 0){
+                    dist = point->l2Distance(centroid);
+                }
+                else if(metric == 1){
+                    dist = point->getTimeSeries()->discreteFrechetDistance(centroid->getTimeSeries()->getVector());
+                }
                 
                 dist = dist * dist;
 
@@ -414,6 +429,8 @@ int Kmeans::findPlusPlusCentroids(std::list<Point *> &points, unsigned int k, st
 
         //add it to the centroids list
         centroids.push_back(chosenPoint);
+        ts = new TimeSeries(chosenPoint);
+        centroids[centroids.size()-1]->setTimeSeries(ts);
 
         //delete it from the points list
         std::vector<Point *>::iterator it;

@@ -118,6 +118,11 @@ std::vector<Observation>& TimeSeries::getVector(){
     return this->observations;
 }
 
+int TimeSeries::setVector(std::vector<Observation> observations){
+    this->observations = observations;
+    return 0;
+}
+
 double observationDistance(Observation& obs1, Observation& obs2){
     return sqrt(pow(obs1.x - obs2.x, 2) + pow(obs1.y - obs2.y, 2));
 }

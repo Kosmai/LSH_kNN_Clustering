@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include "../inc/point.hpp"
+#include "../inc/timeSeries.hpp"
 
 Point::Point() {
     this->id = "Uninitialized";
@@ -8,7 +9,6 @@ Point::Point() {
 }
 
 Point::Point(std::vector<double> &vec, const std::string &id) {
-    //copy constructor
     this->vec = vec;
     this->id = id;
     this->clusterIndex = -1;
@@ -20,7 +20,7 @@ Point &Point::operator=(const Point &copy) {
     this->vec = copy.vec;
     this->id = copy.id;
     this->clusterIndex = copy.clusterIndex;
-    this->timeSeries = copy.timeSeries;
+    this->timeSeries = nullptr;
 
     return *this;
 }
