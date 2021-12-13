@@ -1,0 +1,64 @@
+Query: 1
+Nearest Neighbor-1: azpn
+distanceLSH: 4.974005
+distanceTrue: 3.885945
+Nearest Neighbor-2: a
+distanceLSH: 4.984076
+distanceTrue: 3.976832
+Nearest Neighbor-3: kyo
+distanceLSH: 5.720090
+distanceTrue: 4.265866
+Nearest Neighbor-4: lvs
+distanceLSH: 6.030000
+distanceTrue: 4.300526
+Nearest Neighbor-5: oxy
+distanceLSH: 6.124998
+distanceTrue: 4.330858
+Nearest Neighbor-6: eemx
+distanceLSH: 6.276193
+distanceTrue: 4.874673
+Nearest Neighbor-7: ftv
+distanceLSH: 7.009000
+distanceTrue: 4.905018
+Nearest Neighbor-8: b
+distanceLSH: 7.306753
+distanceTrue: 4.974005
+Nearest Neighbor-9: splk
+distanceLSH: 8.112067
+distanceTrue: 4.984076
+Nearest Neighbor-10: oflx
+distanceLSH: 8.415864
+distanceTrue: 5.001000
+Nearest Neighbor-11: cone
+distanceLSH: 8.429525
+distanceTrue: 5.014718
+Nearest Neighbor-12: ebix
+distanceLSH: 9.525738
+distanceTrue: 5.152963
+Nearest Neighbor-13: ese
+distanceLSH: 10.209094
+distanceTrue: 5.270636
+Nearest Neighbor-14: ctws
+distanceLSH: 10.340000
+distanceTrue: 5.274692
+Nearest Neighbor-15: whg
+distanceLSH: 10.613599
+distanceTrue: 5.426929
+Nearest Neighbor-16: ngg
+distanceLSH: 11.123043
+distanceTrue: 5.488862
+Nearest Neighbor-17: prta
+distanceLSH: 11.364084
+distanceTrue: 5.628000
+Nearest Neighbor-18: pnc-ws
+distanceLSH: 11.398828
+distanceTrue: 5.720090
+Nearest Neighbor-19: jbss
+distanceLSH: 11.623807
+distanceTrue: 5.837860
+Nearest Neighbor-20: soda
+distanceLSH: 11.743559
+distanceTrue: 5.841235
+tLSH : 4.002382
+tTrue: 764.630766
+R-near neighbors:

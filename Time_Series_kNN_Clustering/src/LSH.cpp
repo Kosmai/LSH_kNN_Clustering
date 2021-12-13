@@ -110,16 +110,22 @@ static bool equal(Neighbor* a, Neighbor* b) {
 }
 
 void LSH::bruteForceSearch(Point &queryPoint, int metric = 0){
+    std::cout<<"Brute Forcing"<<std::endl;
+    int i = 0;
     std::list<Point*>::iterator it;
     for (it = points.begin(); it != points.end(); ++it) {
+        std::cout<<++i<<std::endl;
 
         Neighbor* candidate = new Neighbor;
         candidate->point = (Point*)(*it);
         if(metric == 0){
             candidate->distance = queryPoint.l2Distance((Point*)(*it));
         }
-        else if(metric == 1 || metric == 2){
+        else if(metric == 1){
             candidate->distance = queryPoint.getTimeSeries()->discreteFrechetDistance(candidate->point->getTimeSeries());
+        }
+        else if(metric == 2){
+            candidate->distance = queryPoint.getTimeSeries()->continuousFrechetDistance(candidate->point->getTimeSeries());
         }
 
         realNeighbors.push_back(candidate);
@@ -128,6 +134,7 @@ void LSH::bruteForceSearch(Point &queryPoint, int metric = 0){
 }
 
 int LSH::LSHSearch(Point &queryPoint, int metric = 0) {
+    std::cout<<"LSH Searching"<<std::endl;
 
     //make sure the query point is valid
     if (queryPoint.getDimension() != this->dims) {
@@ -161,8 +168,11 @@ int LSH::LSHSearch(Point &queryPoint, int metric = 0) {
                 if(metric == 0){
                     candidate->distance = queryPoint.l2Distance((*it)->data);
                 }
-                else if(metric == 1 || metric == 2){
+                else if(metric == 1){
                     candidate->distance = queryPoint.getTimeSeries()->discreteFrechetDistance((*it)->data->getTimeSeries());
+                }
+                else if(metric == 2){
+                    candidate->distance = queryPoint.getTimeSeries()->continuousFrechetDistance((*it)->data->getTimeSeries());
                 }
 
                 LSHNeighbors.push_back(candidate);
