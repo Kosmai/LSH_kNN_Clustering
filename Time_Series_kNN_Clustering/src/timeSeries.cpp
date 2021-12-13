@@ -2,6 +2,7 @@
 #include <cmath>
 #include "../inc/point.hpp"
 #include "../inc/timeSeries.hpp"
+#include "../fred/include/frechet.hpp"
 
 TimeSeries::TimeSeries(Point* point){
     int i = 0;
@@ -125,6 +126,33 @@ int TimeSeries::setVector(std::vector<Observation> observations){
 
 double observationDistance(Observation& obs1, Observation& obs2){
     return sqrt(pow(obs1.x - obs2.x, 2) + pow(obs1.y - obs2.y, 2));
+}
+
+double TimeSeries::continuousFrechetDistance(TimeSeries* otherTs){
+    return continuousFrechetDistance(otherTs->getVector());
+}
+
+double TimeSeries::continuousFrechetDistance(std::vector <Observation>& otherObservations) {
+    double distance;
+    Curve ts1(2,"ts1");
+    Curve ts2(2,"ts2");
+    //create curves from timeseries
+    for(auto observation: this->observations){
+        FredPoint p(2);
+        p.set(0, observation.x);
+        p.set(1, observation.y);
+        ts1.push_back(p);
+    }
+    for(auto observation: otherObservations){
+        FredPoint p(2);
+        p.set(0, observation.x);
+        p.set(1, observation.y);
+        ts2.push_back(p);
+    }
+    //calculate continuous frechet distance
+    distance = Frechet::Continuous::distance(ts1, ts2).value;
+
+    return distance;
 }
 
 double TimeSeries::discreteFrechetDistance(TimeSeries* otherTs) {
