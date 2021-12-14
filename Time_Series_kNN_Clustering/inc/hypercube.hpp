@@ -75,4 +75,6 @@ public:
 	double averageRatio   = 0;
 	double worstDistance  = DBL_MIN;
 	int successfulQueries = 0;
+	double totalTimeApproximate; //used to compute average time per query
+	double totalTimeTrue;        //same for brute force
 };

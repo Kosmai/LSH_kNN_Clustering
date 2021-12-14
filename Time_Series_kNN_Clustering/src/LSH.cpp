@@ -22,6 +22,8 @@ LSH::LSH(int dims, int buckets, int L, int k, int w)
         hashTables[i] = HashTable(buckets);
         gFunctions[i] = HashFunctionG(k, w, dims);
     }
+    this->totalTimeApproximate = 0;
+    this->totalTimeTrue = 0;
 }
 
 LSH::LSH(const LSH &copy)
@@ -184,7 +186,7 @@ int LSH::LSHSearch(Point &queryPoint, int metric = 0) {
 }
 
 
-void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN){
+void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN, int metric){
 
     double avgRatio = 0;
     double dist;
@@ -193,6 +195,14 @@ void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN){
     //Print query ID
     fprintf(fp, "Query: %s\n", queryPoint.getId().c_str());
 
+    //Print algorithm
+    switch(metric){
+        case 0:fprintf(fp, "Algorithm: LSH_Vector\n"); break;
+        case 1:fprintf(fp, "Algorithm: LSH_Frechet_Discrete\n"); break;
+        case 2:fprintf(fp, "Algorithm: LSH_Frechet_Continuous\n"); break;
+        default: fprintf(fp, "Algorithm: Unknown\n");
+    }
+
     //Print K nearest neighbors
     std::list<Neighbor*>::iterator LSHIterator = LSHNeighbors.begin();
     std::list<Neighbor*>::iterator realIterator = realNeighbors.begin();
@@ -200,7 +210,7 @@ void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN){
     for(i = 0; i < numOfNN; i++){
 
         if(LSHIterator != LSHNeighbors.end() && realIterator == realNeighbors.end()){
-            fprintf(fp, "Nearest Neighbor-%d: %s\n", i+1, (*LSHIterator)->point->getId().c_str());
+            fprintf(fp, "Approximate Nearest Neighbor: %s\n", (*LSHIterator)->point->getId().c_str());
             fprintf(fp, "distanceLSH: %lf\n", (double)(*LSHIterator)->distance);
             LSHIterator++;
             continue;
@@ -211,9 +221,11 @@ void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN){
             break;
         }
 
-        fprintf(fp, "Nearest Neighbor-%d: %s\n", i+1, (*LSHIterator)->point->getId().c_str());
-        fprintf(fp, "distanceLSH: %lf\n", (double)(*LSHIterator)->distance);
+        fprintf(fp, "Approximate Nearest Neighbor: %s\n", (*LSHIterator)->point->getId().c_str());
+        fprintf(fp, "True Nearest Neighbor: %s\n", (*realIterator)->point->getId().c_str());
+        fprintf(fp, "distanceApproximate: %lf\n", (double)(*LSHIterator)->distance);
         fprintf(fp, "distanceTrue: %lf\n", (double)(*realIterator)->distance);
+        
 
         //used for debugging purposes
         dist = (double)(*LSHIterator)->distance / (double)(*realIterator)->distance;
@@ -255,28 +267,14 @@ int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, doub
     auto LSH_us = duration_cast<microseconds>(LSH_t2 - LSH_t1);
     auto brute_us = duration_cast<microseconds>(brute_t2 - brute_t1);
 
-    displayResults(queryPoint, fp, numOfNN);
+    displayResults(queryPoint, fp, numOfNN, metric);
 
-    fprintf(fp, "tLSH : %.6lf\n", (double)LSH_us.count()/1000000);
-    fprintf(fp, "tTrue: %.6lf\n", (double)brute_us.count()/1000000);
+    this->totalTimeApproximate += (double)LSH_us.count()/1000000;
+    this->totalTimeTrue += (double)brute_us.count()/1000000;
 
-    printf("tLSH : %.6lf\n", (double)LSH_us.count()/1000000);
-    printf("tTrue: %.6lf\n", (double)brute_us.count()/1000000);
+    printf("tApproximateAverage : %.6lf\n", (double)LSH_us.count()/1000000);
+    printf("tTrueAverage: %.6lf\n", (double)brute_us.count()/1000000);
     printf("---------------\n");
-
- 
-    fprintf(fp, "R-near neighbors:\n");
-
-    std::list<Neighbor*>::iterator it;
-
-    for (it = LSHNeighbors.begin(); it != LSHNeighbors.end(); ++it) {
-
-        if((*it)->distance > r){
-            break;
-        }
-
-        fprintf(fp, "%s\n",(*it)->point->getId().c_str());
-    }
     
     return 0;
 }

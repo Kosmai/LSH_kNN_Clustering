@@ -24,6 +24,8 @@ Hypercube::Hypercube(int dims, int buckets, int L, int k, int w)
         hashTables[i] = HashTable(buckets);
         fFunctions[i] = HashFunctionF(k, w, dims);
     }
+    this->totalTimeApproximate = 0;
+    this->totalTimeTrue = 0;
 }
 
 Hypercube::Hypercube(const Hypercube &copy)
@@ -185,6 +187,7 @@ void Hypercube::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN
 
     //Print query ID
     fprintf(fp, "Query: %s\n", queryPoint.getId().c_str());
+    fprintf(fp, "Algorithm: Hypercube\n");
 
     //Print K nearest neighbors
     std::list<Neighbor*>::iterator HyperIterator = HyperNeighbors.begin();
@@ -201,8 +204,9 @@ void Hypercube::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN
             break;
         }
 
-        fprintf(fp, "Nearest Neighbor-%d: %s\n", i+1, (*HyperIterator)->point->getId().c_str());
-        fprintf(fp, "distanceHypercube: %lf\n", (double)(*HyperIterator)->distance);
+        fprintf(fp, "Approximate Nearest Neighbor: %s\n", (*HyperIterator)->point->getId().c_str());
+        fprintf(fp, "True Nearest Neighbor: %s\n", (*realIterator)->point->getId().c_str());
+        fprintf(fp, "distanceApproximate: %lf\n", (double)(*HyperIterator)->distance);
         fprintf(fp, "distanceTrue: %lf\n", (double)(*realIterator)->distance);
 
         //used for debugging purposes
@@ -246,26 +250,12 @@ int Hypercube::calculateNN(Point &queryPoint, FILE* fp, int M, int probes, unsig
 
     displayResults(queryPoint, fp, numOfNN, r);
 
-    fprintf(fp, "tHypercube:  %.6lf\n", (double)Hyper_us.count()/1000000);
-    fprintf(fp, "tTrue: %.6lf\n", (double)brute_us.count()/1000000);
+    this->totalTimeApproximate += (double)Hyper_us.count()/1000000;
+    this->totalTimeTrue += (double)brute_us.count()/1000000;
 
-    printf("tHyper: %.6lf\n", (double)Hyper_us.count()/1000000);
-    printf("tTrue : %.6lf\n", (double)brute_us.count()/1000000);
+    printf("tApproximateAverage: %.6lf\n", (double)Hyper_us.count()/1000000);
+    printf("tTrueAverage : %.6lf\n", (double)brute_us.count()/1000000);
     printf("----------------\n");
-
-    fprintf(fp, "R-near neighbors:\n");
-
-    std::list<Neighbor*>::iterator it;
-
-    for (it = HyperNeighbors.begin(); it != HyperNeighbors.end(); ++it) {
-
-        if((*it)->distance > r){
-            break;
-        }
-
-        fprintf(fp, "%s\n",(*it)->point->getId().c_str());
-
-    }
 
     return 0;
 }

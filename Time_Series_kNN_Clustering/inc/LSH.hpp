@@ -40,7 +40,7 @@ private:
     int LSHSearch(Point& queryPoint, int metric);
 
     //print the results in output file fp
-	void displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN);
+	void displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN, int metric);
 
 public:
 	//constructors-destructors
@@ -84,4 +84,6 @@ public:
 	double averageRatio   = 0;
 	double worstDistance  = DBL_MIN;
 	int successfulQueries = 0;
+	double totalTimeApproximate; //used to compute average time per query
+	double totalTimeTrue;        //same for brute force
 };

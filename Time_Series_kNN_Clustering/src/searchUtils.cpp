@@ -13,7 +13,7 @@
 #include "../inc/searchUtils.hpp"
 #include "../inc/timeSeries.hpp"
 
-#define W_LSH_MULTIPLIER 0.1
+#define W_LSH_MULTIPLIER 0.4
 #define W_CUBE_MULTIPLIER 0.2
 #define BUCKET_DIVISOR 4
 
@@ -179,10 +179,17 @@ int searchLoop(LSH& lsh, std::string queryFile, std::string outputFile, int numO
 			}
 		}
 
+		//print average time in output file
+		fprintf(outfp, "\ntApproximateAverage: %lf\n", lsh.totalTimeApproximate/lsh.successfulQueries);
+		fprintf(outfp, "tTrueAverage: %lf\n" , lsh.totalTimeTrue/lsh.successfulQueries);
+		fprintf(outfp, "MAF: %lf\n" , lsh.worstDistance);
+
 		//statistics
 		if(lsh.successfulQueries > 0 && disableBruteForce == false){
 			std::cout << "Statistics" << std::endl;
 			std::cout << "--------------------------------------------------" << std::endl;
+			std::cout << "tApproximateAverage: " << lsh.totalTimeApproximate/lsh.successfulQueries << std::endl;
+			std::cout << "tTrueAverage: " << lsh.totalTimeTrue/lsh.successfulQueries << std::endl;
 			std::cout << "Average predicted/true distance ratio: " << lsh.averageRatio/lsh.successfulQueries << std::endl;
 			std::cout << "Worst   predicted/true distance ratio: " << lsh.worstDistance << std::endl;
 			std::cout << "--------------------------------------------------" << std::endl;
@@ -247,10 +254,17 @@ int searchLoop(Hypercube& cube, std::string queryFile, std::string outputFile, i
 			cube.calculateNN(*queries[i], outfp, m, probes, numOfNearest, radius);
 		}
 
+		//print average time in output file
+		fprintf(outfp, "\ntApproximateAverage: %lf\n", cube.totalTimeApproximate/cube.successfulQueries);
+		fprintf(outfp, "tTrueAverage: %lf\n" , cube.totalTimeTrue/cube.successfulQueries);
+		fprintf(outfp, "MAF: %lf\n" , cube.worstDistance);
+
 		//statistics
 		if(cube.successfulQueries > 0){
 			std::cout << "Statistics" << std::endl;
 			std::cout << "--------------------------------------------------" << std::endl;
+			std::cout << "tApproximateAverage: " << cube.totalTimeApproximate/cube.successfulQueries << std::endl;
+			std::cout << "tTrueAverage: " << cube.totalTimeTrue/cube.successfulQueries << std::endl;
 			std::cout << "Average predicted/true distance ratio: " << cube.averageRatio/cube.successfulQueries << std::endl;
 			std::cout << "Worst   predicted/true distance ratio: " << cube.worstDistance << std::endl;
 			std::cout << "--------------------------------------------------" << std::endl;

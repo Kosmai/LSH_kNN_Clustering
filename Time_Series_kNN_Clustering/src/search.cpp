@@ -24,14 +24,14 @@ int main(int argc, char **argv) {
 	std::string queryFile  = "datasets/our_query.csv";
 	std::string outputFile = "out.txt";
 	std::string algorithm = "Frechet";
-	std::string metric = "continuous";
+	std::string metric = "discrete";
 
 	int dims;
 	int k = 4;
 	int l = 5;
 	int m = 50;
     int probes = 25;
-	int numOfNearest = 20;
+	int numOfNearest = 10;
 	double radius = 0.0;
 	double delta = 1;
 	double w;
@@ -78,10 +78,14 @@ int main(int argc, char **argv) {
 			lsh = initializeLSH(dims, l, k, w, timeSeries, -1, -1, e);
 			if(searchLoop(*lsh, queryFile, outputFile, numOfNearest, radius, CONT_FRECHET, -1, -1, e, disableBruteForce) < 0) return 2;
 		}
+		else{
+			std::cout << "Unknown metric entered" << std::endl;
+			return 3;
+		}
 	}
 	else{
 		std::cout << "Unknown algorithm entered" << std::endl;
-		return 3;
+		return 4;
 	}
 
 	//free all memory
