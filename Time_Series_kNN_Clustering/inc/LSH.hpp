@@ -61,7 +61,7 @@ public:
 
 	//uses private search methods and filters their results using r (radius) and numOfNN
 	//outputs the results in the output file fp
-	int calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN, double r, int metric);
+	int calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN, double r, int metric, bool disableBruteForce);
 
 	//used for clustering
 	void getNearestByR(double r , Cluster* clusters, int currentCluster, int metric = 0);

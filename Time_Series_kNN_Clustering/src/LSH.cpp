@@ -110,11 +110,9 @@ static bool equal(Neighbor* a, Neighbor* b) {
 }
 
 void LSH::bruteForceSearch(Point &queryPoint, int metric = 0){
-    std::cout<<"Brute Forcing"<<std::endl;
-    int i = 0;
+
     std::list<Point*>::iterator it;
     for (it = points.begin(); it != points.end(); ++it) {
-        std::cout<<++i<<std::endl;
 
         Neighbor* candidate = new Neighbor;
         candidate->point = (Point*)(*it);
@@ -134,8 +132,7 @@ void LSH::bruteForceSearch(Point &queryPoint, int metric = 0){
 }
 
 int LSH::LSHSearch(Point &queryPoint, int metric = 0) {
-    std::cout<<"LSH Searching"<<std::endl;
-
+    
     //make sure the query point is valid
     if (queryPoint.getDimension() != this->dims) {
         return -1;
@@ -202,6 +199,13 @@ void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN){
 
     for(i = 0; i < numOfNN; i++){
 
+        if(LSHIterator != LSHNeighbors.end() && realIterator == realNeighbors.end()){
+            fprintf(fp, "Nearest Neighbor-%d: %s\n", i+1, (*LSHIterator)->point->getId().c_str());
+            fprintf(fp, "distanceLSH: %lf\n", (double)(*LSHIterator)->distance);
+            LSHIterator++;
+            continue;
+        }
+
         //while there are more points
         if(LSHIterator == LSHNeighbors.end() || realIterator == realNeighbors.end()){
             break;
@@ -231,7 +235,7 @@ void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN){
     }
 }
 
-int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, double r = -1.0, int metric = 0){
+int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, double r = -1.0, int metric = 0, bool disableBruteForce = false){
 
     using std::chrono::high_resolution_clock;
     using std::chrono::duration_cast;
@@ -243,7 +247,9 @@ int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, doub
     auto LSH_t2 = high_resolution_clock::now();
 
     auto brute_t1 = high_resolution_clock::now();
-    bruteForceSearch(queryPoint, metric);
+    if(!disableBruteForce){
+        bruteForceSearch(queryPoint, metric);
+    }
     auto brute_t2 = high_resolution_clock::now();
 
     auto LSH_us = duration_cast<microseconds>(LSH_t2 - LSH_t1);

@@ -1,7 +1,8 @@
 #include <iostream>
 #include <vector>
-
+#include <gtest/gtest.h>
 #include <map>
+
 #include "../inc/randGen.hpp"
 #include "../inc/point.hpp"
 #include "../inc/LSH.hpp"
@@ -9,7 +10,6 @@
 #include "../inc/timeSeries.hpp"
 #include "../inc/hashTable.hpp"
 #include "../inc/cluster.hpp"
-#include <gtest/gtest.h>
 
 /*----------------------*/
 /* Point Module Testing */

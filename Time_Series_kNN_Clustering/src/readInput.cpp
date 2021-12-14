@@ -81,6 +81,45 @@ int readLshArguments(int argc, char **argv, std::string &inputFile, std::string 
     return 0;
 }
 
+int readSearchArguments(int argc, char** argv, std::string &inputFile, std::string &queryFile, int &k, int &l, int &m, int &probes,
+    std::string &outputFile, std::string &algorithm, std::string &metric, double &delta, bool &disableBruteForce) {
+
+    //read arguments
+    for (int i = 1; i < argc; i += 2) {
+        if (std::string(argv[i]).compare("-i") == 0 && i + 1 < argc) {
+            inputFile = argv[i + 1];
+        } else if (std::string(argv[i]).compare("-q") == 0 && i + 1 < argc) {
+            queryFile = argv[i + 1];
+        } else if (std::string(argv[i]).compare("-k") == 0 && i + 1 < argc) {
+            k = atoi(argv[i + 1]);
+        } else if (std::string(argv[i]).compare("-L") == 0 && i + 1 < argc) {
+            l = atoi(argv[i + 1]);
+        } else if (std::string(argv[i]).compare("-M") == 0 && i + 1 < argc) {
+            m = atoi(argv[i + 1]);
+        } else if (std::string(argv[i]).compare("-probes") == 0 && i + 1 < argc) {
+            probes = atoi(argv[i + 1]);
+        } else if (std::string(argv[i]).compare("-o") == 0 && i + 1 < argc) {
+            outputFile = argv[i + 1];
+        } else if (std::string(argv[i]).compare("-algorithm") == 0 && i + 1 < argc) {
+            algorithm = argv[i + 1];
+        } else if (std::string(argv[i]).compare("-metric") == 0 && i + 1 < argc) {
+            metric = argv[i + 1];
+        } else if (std::string(argv[i]).compare("-delta") == 0 && i + 1 < argc) {
+            delta = atof(argv[i + 1]);
+        } else if (std::string(argv[i]).compare("-disableBF") == 0) {
+            disableBruteForce = true;
+            i--;
+        } else {
+            //unknown argument
+            return -1;
+        }
+    }
+
+    return 0;
+
+}
+
+
 int readHyperArguments(int argc, char **argv, std::string &inputFile, std::string &queryFile, int &k, int &m, int &probes,
                    std::string &outputFile, int &numOfNearest, double &radius) {
 

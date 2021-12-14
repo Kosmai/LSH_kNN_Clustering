@@ -119,7 +119,7 @@ void printParameters(int k, int l, int numOfNearest, double radius, int w){
 	return;
 }
 
-int searchLoop(LSH& lsh, std::string queryFile, std::string outputFile, int numOfNearest, double radius, int metric, double dx, double dy, double filter_e){
+int searchLoop(LSH& lsh, std::string queryFile, std::string outputFile, int numOfNearest, double radius, int metric, double dx, double dy, double filter_e, bool disableBruteForce){
 
 	std::vector<Point*> queries;
 
@@ -163,22 +163,24 @@ int searchLoop(LSH& lsh, std::string queryFile, std::string outputFile, int numO
 		//run the algorithm
 		for(unsigned int i = 0; i < queries.size(); i++){
 			if(metric == 0){
-				lsh.calculateNN(*queries[i], outfp, numOfNearest, radius, metric);
+				lsh.calculateNN(*queries[i], outfp, numOfNearest, radius, metric, disableBruteForce);
 			}
 			if(metric == 1){
 				TimeSeries t1(queries[i]);
 				Point* p = t1.snapToGrid(dx, dy);
-				lsh.calculateNN(*p, outfp, numOfNearest, radius, metric);
+				lsh.calculateNN(*p, outfp, numOfNearest, radius, metric, disableBruteForce);
+				delete p;
 			}
 			if(metric == 2){
 				TimeSeries t1(queries[i]);
 				Point* p = t1.filter(filter_e);
-				lsh.calculateNN(*p, outfp, numOfNearest, radius, metric);
+				lsh.calculateNN(*p, outfp, numOfNearest, radius, metric, disableBruteForce);
+				delete p;
 			}
 		}
 
 		//statistics
-		if(lsh.successfulQueries > 0){
+		if(lsh.successfulQueries > 0 && disableBruteForce == false){
 			std::cout << "Statistics" << std::endl;
 			std::cout << "--------------------------------------------------" << std::endl;
 			std::cout << "Average predicted/true distance ratio: " << lsh.averageRatio/lsh.successfulQueries << std::endl;
