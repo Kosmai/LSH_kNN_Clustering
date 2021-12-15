@@ -151,16 +151,17 @@ int readHyperArguments(int argc, char **argv, std::string &inputFile, std::strin
 }
 
 
-int readClusterArguments(int argc, char **argv, std::string &inputFile, std::string &configFile, bool &complete,
-                         std::string &outputFile, std::string &method) {
+int readClusterArguments(int argc, char **argv, std::string &inputFile, std::string &configFile, std::string &outputFile, 
+                         std::string &update, std::string &assignment, bool &complete, bool &silhouette) {
 
     //keep track of what arguments have been read
     std::map<std::string, bool> argumentsRed;
 
-    argumentsRed["-i"] = false;
-    argumentsRed["-c"] = false;
-    argumentsRed["-o"] = false;
-    argumentsRed["-m"] = false;
+    //argumentsRed["-i"] = false;
+    //argumentsRed["-c"] = false;
+    //argumentsRed["-o"] = false;
+    argumentsRed["-assignment"] = false;
+    argumentsRed["-update"] = false;
 
     //read arguments
     for (int i = 1; i < argc; i += 2) {
@@ -170,15 +171,23 @@ int readClusterArguments(int argc, char **argv, std::string &inputFile, std::str
         } else if (std::string(argv[i]).compare("-c") == 0 && i + 1 < argc) {
             configFile = argv[i + 1];
             argumentsRed["-c"] = true;
-        } else if (std::string(argv[i]).compare("-complete") == 0) {
-            complete = true;
-            i--;
         } else if (std::string(argv[i]).compare("-o") == 0 && i + 1 < argc) {
             outputFile = argv[i + 1];
             argumentsRed["-o"] = true;
-        } else if (std::string(argv[i]).compare("-m") == 0 && i + 1 < argc) {
-            method = argv[i + 1];
-            argumentsRed["-m"] = true;
+        } else if (std::string(argv[i]).compare("-update") == 0 && i + 2 < argc) {
+            update = argv[i + 1];
+            update += argv[i + 2];
+            i++;
+            argumentsRed["-update"] = true;
+        } else if (std::string(argv[i]).compare("-assignment") == 0 && i + 1 < argc) {
+            assignment = argv[i + 1];
+            argumentsRed["-assignment"] = true;
+        } else if (std::string(argv[i]).compare("-complete") == 0) {
+            complete = true;
+            i--;
+        } else if (std::string(argv[i]).compare("-silhouette") == 0) {
+            silhouette = true;
+            i--;
         } else {
             //unknown argument
             return -1;
@@ -188,7 +197,7 @@ int readClusterArguments(int argc, char **argv, std::string &inputFile, std::str
     //check for missing required arguments
     for (std::pair<std::string, bool> arg: argumentsRed) {
         if (!arg.second) {
-            //return -2;
+            return -2;
         }
     }
 

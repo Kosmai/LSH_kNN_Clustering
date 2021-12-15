@@ -26,8 +26,8 @@ int readHyperArguments(int argc, char **argv, std::string &inputFile, std::strin
                     std::string &outputFile, int &numOfNearest, double &radius);
 
 //Parses the argc/argv results of main, negative on error
-int readClusterArguments(int argc, char **argv, std::string &inputFile, std::string &configFile, bool &complete,
-                    std::string &outputFile, std::string &method);
+int readClusterArguments(int argc, char **argv, std::string &inputFile, std::string &configFile, std::string &outputFile, 
+                         std::string &update, std::string &assignment, bool &complete, bool &silhouette);
 
 //Reads the config file "fileName", negative values on error
 int readClusterConfig(const std::string &fileName, int &clusters, int &L, int &k,

@@ -281,7 +281,14 @@ int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, doub
 
 void LSH::getNearestByR(double r, Cluster* clusters, int currentCluster, int metric){
 
-    Point centroid = *(clusters[currentCluster].getCentroid().getTimeSeries()->snapToGrid(1,1));
+    Point centroid;
+    if(metric == 0){
+        centroid = clusters[currentCluster].getCentroid();
+    }
+    else if(metric == 1){
+        centroid = *(clusters[currentCluster].getCentroid().getTimeSeries()->snapToGrid(1,1));
+        centroid.setTimeSeries(clusters[currentCluster].getCentroid().getTimeSeries());
+    }
 
     LSHSearch(centroid, metric);
 

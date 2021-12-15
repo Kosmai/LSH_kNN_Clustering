@@ -22,6 +22,9 @@ Kmeans::Kmeans(unsigned int dimension, unsigned int numOfClusters) : dimension(d
 }
 
 Kmeans::~Kmeans() {
+    for(unsigned int i = 0; i < numOfClusters; i++){
+        delete clusters[i].getCentroid().getTimeSeries();
+    }
     delete[] clusters;
 }
 
@@ -122,7 +125,7 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
     double minDistance;
     double distance;
     int minIndex;
-    int centroidMove;
+    double centroidMove;
     LSH* lsh;
     
     //initialize lsh structure
@@ -257,7 +260,7 @@ int Kmeans::computeHypercube(double maxRadius, unsigned int maxIters, centroidIn
     double minDistance;
     double distance;
     int minIndex;
-    int centroidMove;
+    double centroidMove;
 
     //initialize hypercube structure
     Hypercube* hypercube = new Hypercube(this->dimension, (int)pow(2,d), 1, d, w);
