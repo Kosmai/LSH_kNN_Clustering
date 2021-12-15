@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 	setRandomSeed(seed);
 
     std::string inputFile  = "datasets/nasdaq2017_LQ.csv";
-    inputFile = "datasets/our_input.csv";
+    inputFile = "datasets/nasd_input.csv";
 	std::string configFile  = "config/cluster.conf";
 	std::string outputFile = "out.txt";
 
@@ -46,6 +46,8 @@ int main(int argc, char** argv) {
     int M = 10;
     int d = 3;
     int dims;
+
+    int metric = 1;
 
     std::string method;
 
@@ -113,13 +115,13 @@ int main(int argc, char** argv) {
     if(method == "Classic"){
         fprintf(outfp, "Algorithm: Lloyds\n");
         t1 = high_resolution_clock::now();
-        if(kmeans.computeLoyd(MIN_TOLERACE, MAX_ITERS, Random, 1) < 0) return 3;
+        if(kmeans.computeLoyd(MIN_TOLERACE, MAX_ITERS, Random, metric) < 0) return 3;
         t2 = high_resolution_clock::now();
     }
     else if(method == "LSH"){
         fprintf(outfp, "Algorithm: Range Search LSH\n");
         t1 = high_resolution_clock::now();
-        if(kmeans.computeLSH(MAX_RADIUS, MAX_ITERS, PlusPlus, buckets, L, k, w*W_MULTIPLIER_LSH, 1) < 0) return 3;
+        if(kmeans.computeLSH(MAX_RADIUS, MAX_ITERS, PlusPlus, buckets, L, k, w*W_MULTIPLIER_LSH, metric) < 0) return 3;
         t2 = high_resolution_clock::now();
     }
     else if(method == "Hypercube"){
@@ -148,7 +150,7 @@ int main(int argc, char** argv) {
         return 2;
     }
 
-    //kmeans.displaySilhouette(outfp);
+    kmeans.displaySilhouette(outfp, metric);
 
     //if the complete argument was given, print additional info
     if(complete){

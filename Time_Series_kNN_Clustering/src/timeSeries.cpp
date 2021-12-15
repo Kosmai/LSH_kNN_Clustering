@@ -296,10 +296,10 @@ std::vector<Observation> meanCurve(std::vector<Observation> obs1, std::vector<Ob
         sampledCurve.push_back(meanCurve[i]);
     }
 
-    for(unsigned int i = sampledCurve.size(); i < 120; i++){
+    for(unsigned int i = sampledCurve.size(); i < obs1.size(); i++){
         Observation ob;
         ob.x = i+1;
-        ob.y = 0;
+        ob.y = sampledCurve.back().y;
         sampledCurve.push_back(ob);
     }
 

@@ -100,7 +100,6 @@ int Kmeans::computeLoyd(double iterThreshold, unsigned int maxIters, centroidIni
         //recenter the centroids based on the average distance from their points
         for (unsigned int i = 0; i < this->numOfClusters; i++) {
             sumOfCentroidMoves += this->clusters[i].recenter(metric);
-            std::cout << "Centroid movement: " << sumOfCentroidMoves << std::endl;
         }
 
         std::cout << "Total centroid movement: " << sumOfCentroidMoves << std::endl;
@@ -236,6 +235,14 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
         unsigned int clusterPoints = clusters[i].count();
         std::cout << "Items in cluster " << i << ": " << clusterPoints << std::endl;
         pointsAssigned += clusterPoints; 
+    }
+
+    for(auto lshPoint: lsh->getPoints()){
+        for(auto originalPoint: this->points){
+            if(lshPoint->getId() == originalPoint->getId()){
+                originalPoint->setClusterIndex(lshPoint->getClusterIndex());
+            }
+        }
     }
 
     delete lsh;
@@ -458,7 +465,7 @@ int Kmeans::findPlusPlusCentroids(std::list<Point *> &points, unsigned int k, st
     return 0;
 }
 
-double Kmeans::calculatePointSilhouette(Point *point) {
+double Kmeans::calculatePointSilhouette(Point *point, int metric) {
     double a = 0;
     double b = 0;   
 
@@ -466,7 +473,12 @@ double Kmeans::calculatePointSilhouette(Point *point) {
     //calculate average distance from other points of the same cluster
     for (auto p: clusters[point->getClusterIndex()].getClusteredPoints()) {
         if (p->getId() == point->getId())continue;
-        a += point->l2Distance(p);
+        if(metric == 0){
+            a += point->l2Distance(p);
+        }
+        else if(metric == 1){
+            a += point->getTimeSeries()->discreteFrechetDistance(p->getTimeSeries());
+        }
     }
     int clusterSize = (clusters[point->getClusterIndex()].getClusteredPoints().size());
     if (clusterSize - 1 == 0) {
@@ -483,7 +495,13 @@ double Kmeans::calculatePointSilhouette(Point *point) {
     //calculate average distance from points of the next best cluster
     for (unsigned int i = 0; i < this->numOfClusters; i++) {
         if ((unsigned int) point->getClusterIndex() == i)continue;
-        tempDistance = point->l2Distance(&(clusters[i].getCentroid()));
+        if(metric == 0){
+            tempDistance = point->l2Distance(&(clusters[i].getCentroid()));
+        }
+        else if(metric == 1){
+            tempDistance = point->getTimeSeries()->discreteFrechetDistance(clusters[i].getCentroid().getTimeSeries());
+        }
+
         if (tempDistance <= minDistance) {
             minDistance = tempDistance;
             minIndex = i;
@@ -491,7 +509,13 @@ double Kmeans::calculatePointSilhouette(Point *point) {
     }
 
     for (auto p: clusters[minIndex].getClusteredPoints()) {
-        b += point->l2Distance(p);
+        if(metric == 0){
+            b += point->l2Distance(p);
+        }
+        else if (metric == 1){
+            b += point->getTimeSeries()->discreteFrechetDistance(p->getTimeSeries());
+        }
+
     }
 
     clusterSize = (clusters[minIndex].getClusteredPoints().size());
@@ -510,7 +534,7 @@ double Kmeans::calculatePointSilhouette(Point *point) {
 
 }
 
-void Kmeans::displaySilhouette(FILE* fp) {
+void Kmeans::displaySilhouette(FILE* fp, int metric) {
     std::cout << "--------------------------------------------------" << std::endl;
     std::cout << "Silhouette" << std::endl;
     std::cout << "--------------------------------------------------" << std::endl;
@@ -535,7 +559,8 @@ void Kmeans::displaySilhouette(FILE* fp) {
 
     for (auto p: this->points) {
         if(p->getClusterIndex() == -1)continue;
-        sil = this->calculatePointSilhouette(p);
+        sil = this->calculatePointSilhouette(p, metric);
+        std::cout<<"SIL:"<<sil<<std::endl;
         //std::cout << "Silhouette: " << sil << std::endl;
         averageTotalSilhouette += sil;
         averageSilhouettes[p->getClusterIndex()] += sil;

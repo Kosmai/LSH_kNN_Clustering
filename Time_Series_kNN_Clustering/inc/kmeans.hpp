@@ -45,9 +45,9 @@ public:
     //clusters all points using reverse assignemnt with Hypercube algorithm
     int computeHypercube(double maxRadius, unsigned int maxIters, centroidInitializationMethod, int d, int w, int probes, int M);
     //returns the silhouette value of the point given
-    double calculatePointSilhouette(Point *point);
+    double calculatePointSilhouette(Point *point, int metric = 0);
     //writes all the silhoutte values needed in the fp output file
-    void displaySilhouette(FILE* fp);
+    void displaySilhouette(FILE* fp, int metric = 0);
     //writes clusters in output file fp
     void printClusters(FILE* fp);
     //writes additional info to output file fp

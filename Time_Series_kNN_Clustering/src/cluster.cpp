@@ -71,15 +71,22 @@ double Cluster::recenter(int metric) {
         moved = this->centroid.l2Distance(average);
         this->centroid.setVector(average);
     }
-    else if(metric == 1){
-        std::vector<std::vector<Observation>> clusterCurves;
+    else if(metric == 1) {
+        std::vector <std::vector<Observation>> clusterCurves;
         for (auto point: this->clusteredPoints) {
             clusterCurves.push_back(point->getTimeSeries()->getVector());
         }
-        std::vector<Observation> updatedCurve = meanCurve(clusterCurves);
+        std::vector <Observation> updatedCurve = meanCurve(clusterCurves);
         moved = this->getCentroid().getTimeSeries()->discreteFrechetDistance(updatedCurve);
         this->getCentroid().getTimeSeries()->setVector(updatedCurve);
+
+        std::vector<double> vec;
+        for (auto v: updatedCurve) {
+            vec.push_back(v.y);
+        }
+        this->getCentroid().setVector(vec);
     }
+
     return moved;
 }
 
