@@ -14,7 +14,7 @@
 #include "../inc/timeSeries.hpp"
 #include "../inc/clusteringUtils.hpp"
 
-#define MAX_ITERS 1
+#define MAX_ITERS 5
 #define MAX_RADIUS 55000
 #define MIN_TOLERACE 0.05
 #define W_MULTIPLIER_LSH 1.5
@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
 	setRandomSeed(seed);
 
     std::string inputFile  = "datasets/nasdaq2017_LQ.csv";
-    inputFile = "datasets/nasd_input.csv";
+    inputFile = "datasets/mini_input";
 	std::string configFile  = "config/cluster.conf";
 	std::string outputFile = "out.txt";
 
@@ -99,7 +99,7 @@ int main(int argc, char** argv) {
     }
 
     //initialize kmeans structure and add all points
-    Kmeans kmeans = Kmeans(dims, clusters);
+    Kmeans kmeans = Kmeans(dims, clusters, metric);
     for(auto point: points){
         kmeans.addPoint(point);
     }

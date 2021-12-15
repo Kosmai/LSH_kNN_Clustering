@@ -286,7 +286,9 @@ void LSH::getNearestByR(double r, Cluster* clusters, int currentCluster, int met
         centroid = clusters[currentCluster].getCentroid();
     }
     else if(metric == 1){
-        centroid = *(clusters[currentCluster].getCentroid().getTimeSeries()->snapToGrid(1,1));
+        Point* tempCentroid = (clusters[currentCluster].getCentroid().getTimeSeries()->snapToGrid(1,1));
+        centroid = *tempCentroid;
+        delete tempCentroid;
         centroid.setTimeSeries(clusters[currentCluster].getCentroid().getTimeSeries());
     }
 

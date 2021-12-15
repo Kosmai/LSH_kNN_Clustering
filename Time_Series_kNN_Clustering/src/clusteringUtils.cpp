@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 
+#include "../inc/clusteringUtils.hpp"
+
 int getMetric(std::string update){
     int metric;
     if(update == "MeanVector"){

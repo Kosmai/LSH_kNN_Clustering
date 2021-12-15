@@ -1,6 +1,6 @@
 CC=g++
 CFLAGS=-Wall
-OBJ=obj/hashFunctionH.o obj/hashFunctionG.o obj/randGen.o obj/hashTable.o obj/readInput.o obj/point.o obj/LSH.o obj/hamming.o obj/LSH.o obj/kmeans.o obj/cluster.o obj/hypercube.o obj/hashFunctionF.o obj/searchUtils.o obj/timeSeries.o
+OBJ=obj/hashFunctionH.o obj/hashFunctionG.o obj/randGen.o obj/hashTable.o obj/readInput.o obj/point.o obj/LSH.o obj/hamming.o obj/LSH.o obj/kmeans.o obj/cluster.o obj/hypercube.o obj/hashFunctionF.o obj/searchUtils.o obj/timeSeries.o obj/clusteringUtils.o
 FREDOBJ=fredobj/config.o fredobj/curve.o fredobj/frechet.o fredobj/fredPoint.o fredobj/interval.o fredobj/simplification.o 
 OBJDIR := obj
 FREDOBJDIR := fredobj

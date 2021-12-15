@@ -9,6 +9,7 @@ enum centroidInitializationMethod {
 
 class Cluster;
 class Point;
+class LSH;
 
 /* This module provides the Kmeans class which is used to store basic parameters and
 functionality for all the Kmeans clustering implementations used (Lloyd, Reverse
@@ -18,8 +19,10 @@ class Kmeans {
 private:
     unsigned int dimension;
     unsigned int numOfClusters;
+    int metric;
     std::list<Point *> points;
     Cluster *clusters;
+    LSH *lsh;
 
     //assigns centroids to all clusters using the given method (Kmeans++ or random assigment)
     int initializeCentroids(std::list<Point *> &points, centroidInitializationMethod method, int metric = 0);
@@ -33,7 +36,7 @@ private:
 public:
     //constructors-destructors
     Kmeans() = delete;
-    Kmeans(unsigned int dimension, unsigned int numOfClusters);
+    Kmeans(unsigned int dimension, unsigned int numOfClusters, int metric);
     ~Kmeans();
 
     //adds a point to the structure

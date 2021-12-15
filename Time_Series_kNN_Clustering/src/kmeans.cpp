@@ -12,9 +12,10 @@
 #include "../inc/cluster.hpp"
 #include "../inc/timeSeries.hpp"
 
-Kmeans::Kmeans(unsigned int dimension, unsigned int numOfClusters) : dimension(dimension),
-                                                                     numOfClusters(numOfClusters) {
+Kmeans::Kmeans(unsigned int dimension, unsigned int numOfClusters, int metric) : dimension(dimension),
+                                                                     numOfClusters(numOfClusters), metric(metric) {
     clusters = new Cluster[numOfClusters];
+    lsh = nullptr;
 
     for (unsigned int i = 0; i < numOfClusters; i++) {
         clusters[i] = Cluster(dimension);
@@ -26,6 +27,12 @@ Kmeans::~Kmeans() {
         delete clusters[i].getCentroid().getTimeSeries();
     }
     delete[] clusters;
+    if(metric == 1 && lsh != nullptr){
+        for(auto lshPoint: lsh->getPoints()){
+            delete lshPoint;
+        }
+    }
+    delete lsh;
 }
 
 int Kmeans::addPoint(Point *point) {
@@ -126,7 +133,6 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
     double distance;
     int minIndex;
     double centroidMove;
-    LSH* lsh;
     
     //initialize lsh structure
     if(metric == 0){
@@ -248,7 +254,6 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
         }
     }
 
-    delete lsh;
     return 0;
 }
 
