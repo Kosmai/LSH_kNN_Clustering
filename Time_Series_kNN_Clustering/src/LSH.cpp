@@ -272,8 +272,8 @@ int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, doub
     this->totalTimeApproximate += (double)LSH_us.count()/1000000;
     this->totalTimeTrue += (double)brute_us.count()/1000000;
 
-    printf("tApproximateAverage : %.6lf\n", (double)LSH_us.count()/1000000);
-    printf("tTrueAverage: %.6lf\n", (double)brute_us.count()/1000000);
+    printf("tApproximate: %.6lf\n", (double)LSH_us.count()/1000000);
+    printf("tTrue: %.6lf\n", (double)brute_us.count()/1000000);
     printf("---------------\n");
     
     return 0;

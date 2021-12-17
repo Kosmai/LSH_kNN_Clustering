@@ -180,16 +180,16 @@ int searchLoop(LSH& lsh, std::string queryFile, std::string outputFile, int numO
 		}
 
 		//print average time in output file
-		fprintf(outfp, "\ntApproximateAverage: %lf\n", lsh.totalTimeApproximate/lsh.successfulQueries);
-		fprintf(outfp, "tTrueAverage: %lf\n" , lsh.totalTimeTrue/lsh.successfulQueries);
+		fprintf(outfp, "\ntApproximateAverage: %lf\n", lsh.totalTimeApproximate/queries.size());
+		fprintf(outfp, "tTrueAverage: %lf\n" , lsh.totalTimeTrue/(queries.size()));
 		fprintf(outfp, "MAF: %lf\n" , lsh.worstDistance);
 
 		//statistics
 		if(lsh.successfulQueries > 0 && disableBruteForce == false){
 			std::cout << "Statistics" << std::endl;
 			std::cout << "--------------------------------------------------" << std::endl;
-			std::cout << "tApproximateAverage: " << lsh.totalTimeApproximate/lsh.successfulQueries << std::endl;
-			std::cout << "tTrueAverage: " << lsh.totalTimeTrue/lsh.successfulQueries << std::endl;
+			std::cout << "tApproximateAverage: " << lsh.totalTimeApproximate/queries.size() << std::endl;
+			std::cout << "tTrueAverage: " << lsh.totalTimeTrue/queries.size() << std::endl;
 			std::cout << "Average predicted/true distance ratio: " << lsh.averageRatio/lsh.successfulQueries << std::endl;
 			std::cout << "Worst   predicted/true distance ratio: " << lsh.worstDistance << std::endl;
 			std::cout << "--------------------------------------------------" << std::endl;

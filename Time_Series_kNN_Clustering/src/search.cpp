@@ -21,17 +21,17 @@ int main(int argc, char **argv) {
 	setRandomSeed(seed);
 
 	std::string inputFile  = "datasets/nasd_input.csv";
-	std::string queryFile  = "datasets/our_query.csv";
-	std::string outputFile = "out.txt";
-	std::string algorithm = "Frechet";
-	std::string metric = "discrete";
+	std::string queryFile  = "datasets/nasd_query.csv";
+	std::string outputFile = "search.out";
+	std::string algorithm = "";
+	std::string metric = "";
 
 	int dims;
 	int k = 4;
 	int l = 5;
 	int m = 50;
     int probes = 25;
-	int numOfNearest = 10;
+	int numOfNearest = 1;
 	double radius = 0.0;
 	double delta = 1;
 	double w;

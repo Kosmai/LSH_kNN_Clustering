@@ -115,6 +115,21 @@ int readSearchArguments(int argc, char** argv, std::string &inputFile, std::stri
         }
     }
 
+    if(inputFile == ""){
+        std::cout << "Give path to input file: ";
+        std::cin >> inputFile;
+    }
+
+    if(algorithm == ""){
+        std::cout << "Give algorithm (LSH/Hypercube/Frechet): ";
+        std::cin >> algorithm;
+    }
+
+    if(algorithm == "Frechet" && metric == ""){
+        std::cout << "Give metric (discrete/continuous): ";
+        std::cin >> metric;
+    }
+
     return 0;
 
 }

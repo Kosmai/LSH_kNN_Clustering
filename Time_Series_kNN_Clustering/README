@@ -47,11 +47,11 @@ https://github.com/Kosmai/LSH_kNN_Clustering
 ->	Για την εύρεση πλησιέστερων γειτόνων αρκεί να εκτελεστεί το εκτελέσιμο search, που έχει παραχθεί με τη
 	μεταγλώττιση, με τα παρακάτω ορίσματα:
 
-	./search -i <input file> -q <query file> -k <int> -L <int> -M <int> -probes <int> -o <output file> -algorithm <LSH/Hypercube/Frechet> -metric <discrete/continuous> -delta <double>
+	./search -i <input file> -q <query file> -k <int> -L <int> -M <int> -probes <int> -o <output file> -algorithm <LSH/Hypercube/Frechet> -metric <discrete/continuous> -delta <double> -disableBF
 
 
 	Παράδειγμα εκτέλεσης:
-	./search -i datasets/nasd_input.csv -q datasets/nasd_query.csv -k ? -L ? -M 1000 -probes 10 -o search.out -algorithm Frechet -metric discrete -delta 1 -disableBruteForce <optional>
+	./search -i datasets/nasd_input.csv -q datasets/nasd_query.csv -k ? -L ? -M 1000 -probes 10 -o search.out -algorithm Frechet -metric discrete -delta 1 -disableBF <optional>
 
 	Το τελευταίο όρισμα εντάχθηκε προκειμένου να αποφευχθεί ο χρόνοβόρος υπολογισμός της προσέγγισης ωμής βίας,
 	κυρίως κατά τη χρήση της συνεχούς εκδοχής της μετρικής Frechet.
