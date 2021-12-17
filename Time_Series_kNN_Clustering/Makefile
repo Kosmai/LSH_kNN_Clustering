@@ -5,9 +5,9 @@ FREDOBJ=fredobj/config.o fredobj/curve.o fredobj/frechet.o fredobj/fredPoint.o f
 OBJDIR := obj
 FREDOBJDIR := fredobj
 
-all: $(OBJDIR) $(FREDOBJDIR) search test clustering
+all: $(OBJDIR) $(FREDOBJDIR) search test cluster
 
-safe: clean $(OBJDIR) $(FREDOBJDIR) search test clustering
+safe: clean $(OBJDIR) $(FREDOBJDIR) search test cluster
 
 obj/%.o: src/%.cpp
 	$(CC) $(CFLAGS) -c -o $@ $^
