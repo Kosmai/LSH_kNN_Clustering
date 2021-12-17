@@ -88,7 +88,7 @@ int LSH::addPoint(Point* p) {
 int LSH::addTimeSeries(TimeSeries* t, double dx, double dy, double filter_e){
    Point* p;
    if(filter_e < 0){
-       p = t->snapToGrid(dx, dy);
+       p = t->snapToGrid(dx, dy, tx, ty);
    }
 
    else{
@@ -354,6 +354,22 @@ double LSH::calculateW(std::vector<Point*> &points){
 	double averageDistance = totalDist /= i*j;
 
 	return averageDistance;
+}
+
+double LSH::getTx(){
+    return this->tx;
+}
+
+double LSH::getTy(){
+    return this->ty;
+}
+
+void LSH::setTx(double tx) {
+    this->tx = tx;
+}
+
+void LSH::setTy(double ty){
+    this->ty = ty;
 }
 
 void LSH::resetStatistics(){

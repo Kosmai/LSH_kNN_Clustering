@@ -15,8 +15,10 @@
 
 #define W_LSH_MULTIPLIER 0.4
 #define W_CUBE_MULTIPLIER 0.2
-#define BUCKET_DIVISOR 4
+#define W_FRECHET_DISCRETE_MULTIPLIER 1
+#define W_FRECHET_CONTINUOUS_MULTIPLIER 1
 
+#define BUCKET_DIVISOR 4
 
 Hypercube* initializeHypercube(int dims, int k, double &w, std::vector<Point*> &points){
 	//initialize w
@@ -39,7 +41,9 @@ LSH* initializeLSH(int dims, int l, int k, double &w, std::vector<Point*> &point
 	//initialize buckets and w
 	std::cout << "Calculating optimal w...";
 	fflush(stdout);
-	w = LSH::calculateW(points)*W_LSH_MULTIPLIER;
+    if(w < 0){
+        w = LSH::calculateW(points)*W_LSH_MULTIPLIER;
+    }
 	int buckets = points.size() >= BUCKET_DIVISOR ? points.size()/BUCKET_DIVISOR : 1;
 	std::cout << "done" << std::endl;
 
@@ -59,6 +63,7 @@ LSH* initializeLSH(int dims, int l, int k, double &w, std::vector<TimeSeries*> &
 	std::cout << "Calculating optimal w...";
 	fflush(stdout);
 	//w = LSH::calculateW(points)*W_LSH_MULTIPLIER;
+
 	int buckets = ts.size() >= BUCKET_DIVISOR ? ts.size()/BUCKET_DIVISOR : 1;
 	std::cout << "done" << std::endl;
 
@@ -67,12 +72,18 @@ LSH* initializeLSH(int dims, int l, int k, double &w, std::vector<TimeSeries*> &
 	LSH* lsh;
 	fflush(stdout);
 	if(filter_e < 0){
+        w = w * W_FRECHET_DISCRETE_MULTIPLIER;
 		lsh = new LSH(2*dims, buckets, l, k, w);
+
+        lsh->setTx(getUniformRandomFloat()*std::min(dx,dy));
+        lsh->setTy(getUniformRandomFloat()*std::min(dx,dy));
+
 		for(auto t: ts){
 			lsh->addTimeSeries(t, dx, dy);
 		}
 	}
 	else{
+        w = w * W_FRECHET_CONTINUOUS_MULTIPLIER;
 		lsh = new LSH(dims, buckets, l, k, w);
 		for(auto t: ts){
 			lsh->addTimeSeries(t, dx, dy, filter_e);
@@ -167,7 +178,7 @@ int searchLoop(LSH& lsh, std::string queryFile, std::string outputFile, int numO
 			}
 			if(metric == 1){
 				TimeSeries t1(queries[i]);
-				Point* p = t1.snapToGrid(dx, dy);
+				Point* p = t1.snapToGrid(dx, dy, lsh.getTx(), lsh.getTy());
 				lsh.calculateNN(*p, outfp, numOfNearest, radius, metric, disableBruteForce);
 				delete p;
 			}

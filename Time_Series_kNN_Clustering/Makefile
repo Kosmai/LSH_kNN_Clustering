@@ -21,7 +21,7 @@ test: obj/testing.o $(OBJ) $(FREDOBJ)
 search: obj/search.o $(OBJ) $(FREDOBJ)
 	$(CC) $(CFLAGS) -o $@ $^
 
-clustering: obj/clustering.o $(OBJ) $(FREDOBJ)
+cluster: obj/clustering.o $(OBJ) $(FREDOBJ)
 	$(CC) $(CFLAGS) -o $@ $^
 
 $(OBJDIR):

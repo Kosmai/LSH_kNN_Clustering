@@ -15,7 +15,7 @@ int readDataSet(std::string& fileName, char delimiter, std::vector<Point*>& poin
 
 //Parses the argc/argv results of main
 int readSearchArguments(int argc, char** argv, std::string &inputFile, std::string &queryFile, int &k, int &l, int &m, int &probes,
-    std::string &outputFile, std::string &algorithm, std::string &metric, double &delta, bool &disableBruteForce);
+    std::string &outputFile, std::string &algorithm, std::string &metric, double &delta, bool &disableBruteForce, double& w);
     
 //Parses the argc/argv results of main, negative on error
 int readLshArguments(int argc, char **argv, std::string &inputFile, std::string &queryFile, int &k, int &l,

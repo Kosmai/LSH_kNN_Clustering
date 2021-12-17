@@ -33,6 +33,10 @@ private:
 	std::list<Neighbor*> LSHNeighbors;
 	std::list<Neighbor*> realNeighbors;
 
+    double tx;
+    double ty;
+    double delta;
+
 	//uses brute force to store nearest neighbors in realNeighbors
 	void bruteForceSearch(Point &queryPoint, int metric);
 
@@ -41,6 +45,7 @@ private:
 
     //print the results in output file fp
 	void displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN, int metric);
+
 
 public:
 	//constructors-destructors
@@ -68,6 +73,13 @@ public:
 
 	//dynamic calculation of the w parameter
 	static double calculateW(std::vector<Point*> &points);
+
+    //used for grid snapping
+    double getTx();
+    double getTy();
+
+    void setTx(double tx);
+    void setTy(double ty);
 
 
 	//used for testing purposes

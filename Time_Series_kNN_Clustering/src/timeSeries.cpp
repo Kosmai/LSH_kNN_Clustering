@@ -21,15 +21,16 @@ void TimeSeries::print(){
     }
 }
 
-Point* TimeSeries::snapToGrid(double dx, double dy){
+Point* TimeSeries::snapToGrid(double dx, double dy, double tx, double ty){
     std::vector<double> elements;
     int x;
     double y;
+
     bool exists = false;
 
     for(auto obs : this->observations){
-        x = (int)((obs.x / dx) + 0.5);
-        y = (int)((obs.y / dy) + 0.5);
+        x = (int)((obs.x / dx) + 0.5 + tx);
+        y = (int)((obs.y / dy) + 0.5 + ty);
 
         for(int i = elements.size()-2; i > 0; i-=2){
             if(elements[i] == x){
@@ -55,8 +56,6 @@ Point* TimeSeries::snapToGrid(double dx, double dy){
         elements.push_back(0);
     }
 
-    //std::cout << elements.size()/2 << std::endl;
-
     Point* snapped = new Point(elements, this->id);
 
     snapped->setTimeSeries(this);
@@ -71,25 +70,19 @@ Point* TimeSeries::filter(double e, bool consecutiveErases){
         filtered.push_back(observation.y);
     }
 
-    //std::cout<<std::endl<<std::endl;
 
     double a, b, c;
 
     for(unsigned int i=0; i<filtered.size()-2; i++){
 
-//        for(unsigned int i=0; i<filtered.size(); i++){
-//            std::cout<<filtered[i]<<"->";
-//        }
-//        std::cout<<std::endl;
 
         a = filtered[i];
         b = filtered[i+1];
         c = filtered[i+2];
 
-        //std::cout<< "a: "<< a <<" b: " << b << " c: " << c << std::endl;
 
         if((std::abs(a - b) < e) && (std::abs(b - c) < e)){
-            //std::cout<<"deleted :" << filtered[i+1]<<std::endl;
+
             filtered.erase(filtered.begin() + i + 1);
             consecutiveErases ? i-- : i;
         }
@@ -99,16 +92,7 @@ Point* TimeSeries::filter(double e, bool consecutiveErases){
         filtered.push_back(0);
     }
 
-    /*
-    for(unsigned int i=0; i<filtered.size(); i++){
-        std::cout<<filtered[i]<<"->";
-    }
-    std::cout << std::endl;
-    std::cout << filtered.size() << std::endl;
-   
-    std::cout<<std::endl;
 
-    */
     Point* snapped = new Point(filtered, this->id);
     snapped->setTimeSeries(this);
 
@@ -136,7 +120,7 @@ double TimeSeries::continuousFrechetDistance(std::vector <Observation>& otherObs
     double distance;
     Curve ts1(2,"ts1");
     Curve ts2(2,"ts2");
-    //create curves from timeseries
+    //create curves from time series
     for(auto observation: this->observations){
         FredPoint p(2);
         p.set(0, observation.x);
@@ -209,18 +193,6 @@ std::vector<Observation> meanCurve(std::vector<Observation> obs1, std::vector<Ob
             frechetArray[i][j] = std::max(minPrevDistance, observationDistance(obs1[i], obs2[j]));
         }
     }
-/*
-    for (i = 0; i < ts1_size; i++){
-        for(j = 0; j < ts2_size; j++){
-
-            std::cout<<frechetArray[i][j]<<" ";
-        }
-
-        std::cout<<std::endl<<std::endl;
-    }
-
-    std::cout<<frechetArray[ts1_size-1][ts2_size-1]<<std::endl;
-*/
 
     std::vector<struct Leash> optimalTraversal;
 
@@ -274,21 +246,6 @@ std::vector<Observation> meanCurve(std::vector<Observation> obs1, std::vector<Ob
         meanCurve.push_back(observation);
     }
 
-    // std::cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"<<std::endl;
-    // for(auto obs: obs1){
-    //     std:: cout << "(" << obs.x << ", " << obs.y << ") -> ";
-    // }
-    // std::cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"<<std::endl;
-    // for(auto obs: obs2){
-    //     std:: cout << "(" << obs.x << ", " << obs.y << ") -> ";
-    // }
-    // std::cout<<"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"<<std::endl;
-
-    // for(auto obs: meanCurve){
-    //     std:: cout << "(" << obs.x << ", " << obs.y << ") -> ";
-    // }
-
-
     //sampling 
     std::vector<Observation> sampledCurve;
     int sampleFrequency = std::ceil((double)meanCurve.size() / obs1.size());
@@ -302,10 +259,6 @@ std::vector<Observation> meanCurve(std::vector<Observation> obs1, std::vector<Ob
         ob.y = sampledCurve.back().y;
         sampledCurve.push_back(ob);
     }
-
-    // for(auto obs: sampledCurve){
-    //     std:: cout << "(" << obs.x << ", " << obs.y << ") -> ";
-    // }
 
     frechetDistance = frechetArray[ts1_size-1][ts2_size-1];
 

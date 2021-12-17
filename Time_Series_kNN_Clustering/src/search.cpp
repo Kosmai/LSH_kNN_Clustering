@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
 	int numOfNearest = 1;
 	double radius = 0.0;
 	double delta = 1;
-	double w;
+	double w = -1;
 	bool disableBruteForce = false;
 
 	LSH* lsh = nullptr;
@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
 	std::vector<Point*> points;
 	std::vector<TimeSeries*> timeSeries;
 
-	if (readSearchArguments(argc, argv, inputFile, queryFile, k, l, m, probes, outputFile, algorithm, metric, delta, disableBruteForce) != 0) {
+	if (readSearchArguments(argc, argv, inputFile, queryFile, k, l, m, probes, outputFile, algorithm, metric, delta, disableBruteForce, w) != 0) {
 		std::cout << "Unknown argument read! Aborting..." << std::endl;
 		return -1;
 	}
@@ -65,7 +65,10 @@ int main(int argc, char **argv) {
 			TimeSeries* t = new TimeSeries(point);
 			timeSeries.push_back(t);
 		}
-		w = 200;
+        if(w < 0){
+            w = 300;
+        }
+
 		double dx = delta;
 		double dy = delta;
 		double e = 0.1;
@@ -75,7 +78,7 @@ int main(int argc, char **argv) {
 			if(searchLoop(*lsh, queryFile, outputFile, numOfNearest, radius, DISC_FRECHET, dx, dy, -1, disableBruteForce) < 0) return 2;
 		}
 		else if(metric == "continuous"){
-			lsh = initializeLSH(dims, l, k, w, timeSeries, -1, -1, e);
+			lsh = initializeLSH(dims, 1, k, w, timeSeries, -1, -1, e);
 			if(searchLoop(*lsh, queryFile, outputFile, numOfNearest, radius, CONT_FRECHET, -1, -1, e, disableBruteForce) < 0) return 2;
 		}
 		else{
