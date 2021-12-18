@@ -38,10 +38,10 @@ private:
     double delta;
 
 	//uses brute force to store nearest neighbors in realNeighbors
-	void bruteForceSearch(Point &queryPoint, int metric);
+	void bruteForceSearch(Point &queryPoint, int metric = 0, bool filterQueries = false);
 
 	//finds nearest neighbors and stores them in LSHNeighbors
-    int LSHSearch(Point& queryPoint, int metric);
+    int LSHSearch(Point& queryPoint, int metric = 0, bool filterQueries = false);
 
     //print the results in output file fp
 	void displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN, int metric);
@@ -66,7 +66,7 @@ public:
 
 	//uses private search methods and filters their results using r (radius) and numOfNN
 	//outputs the results in the output file fp
-	int calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN, double r, int metric, bool disableBruteForce);
+	int calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, double r = -1, int metric = 0, bool disableBruteForce = false, bool filterQueries = false);
 
 	//used for clustering
 	void getNearestByR(double r , Cluster* clusters, int currentCluster, int metric = 0);

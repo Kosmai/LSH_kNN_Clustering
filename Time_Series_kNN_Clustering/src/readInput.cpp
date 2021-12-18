@@ -82,7 +82,7 @@ int readLshArguments(int argc, char **argv, std::string &inputFile, std::string 
 }
 
 int readSearchArguments(int argc, char** argv, std::string &inputFile, std::string &queryFile, int &k, int &l, int &m, int &probes,
-    std::string &outputFile, std::string &algorithm, std::string &metric, double &delta, bool &disableBruteForce, double &w) {
+    std::string &outputFile, std::string &algorithm, std::string &metric, double &delta, bool &disableBruteForce, double &w, bool& filterQueries) {
 
     //read arguments
     for (int i = 1; i < argc; i += 2) {
@@ -111,6 +111,9 @@ int readSearchArguments(int argc, char** argv, std::string &inputFile, std::stri
             i--;
         } else if (std::string(argv[i]).compare("-w") == 0 && i + 1 < argc) {
             w = atof(argv[i + 1]);
+        } else if (std::string(argv[i]).compare("-filterQueries") == 0) {
+            filterQueries = true;
+            i--;
         }
         else {
             //unknown argument

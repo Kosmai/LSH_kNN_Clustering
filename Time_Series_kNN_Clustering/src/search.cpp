@@ -36,6 +36,7 @@ int main(int argc, char **argv) {
 	double delta = 1;
 	double w = -1;
 	bool disableBruteForce = false;
+	bool filterQueries = false;
 
 	LSH* lsh = nullptr;
 	Hypercube* cube = nullptr;
@@ -43,7 +44,7 @@ int main(int argc, char **argv) {
 	std::vector<Point*> points;
 	std::vector<TimeSeries*> timeSeries;
 
-	if (readSearchArguments(argc, argv, inputFile, queryFile, k, l, m, probes, outputFile, algorithm, metric, delta, disableBruteForce, w) != 0) {
+	if (readSearchArguments(argc, argv, inputFile, queryFile, k, l, m, probes, outputFile, algorithm, metric, delta, disableBruteForce, w, filterQueries) != 0) {
 		std::cout << "Unknown argument read! Aborting..." << std::endl;
 		return -1;
 	}
@@ -79,7 +80,7 @@ int main(int argc, char **argv) {
 		}
 		else if(metric == "continuous"){
 			lsh = initializeLSH(dims, 1, k, w, timeSeries, -1, -1, e);
-			if(searchLoop(*lsh, queryFile, outputFile, numOfNearest, radius, CONT_FRECHET, -1, -1, e, disableBruteForce) < 0) return 2;
+			if(searchLoop(*lsh, queryFile, outputFile, numOfNearest, radius, CONT_FRECHET, -1, -1, e, disableBruteForce, filterQueries) < 0) return 2;
 		}
 		else{
 			std::cout << "Unknown metric entered" << std::endl;

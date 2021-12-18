@@ -112,26 +112,42 @@ double observationDistance(Observation& obs1, Observation& obs2){
     return sqrt(pow(obs1.x - obs2.x, 2) + pow(obs1.y - obs2.y, 2));
 }
 
-double TimeSeries::continuousFrechetDistance(TimeSeries* otherTs){
-    return continuousFrechetDistance(otherTs->getVector());
+double TimeSeries::continuousFrechetDistance(TimeSeries* otherTs, bool filterQueries){
+    return continuousFrechetDistance(otherTs->getVector(), filterQueries);
 }
 
-double TimeSeries::continuousFrechetDistance(std::vector <Observation>& otherObservations) {
+double TimeSeries::continuousFrechetDistance(std::vector <Observation>& otherObservations, bool filterQueries, double e) {
     double distance;
     Curve ts1(2,"ts1");
     Curve ts2(2,"ts2");
     //create curves from time series
-    for(auto observation: this->observations){
-        FredPoint p(2);
-        p.set(0, observation.x);
-        p.set(1, observation.y);
-        ts1.push_back(p);
+    if(filterQueries){
+        for(auto observation: filterCurve(this->observations, e)){
+            FredPoint p(2);
+            p.set(0, observation.x);
+            p.set(1, observation.y);
+            ts1.push_back(p);
+        }
+        for(auto observation: filterCurve(otherObservations, e)){
+            FredPoint p(2);
+            p.set(0, observation.x);
+            p.set(1, observation.y);
+            ts2.push_back(p);
+        }
     }
-    for(auto observation: otherObservations){
-        FredPoint p(2);
-        p.set(0, observation.x);
-        p.set(1, observation.y);
-        ts2.push_back(p);
+    else{
+       for(auto observation: this->observations){
+            FredPoint p(2);
+            p.set(0, observation.x);
+            p.set(1, observation.y);
+            ts1.push_back(p);
+        }
+        for(auto observation: otherObservations){
+            FredPoint p(2);
+            p.set(0, observation.x);
+            p.set(1, observation.y);
+            ts2.push_back(p);
+        } 
     }
     //calculate continuous frechet distance
     distance = Frechet::Continuous::distance(ts1, ts2).value;
@@ -283,4 +299,29 @@ std::vector<Observation> meanCurve(std::vector<std::vector<Observation>>& obs){
         inc*=2;
     }
     return array[0];
+}
+
+
+std::vector<Observation> filterCurve(std::vector<Observation>& obs, double e, bool consecutiveErases){
+    std::vector<Observation> filtered;
+    for(auto ob: obs){
+        filtered.push_back(ob);
+    }
+
+    Observation a, b, c;
+
+    for(unsigned int i=0; i<filtered.size()-2; i++){
+
+        a = filtered[i];
+        b = filtered[i+1];
+        c = filtered[i+2];
+
+        if((std::abs(a.y - b.y) < e) && (std::abs(b.y - c.y) < e)){
+
+            filtered.erase(filtered.begin() + i + 1);
+            consecutiveErases ? i-- : i;
+        }
+    }
+
+    return filtered;
 }

@@ -1,0 +1,34 @@
+Query: aer
+Algorithm: LSH_Frechet_Continuous
+Query: aeri
+Algorithm: LSH_Frechet_Continuous
+Query: aes
+Algorithm: LSH_Frechet_Continuous
+Approximate Nearest Neighbor: abdc
+distanceLSH: 3.448800
+Query: aet
+Algorithm: LSH_Frechet_Continuous
+Query: aeti
+Algorithm: LSH_Frechet_Continuous
+Approximate Nearest Neighbor: aame
+distanceLSH: 2.726297
+Query: aey
+Algorithm: LSH_Frechet_Continuous
+Approximate Nearest Neighbor: aame
+distanceLSH: 3.294635
+Query: aezs
+Algorithm: LSH_Frechet_Continuous
+Query: afam
+Algorithm: LSH_Frechet_Continuous
+Query: afb
+Algorithm: LSH_Frechet_Continuous
+Approximate Nearest Neighbor: adx
+distanceLSH: 3.004950
+Query: afc
+Algorithm: LSH_Frechet_Continuous
+Approximate Nearest Neighbor: aed
+distanceLSH: 1.212864
+
+tApproximateAverage: 4.970467
+tTrueAverage: 0.000000
+MAF: 0.000000

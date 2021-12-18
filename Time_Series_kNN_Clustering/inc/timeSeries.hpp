@@ -3,6 +3,9 @@
 
 class Point;
 
+/* This module implements the Time Series class that represents a
+time series (polygonal curve) */
+
 struct Observation{
     double x;
     double y;
@@ -29,9 +32,11 @@ public:
 
     double discreteFrechetDistance(TimeSeries* otherTs);
     double discreteFrechetDistance(std::vector<Observation>& otherObservations);
-    double continuousFrechetDistance(TimeSeries* otherTs);
-    double continuousFrechetDistance(std::vector<Observation>& otherObservations);
+    double continuousFrechetDistance(TimeSeries* otherTs, bool filterQueries = false);
+    double continuousFrechetDistance(std::vector<Observation>& otherObservations, bool filterQueries = false, double e = 1);
 };
 
 std::vector<Observation> meanCurve(std::vector<Observation> obs1, std::vector<Observation> obs2, double& frechetDistance);
 std::vector<Observation> meanCurve(std::vector<std::vector<Observation>>& obs);
+
+std::vector<Observation> filterCurve(std::vector<Observation>& obs, double e, bool consecutiveErases = true);

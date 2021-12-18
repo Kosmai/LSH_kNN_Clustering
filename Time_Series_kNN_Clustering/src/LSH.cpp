@@ -113,7 +113,7 @@ static bool equal(Neighbor* a, Neighbor* b) {
     return equality;
 }
 
-void LSH::bruteForceSearch(Point &queryPoint, int metric = 0){
+void LSH::bruteForceSearch(Point &queryPoint, int metric, bool filterQueries){
 
     std::list<Point*>::iterator it;
     for (it = points.begin(); it != points.end(); ++it) {
@@ -127,7 +127,7 @@ void LSH::bruteForceSearch(Point &queryPoint, int metric = 0){
             candidate->distance = queryPoint.getTimeSeries()->discreteFrechetDistance(candidate->point->getTimeSeries());
         }
         else if(metric == 2){
-            candidate->distance = queryPoint.getTimeSeries()->continuousFrechetDistance(candidate->point->getTimeSeries());
+            candidate->distance = queryPoint.getTimeSeries()->continuousFrechetDistance(candidate->point->getTimeSeries(), filterQueries);
         }
 
         realNeighbors.push_back(candidate);
@@ -135,7 +135,7 @@ void LSH::bruteForceSearch(Point &queryPoint, int metric = 0){
     realNeighbors.sort(compare);
 }
 
-int LSH::LSHSearch(Point &queryPoint, int metric = 0) {
+int LSH::LSHSearch(Point &queryPoint, int metric, bool filterQueries) {
     
     //make sure the query point is valid
     if (queryPoint.getDimension() != this->dims) {
@@ -173,7 +173,7 @@ int LSH::LSHSearch(Point &queryPoint, int metric = 0) {
                     candidate->distance = queryPoint.getTimeSeries()->discreteFrechetDistance((*it)->data->getTimeSeries());
                 }
                 else if(metric == 2){
-                    candidate->distance = queryPoint.getTimeSeries()->continuousFrechetDistance((*it)->data->getTimeSeries());
+                    candidate->distance = queryPoint.getTimeSeries()->continuousFrechetDistance((*it)->data->getTimeSeries(), filterQueries);
                 }
 
                 LSHNeighbors.push_back(candidate);
@@ -249,7 +249,7 @@ void LSH::displayResults(Point &queryPoint, FILE* fp, unsigned int numOfNN, int 
     }
 }
 
-int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, double r = -1.0, int metric = 0, bool disableBruteForce = false){
+int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN, double r, int metric, bool disableBruteForce, bool filterQueries){
 
     using std::chrono::high_resolution_clock;
     using std::chrono::duration_cast;
@@ -257,12 +257,12 @@ int LSH::calculateNN(Point &queryPoint, FILE* fp, unsigned int numOfNN = 1, doub
     using std::chrono::microseconds;
 
     auto LSH_t1 = high_resolution_clock::now();
-    LSHSearch(queryPoint, metric);
+    LSHSearch(queryPoint, metric, filterQueries);
     auto LSH_t2 = high_resolution_clock::now();
 
     auto brute_t1 = high_resolution_clock::now();
     if(!disableBruteForce){
-        bruteForceSearch(queryPoint, metric);
+        bruteForceSearch(queryPoint, metric, filterQueries);
     }
     auto brute_t2 = high_resolution_clock::now();
 

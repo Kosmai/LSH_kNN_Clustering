@@ -130,7 +130,7 @@ void printParameters(int k, int l, int numOfNearest, double radius, int w){
 	return;
 }
 
-int searchLoop(LSH& lsh, std::string queryFile, std::string outputFile, int numOfNearest, double radius, int metric, double dx, double dy, double filter_e, bool disableBruteForce){
+int searchLoop(LSH& lsh, std::string queryFile, std::string outputFile, int numOfNearest, double radius, int metric, double dx, double dy, double filter_e, bool disableBruteForce, bool filterQueries){
 
 	std::vector<Point*> queries;
 
@@ -185,7 +185,7 @@ int searchLoop(LSH& lsh, std::string queryFile, std::string outputFile, int numO
 			if(metric == 2){
 				TimeSeries t1(queries[i]);
 				Point* p = t1.filter(filter_e);
-				lsh.calculateNN(*p, outfp, numOfNearest, radius, metric, disableBruteForce);
+				lsh.calculateNN(*p, outfp, numOfNearest, radius, metric, disableBruteForce, filterQueries);
 				delete p;
 			}
 		}
