@@ -26,10 +26,9 @@ int main(int argc, char** argv) {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	setRandomSeed(seed);
 
-    std::string inputFile  = "datasets/nasdaq2017_LQ.csv";
-    inputFile = "datasets/mini_input";
-	std::string configFile  = "config/cluster.conf";
-	std::string outputFile = "out.txt";
+    std::string inputFile  = "";
+	std::string configFile  = "";
+	std::string outputFile = "";
 
     using std::chrono::high_resolution_clock;
     using std::chrono::duration_cast;

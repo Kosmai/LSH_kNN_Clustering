@@ -9,6 +9,8 @@ all: $(OBJDIR) $(FREDOBJDIR) search test cluster
 
 safe: clean $(OBJDIR) $(FREDOBJDIR) search test cluster
 
+notests: $(OBJDIR) $(FREDOBJDIR) search cluster
+
 obj/%.o: src/%.cpp
 	$(CC) $(CFLAGS) -c -o $@ $^
 

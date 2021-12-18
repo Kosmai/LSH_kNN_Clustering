@@ -24,6 +24,8 @@ LSH::LSH(int dims, int buckets, int L, int k, int w)
     }
     this->totalTimeApproximate = 0;
     this->totalTimeTrue = 0;
+    this->tx = 0;
+    this->ty = 0;
 }
 
 LSH::LSH(const LSH &copy)

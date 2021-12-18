@@ -196,7 +196,7 @@ int Kmeans::computeLSH(double maxRadius, unsigned int maxIters, centroidInitiali
         }
         std::cout << "Total centroid movement: " << sumOfCentroidMoves << std::endl;
 
-        radius *= 2;
+        radius *= 1.5;
         if(radius >= maxRadius)break;
         std::cout << "Max radius: " << radius << std::endl;
 
@@ -627,5 +627,5 @@ double Kmeans::calculateInitialRadius(){
     }
 
     //return minDistance/2 if possible
-    return minDistance>2 ? minDistance/2 : 2;
+    return minDistance>2 ? minDistance/16 : 2;
 }
