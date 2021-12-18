@@ -1,7 +1,11 @@
 Query: aer
 Algorithm: LSH_Frechet_Continuous
+Approximate Nearest Neighbor: aal
+distanceLSH: 13.499970
 Query: aeri
 Algorithm: LSH_Frechet_Continuous
+Approximate Nearest Neighbor: adtn
+distanceLSH: 43.611746
 Query: aes
 Algorithm: LSH_Frechet_Continuous
 Approximate Nearest Neighbor: abdc
@@ -10,25 +14,27 @@ Query: aet
 Algorithm: LSH_Frechet_Continuous
 Query: aeti
 Algorithm: LSH_Frechet_Continuous
-Approximate Nearest Neighbor: aame
-distanceLSH: 2.726297
+Approximate Nearest Neighbor: aeg
+distanceLSH: 4.754137
 Query: aey
 Algorithm: LSH_Frechet_Continuous
-Approximate Nearest Neighbor: aame
-distanceLSH: 3.294635
+Approximate Nearest Neighbor: aau
+distanceLSH: 1.880496
 Query: aezs
 Algorithm: LSH_Frechet_Continuous
 Query: afam
 Algorithm: LSH_Frechet_Continuous
+Approximate Nearest Neighbor: aee
+distanceLSH: 21.295305
 Query: afb
 Algorithm: LSH_Frechet_Continuous
-Approximate Nearest Neighbor: adx
-distanceLSH: 3.004950
+Approximate Nearest Neighbor: acp
+distanceLSH: 5.195202
 Query: afc
 Algorithm: LSH_Frechet_Continuous
-Approximate Nearest Neighbor: aed
-distanceLSH: 1.212864
+Approximate Nearest Neighbor: abb
+distanceLSH: 7.607015
 
-tApproximateAverage: 4.970467
+tApproximateAverage: 1.032086
 tTrueAverage: 0.000000
 MAF: 0.000000

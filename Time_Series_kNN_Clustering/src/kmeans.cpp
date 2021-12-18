@@ -568,8 +568,6 @@ void Kmeans::displaySilhouette(FILE* fp, int metric) {
     for (auto p: this->points) {
         if(p->getClusterIndex() == -1)continue;
         sil = this->calculatePointSilhouette(p, metric);
-        std::cout<<"SIL:"<<sil<<std::endl;
-        //std::cout << "Silhouette: " << sil << std::endl;
         averageTotalSilhouette += sil;
         averageSilhouettes[p->getClusterIndex()] += sil;
     }
