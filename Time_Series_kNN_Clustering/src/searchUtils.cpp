@@ -124,7 +124,7 @@ void printParameters(int k, int l, int numOfNearest, double radius, int w){
 	std::cout << "k: " << k << std::endl;
 	std::cout << "l: " << l << std::endl;
 	std::cout << "N: " << numOfNearest << std::endl;
-	std::cout << "R: " << radius << std::endl;
+	//std::cout << "R: " << radius << std::endl;
 	std::cout << "w: " << w << std::endl;
 	std::cout << "--------------------------------------------------" << std::endl;
 	return;

@@ -23,20 +23,26 @@ private:
 public:
     TimeSeries(Point* point);
     ~TimeSeries() = default;
-    void print();
+    void print();   // used for debugging purposes
+
+    // snapping and filtering
     Point* snapToGrid(double dx, double dy, double tx = 0, double ty = 0);
     Point* filter(double e, bool consecutiveErases = false);
 
-    std::vector<Observation>& getVector();
-    int setVector(std::vector<Observation> observations);
 
+    //frechet distance
     double discreteFrechetDistance(TimeSeries* otherTs);
     double discreteFrechetDistance(std::vector<Observation>& otherObservations);
     double continuousFrechetDistance(TimeSeries* otherTs, bool filterQueries = false);
     double continuousFrechetDistance(std::vector<Observation>& otherObservations, bool filterQueries = false, double e = 1);
+
+    std::vector<Observation>& getVector();
+    int setVector(std::vector<Observation> observations);
 };
 
+// calculation of mean curves (used for clustering while updating centroids)
 std::vector<Observation> meanCurve(std::vector<Observation> obs1, std::vector<Observation> obs2, double& frechetDistance);
 std::vector<Observation> meanCurve(std::vector<std::vector<Observation>>& obs);
 
+// used to filter curves for continuous frechet distance (optional)
 std::vector<Observation> filterCurve(std::vector<Observation>& obs, double e, bool consecutiveErases = true);

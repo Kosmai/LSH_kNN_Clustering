@@ -28,6 +28,7 @@ Point* TimeSeries::snapToGrid(double dx, double dy, double tx, double ty){
 
     bool exists = false;
 
+    // snapping
     for(auto obs : this->observations){
         x = (int)((obs.x / dx) + 0.5 + tx);
         y = (int)((obs.y / dy) + 0.5 + ty);
@@ -50,7 +51,7 @@ Point* TimeSeries::snapToGrid(double dx, double dy, double tx, double ty){
         exists = false;
     }
 
-
+    // padding
     for(int i = elements.size(); i < (int)observations.size()*2; i+=2){
         elements.push_back(0);
         elements.push_back(0);
@@ -73,13 +74,12 @@ Point* TimeSeries::filter(double e, bool consecutiveErases){
 
     double a, b, c;
 
+    // parse the curve in triads checking if the
+    // middle element should be removed
     for(unsigned int i=0; i<filtered.size()-2; i++){
-
-
         a = filtered[i];
         b = filtered[i+1];
         c = filtered[i+2];
-
 
         if((std::abs(a - b) < e) && (std::abs(b - c) < e)){
 
@@ -88,6 +88,7 @@ Point* TimeSeries::filter(double e, bool consecutiveErases){
         }
     }
 
+    //padding
     for(unsigned int i = filtered.size(); i < observations.size(); i++){
         filtered.push_back(0);
     }
@@ -120,7 +121,8 @@ double TimeSeries::continuousFrechetDistance(std::vector <Observation>& otherObs
     double distance;
     Curve ts1(2,"ts1");
     Curve ts2(2,"ts2");
-    //create curves from time series
+
+    //create fred curves from time series
     if(filterQueries){
         for(auto observation: filterCurve(this->observations, e)){
             FredPoint p(2);
@@ -221,6 +223,7 @@ std::vector<Observation> meanCurve(std::vector<Observation> obs1, std::vector<Ob
 
     optimalTraversal.push_back(leash);
 
+    // calculate optimal traversal
     while(i > 0 || j > 0){
         double min;
         if(i == 0){
@@ -255,6 +258,7 @@ std::vector<Observation> meanCurve(std::vector<Observation> obs1, std::vector<Ob
 
     std::vector<Observation> meanCurve;
 
+    // create mean curve
     for(auto v: optimalTraversal){
         Observation observation;
         observation.x = (obs1[v.i].x + obs2[v.j].x)/2;
@@ -290,6 +294,8 @@ std::vector<Observation> meanCurve(std::vector<std::vector<Observation>>& obs){
     std::vector<std::vector<Observation>> array = obs;
     unsigned int inc = 1;
     double dist;
+
+    // pseudo map-reduce to find total mean curve
     while(inc < array.size()){
         for(unsigned int i = 0; i < array.size(); i+=(inc*2)){
             if(i+inc < array.size()){
