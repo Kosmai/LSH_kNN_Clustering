@@ -34,4 +34,4 @@ $(FREDOBJDIR):
 
 .PHONY: clean
 clean:
-	rm -f obj/*.o fredobj/*.o search test clustering *.txt
+	rm -f obj/*.o fredobj/*.o search test cluster *.txt

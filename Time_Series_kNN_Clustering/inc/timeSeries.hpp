@@ -27,7 +27,7 @@ public:
 
     // snapping and filtering
     Point* snapToGrid(double dx, double dy, double tx = 0, double ty = 0);
-    Point* filter(double e, bool consecutiveErases = false);
+    Point* filter(double e, bool consecutiveErases = false, double delta = 1, double t = 0.05);
 
 
     //frechet distance

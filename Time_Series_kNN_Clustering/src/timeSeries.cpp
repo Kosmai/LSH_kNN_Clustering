@@ -64,8 +64,9 @@ Point* TimeSeries::snapToGrid(double dx, double dy, double tx, double ty){
     return snapped;
 }
 
-Point* TimeSeries::filter(double e, bool consecutiveErases){
+Point* TimeSeries::filter(double e, bool consecutiveErases, double delta, double t){
     std::vector<double> filtered;
+    std::vector<double> snapped;
 
     for(auto observation: this->observations){
         filtered.push_back(observation.y);
@@ -88,16 +89,25 @@ Point* TimeSeries::filter(double e, bool consecutiveErases){
         }
     }
 
+    //snapping to R
+    double x;
+    for(auto item : filtered){
+        x = (int)((item / delta) + 0.5 + t);
+        snapped.push_back(x);
+    }
+
     //padding
-    for(unsigned int i = filtered.size(); i < observations.size(); i++){
-        filtered.push_back(0);
+    for(unsigned int i = snapped.size(); i < observations.size(); i++){
+        snapped.push_back(0);
     }
 
 
-    Point* snapped = new Point(filtered, this->id);
-    snapped->setTimeSeries(this);
 
-    return snapped;
+
+    Point* point = new Point(snapped, this->id);
+    point->setTimeSeries(this);
+
+    return point;
 }
 
 std::vector<Observation>& TimeSeries::getVector(){

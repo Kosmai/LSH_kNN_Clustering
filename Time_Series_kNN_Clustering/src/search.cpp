@@ -20,9 +20,9 @@ int main(int argc, char **argv) {
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	setRandomSeed(seed);
 
-	std::string inputFile  = "datasets/nasd_input.csv";
-	std::string queryFile  = "datasets/nasd_query.csv";
-	std::string outputFile = "search.out";
+	std::string inputFile  = "";
+	std::string queryFile  = "";
+	std::string outputFile = "";
 	std::string algorithm = "";
 	std::string metric = "";
 
