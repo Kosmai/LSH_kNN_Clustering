@@ -12,3 +12,4 @@ Time_Series_kNN_Clustering/test
 Time_Series_kNN_Clustering/cluster
 Time_Series_kNN_Clustering/sample_outputs
 Time_Series_kNN_Clustering/*.out
+Time_Series_Analysis/datasets/
