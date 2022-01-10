@@ -1,16 +1,12 @@
+import sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_absolute_error
-from keras.models import Sequential
+from keras.models import Sequential, load_model
 from keras.layers import Dense, LSTM, Dropout
 from data_import import read_dataset
-
-pretrained_model = False
-batch_training = False
-
-all_ts = read_dataset('datasets/nasdaq2007_17.csv', 5)
 
 
 def create_train_set(ts, training_ratio, lookback):
@@ -96,7 +92,10 @@ def train(all_ts, training_ratio, lookback, saved_model_name=None):
 
     model.compile(optimizer='Adam', loss='mean_squared_error')
 
-    model.fit(x_train, y_train, batch_size=50, epochs=2)
+    model.fit(x_train, y_train, batch_size=64, epochs=3)
+
+    if saved_model_name is not None:
+        model.save('models/' + saved_model_name)
 
     return model
 
@@ -119,47 +118,86 @@ def forecast(ts, model, lookback):
     return predictions
 
 
-training_ratio = 0.7
-lookback = 10
+def plot_results(forecasted_ts_part, forecasts):
+    forecasted_part['forecasts'] = forecasts
 
-if pretrained_model:
-    pass
-else:
-    if batch_training:
-        model = train(all_ts, training_ratio, lookback)
+    plt.figure(figsize=(16, 8))
+    plt.grid()
+    plt.title('Forecasting')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.plot(forecasted_part['value'])
+    plt.plot(forecasted_part['forecasts'])
+    mae = mean_absolute_error(forecasted_part['value'], forecasted_part['forecasts'])
+    plt.legend(['Real Values', 'Predicted Values\n' + 'Mean Absolute Error: ' + str(round(mae, 2))])
+    plt.show()
 
-        for ts in all_ts:
-            training_size = int(0.7 * ts.shape[0])
-            forecasts = test(ts, training_ratio, model, lookback)
 
-            forecasted_part = ts[training_size:].copy()
-            forecasted_part['forecasts'] = forecasts
+if __name__ == '__main__':
+    pretrained_model = None
+    individual_training = False
+    save_model = False
+    dataset = 'datasets/nasdaq2007_17.csv'
 
-            plt.figure(figsize=(16, 8))
-            plt.title('Forecasting')
-            plt.xlabel('Date')
-            plt.ylabel('Value')
-            plt.plot(forecasted_part['value'])
-            plt.plot(forecasted_part['forecasts'])
-            mae = mean_absolute_error(forecasted_part['value'], forecasted_part['forecasts'])
-            plt.legend(['Real Values', 'Predicted Values\n' + 'Mean Absolute Error: ' + str(round(mae, 2))])
-            plt.show()
+    n = 5
+
+    for i, arg in enumerate(sys.argv):
+        if arg == '-individual_training':
+            individual_training = True
+        if arg == '-model':
+            pretrained_model = sys.argv[i + 1]
+        if arg == '-n':
+            n = int(sys.argv[i + 1])
+        if arg == '-d':
+            dataset = sys.argv[i + 1]
+        if arg == '-save_model':
+            save_model = True
+
+    all_ts = read_dataset(dataset, n)
+    training_ratio = 0.7
+    lookback = 10
+
+    if pretrained_model is not None:
+        try:
+            model = load_model(pretrained_model)
+            for ts in all_ts:
+                forecasts = forecast(ts, model, lookback)
+
+                forecasted_part = ts[lookback:].copy()
+                plot_results(forecasted_part, forecasts)
+        except:
+            print('Error while using pre-trained model!')
+            exit()
 
     else:
-        for ts in all_ts:
-            model = train([ts], training_ratio, lookback)
-            training_size = int(training_ratio * ts.shape[0])
-            forecasts = test(ts, training_ratio, model, lookback)
+        try:
+            if individual_training:
+                for ts in all_ts:
+                    if save_model:
+                        model_name = input("Saved Model Name: ")
+                        model = train([ts], training_ratio, lookback, model_name)
+                    else:
+                        model = train([ts], training_ratio, lookback)
+                    training_size = int(training_ratio * ts.shape[0])
+                    forecasts = test(ts, training_ratio, model, lookback)
 
-            forecasted_part = ts[training_size:].copy()
-            forecasted_part['forecasts'] = forecasts
+                    forecasted_part = ts[training_size:].copy()
+                    plot_results(forecasted_part, forecasts)
 
-            plt.figure(figsize=(16, 8))
-            plt.title('Forecasting')
-            plt.xlabel('Date')
-            plt.ylabel('Value')
-            plt.plot(forecasted_part['value'])
-            plt.plot(forecasted_part['forecasts'])
-            mae = mean_absolute_error(forecasted_part['value'], forecasted_part['forecasts'])
-            plt.legend(['Real Values', 'Predicted Values\n' + 'Mean Absolute Error: ' + str(round(mae, 2))])
-            plt.show()
+            else:
+                if save_model:
+                    model_name = input("Saved Model Name: ")
+                    model = train(all_ts, training_ratio, lookback, model_name)
+                else:
+                    model = train(all_ts, training_ratio, lookback)
+
+                for ts in all_ts:
+                    training_size = int(0.7 * ts.shape[0])
+                    forecasts = test(ts, training_ratio, model, lookback)
+                    forecasted_part = ts[training_size:].copy()
+
+                    plot_results(forecasted_part, forecasts)
+
+        except:
+            print('Error while training/testing model!')
+            exit()
