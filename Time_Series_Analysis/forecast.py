@@ -60,7 +60,6 @@ def train(all_ts, training_ratio, lookback, saved_model_name=None):
     scaler = MinMaxScaler(feature_range=(0, 1))
     scaler.fit(all_ts_df)
 
-    # create x_train and y_train
     x_train = []
     y_train = []
 
@@ -79,12 +78,6 @@ def train(all_ts, training_ratio, lookback, saved_model_name=None):
     model.add(LSTM(50, return_sequences=True, input_shape=(x_train.shape[1], 1)))
     model.add(Dropout(0.2))
 
-    model.add(LSTM(50, return_sequences=True))
-    model.add(Dropout(0.2))
-
-    model.add(LSTM(50, return_sequences=True))
-    model.add(Dropout(0.2))
-
     model.add(LSTM(50, return_sequences=False))
     model.add(Dropout(0.2))
 
@@ -95,7 +88,7 @@ def train(all_ts, training_ratio, lookback, saved_model_name=None):
     model.fit(x_train, y_train, batch_size=64, epochs=3)
 
     if saved_model_name is not None:
-        model.save('models/' + saved_model_name)
+        model.save('models/forecast/' + saved_model_name)
 
     return model
 
@@ -138,9 +131,9 @@ if __name__ == '__main__':
     individual_training = False
     save_model = False
     dataset = 'datasets/nasdaq2007_17.csv'
-
     n = 5
 
+    # read command line arguments
     for i, arg in enumerate(sys.argv):
         if arg == '-individual_training':
             individual_training = True
@@ -155,8 +148,9 @@ if __name__ == '__main__':
 
     all_ts = read_dataset(dataset, n)
     training_ratio = 0.7
-    lookback = 10
+    lookback = 50
 
+    # using a saved pretrained model
     if pretrained_model is not None:
         try:
             model = load_model(pretrained_model)
@@ -169,8 +163,10 @@ if __name__ == '__main__':
             print('Error while using pre-trained model!')
             exit()
 
+    # training the model using the dataset
     else:
         try:
+            # train the model for each time series individually
             if individual_training:
                 for ts in all_ts:
                     if save_model:
@@ -184,6 +180,7 @@ if __name__ == '__main__':
                     forecasted_part = ts[training_size:].copy()
                     plot_results(forecasted_part, forecasts)
 
+            # train the model for all time series at once
             else:
                 if save_model:
                     model_name = input("Saved Model Name: ")
