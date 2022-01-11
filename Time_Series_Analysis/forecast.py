@@ -146,7 +146,12 @@ if __name__ == '__main__':
         if arg == '-save_model':
             save_model = True
 
-    all_ts = read_dataset(dataset, n)
+    try:
+        all_ts = read_dataset(dataset, n)
+    except:
+        print('Error in reading dataset!')
+        exit()
+
     training_ratio = 0.7
     lookback = 50
 
