@@ -7,7 +7,7 @@ def get_time_series(data, index, starting_date='2007-01-01', introduce_anomaly=F
     ts['date'] = pd.date_range(starting_date, periods=ts.shape[0]).tolist()
     ts = ts.set_index('date')
     if introduce_anomaly:
-        ts['value'][3000:3002] = -40
+        ts['value'][3000:3010] = ts['value'][3000:3010] + 80
     return ts
 
 

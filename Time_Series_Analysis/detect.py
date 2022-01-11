@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential, load_model
 from keras.layers import Dense, LSTM, Dropout, RepeatVector, TimeDistributed
-from datetime import datetime, timedelta
+from datetime import timedelta
 from data_import import read_dataset
 
 
@@ -85,13 +85,15 @@ def train(all_ts, training_ratio, lookback, saved_model_name=None):
     model = Sequential()
     model.add(LSTM(units=64, input_shape=(x_train.shape[1], x_train.shape[2])))
     model.add(Dropout(rate=0.2))
+
     model.add(RepeatVector(n=x_train.shape[1]))
     model.add(LSTM(units=64, return_sequences=True))
     model.add(Dropout(rate=0.2))
+
     model.add(TimeDistributed(Dense(x_train.shape[2])))
     model.compile(optimizer='adam', loss='mae')
 
-    model.fit(x_train, y_train, epochs=5, batch_size=64, validation_split=0.1, shuffle=False)
+    model.fit(x_train, y_train, epochs=4, batch_size=64, validation_split=0.1, shuffle=False)
 
     if saved_model_name is not None:
         model.save('models/detect/' + saved_model_name)
@@ -124,6 +126,7 @@ def test_forecast(ts, model, lookback, threshold, training_ratio=None):
 
     plt.figure(figsize=(16, 8))
     plt.grid()
+    plt.title('Error')
     plt.plot(test_score_df.index, test_score_df.loss, label='loss')
     plt.plot(test_score_df.index, test_score_df.threshold, label='threshold')
     plt.xticks(rotation=25)
@@ -134,6 +137,7 @@ def test_forecast(ts, model, lookback, threshold, training_ratio=None):
 
     corrected_dates = []
 
+    # sync anomalies points with the correct time series points
     for date in anomalies.index:
         day_before = (date - timedelta(days=2)).date()
         corrected_dates.append(day_before)
@@ -143,6 +147,7 @@ def test_forecast(ts, model, lookback, threshold, training_ratio=None):
 
     plt.figure(figsize=(16, 8))
     plt.grid()
+    plt.title('Anomalies')
     plt.plot(test_ts['value'], zorder=1)
     plt.scatter(anomalies.index, anomalies['value'], color='red', linewidths=1, zorder=2)
     plt.show()
@@ -150,7 +155,7 @@ def test_forecast(ts, model, lookback, threshold, training_ratio=None):
 
 if __name__ == '__main__':
     dataset = 'datasets/nasdaq2007_17.csv'
-    n = 15
+    n = 400
     mae_threshold = 0.15
     save_model = False
     pretrained_model = None  # 'models/detect/model1'
@@ -169,13 +174,13 @@ if __name__ == '__main__':
             mae_threshold = float(sys.argv[i + 1])
 
     try:
-        all_ts = read_dataset(dataset, n, introduce_anomaly=False)
+        all_ts = read_dataset(dataset, n)
     except:
         print('Error in reading dataset!')
         exit()
 
-    training_ratio = 0.8
-    lookback = 50
+    training_ratio = 0.7
+    lookback = 200
 
     if pretrained_model is not None:
         try:
@@ -191,12 +196,14 @@ if __name__ == '__main__':
             else:
                 model = train(all_ts, training_ratio, lookback)
         except:
-            print('Error in training the model!')
-            exit()
-
+            print('Error while training model!')
     try:
-        for ts in all_ts:
-            test_forecast(ts, model, lookback, mae_threshold)
+        if pretrained_model is not None:
+            for ts in all_ts:
+                test_forecast(ts, model, lookback, mae_threshold)
+        else:
+            for ts in all_ts:
+                test_forecast(ts, model, lookback, mae_threshold, training_ratio)
     except:
         print('Error while making forecasts')
         exit()
