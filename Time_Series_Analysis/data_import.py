@@ -26,4 +26,6 @@ def read_dataset(file_name, num_of_ts=None, sep='\t', header=None, index_col=0, 
     if num_of_ts is not None and num_of_ts < data.shape[0]:
         all_ts = all_ts[:num_of_ts]
 
-    return all_ts
+    indexes = list(data[:num_of_ts].index.values)
+
+    return all_ts, indexes

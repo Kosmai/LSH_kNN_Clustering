@@ -147,7 +147,7 @@ if __name__ == '__main__':
             save_model = True
 
     try:
-        all_ts = read_dataset(dataset, n)
+        all_ts, _ = read_dataset(dataset, n)
     except:
         print('Error in reading dataset!')
         exit()

@@ -174,7 +174,7 @@ if __name__ == '__main__':
             mae_threshold = float(sys.argv[i + 1])
 
     try:
-        all_ts = read_dataset(dataset, n)
+        all_ts, _ = read_dataset(dataset, n)
     except:
         print('Error in reading dataset!')
         exit()
