@@ -182,12 +182,14 @@ if __name__ == '__main__':
     training_ratio = 0.7
     lookback = 200
 
+    # use pretrained model
     if pretrained_model is not None:
         try:
             model = load_model(pretrained_model)
         except:
             print('Error in loading pretrained model!')
             exit()
+    # train and test model
     else:
         try:
             if save_model:

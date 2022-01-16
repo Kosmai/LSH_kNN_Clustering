@@ -51,7 +51,6 @@ def create_forecast_set(ts, lookback):
 
 
 def train(all_ts, training_ratio, lookback, saved_model_name=None):
-    # create scaler
     all_ts_df = pd.DataFrame(all_ts[0])
 
     for series in all_ts[1:]:
