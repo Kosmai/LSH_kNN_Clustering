@@ -97,7 +97,7 @@ def test(all_ts, autoencoder, training_ratio, window_size):
         plt.show()
 
 
-def encode(all_ts, indexes, encoder, window_size, output_file_name):
+def encode(all_ts, indexes, encoder, window_size, output_file_name, output_query_name=None):
     print('Producing reduced time series, please wait...')
 
     reduced_df = None
@@ -141,22 +141,29 @@ def encode(all_ts, indexes, encoder, window_size, output_file_name):
 
         reduced_df = reduced_df.append(s)
 
-    reduced_df.to_csv(output_file_name, sep='\t', header=False)
+    if output_query_name is None:
+        reduced_df.to_csv(output_file_name, sep='\t', header=False)
+    else:
+        reduced_df[:-10].to_csv(output_file_name, sep='\t', header=False)
+        reduced_df[-10:].to_csv(output_query_name, sep='\t', header=False)
 
 
 if __name__ == '__main__':
-    pretrained_model = None
+    pretrained_model = 'models/reduce/reduce_model'
     training_ratio = 0.7
     n = 20
     dataset = 'datasets/nasdaq2007_17.csv'
-    output_file = 'reduced_stock_ts/out.csv'
+    output_dataset = 'reduced_stock_ts/input.csv'
+    output_query = 'reduced_stock_ts/query.csv'
     save_model = False
     output_size = None
 
     # read command line arguments
     for i, arg in enumerate(sys.argv):
         if arg == '-od':
-            output_file = sys.argv[i + 1]
+            output_dataset = sys.argv[i + 1]
+        if arg == '-oq':
+            output_query = sys.argv[i + 1]
         if arg == '-model':
             pretrained_model = sys.argv[i + 1]
         if arg == '-n':
@@ -172,7 +179,7 @@ if __name__ == '__main__':
         try:
             encoder = load_model(pretrained_model)
             all_ts, indexes = read_dataset(dataset, output_size)
-            encode(all_ts, indexes, encoder, 10, output_file)
+            encode(all_ts, indexes, encoder, 10, output_dataset, output_query)
         except:
             print('Error while using pretrained model!')
             exit()
